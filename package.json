@@ -1,19 +1,13 @@
 {
-  "name": "lower-case-dashed-name-of-project",
-  "repository": "REPOSITORY-NAME-AS-IT-APPEARS-IN-GITHUB-URL",
+  "name": "glider",
+  "repository": "426project",
   "version": "0.1.0",
-  "title": "PROJECT TITLE HERE",
-  "description": "SHORT DESCRIPTION OF PROJECT HERE. ONE TO TWO SENTENCES MAX",
+  "title": "Glider",
+  "description": "Stay afloat and try not to hit the ground in this infinite gliding game!",
   "keywords": [
     "Princeton",
-    "graphics",
-    "three.js",
-    "COS 426",
-    "ivy league",
-    "keyword1",
-    "keyword2",
-    "...",
-    "this last entry CANNOT have a comma after it ->"
+    "COS426",
+    "Glider"
   ],
   "scripts": {
     "start": "webpack-dev-server --mode development --output-public-path \"\"",
