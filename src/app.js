@@ -9,7 +9,7 @@
 import { WebGLRenderer, PerspectiveCamera, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SeedScene } from 'scenes';
-import { handleKeyPress } from './components/handlers/handlers.js';
+import  *  as handlers from './components/handlers/handlers.js';
 
 
 // Initialize core ThreeJS components
@@ -17,8 +17,13 @@ const scene = new SeedScene();
 const camera = new PerspectiveCamera();
 const renderer = new WebGLRenderer({ antialias: true });
 
+// Initialize global variables
+const keypress = {};
+const character = 'falcon';
+const sealevel = 0;
+
 // Set up camera
-camera.position.set(0, 3, 8);
+camera.position.set(0, 0, 8);
 camera.lookAt(new Vector3(0, 0, 0));
 
 // Set up renderer, canvas, and minor CSS adjustments
@@ -43,6 +48,8 @@ const onAnimationFrameHandler = (timeStamp) => {
     renderer.render(scene, camera);
     scene.update && scene.update(timeStamp);
     window.requestAnimationFrame(onAnimationFrameHandler);
+    handlers.handleCharacterControls(scene, keypress, character, camera);
+    // console.log(scene.getObjectByName('falcon').position.y-sealevel)
 };
 window.requestAnimationFrame(onAnimationFrameHandler);
 
@@ -56,6 +63,11 @@ const windowResizeHandler = () => {
 windowResizeHandler();
 window.addEventListener('resize', windowResizeHandler, false);
 
-window.addEventListener('keydown', event => handleKeyPress(scene, event), false);
+// deprecated
+// window.addEventListener('keydown', event => handleKeyPress(scene, "falcon", event), false);
+
+// Listen for user input (arrow keys)
+window.addEventListener('keydown', event=> handlers.handleKeyDown(event, keypress), false);
+window.addEventListener('keyup', event => handlers.handleKeyUp(event, keypress), false);
 
 
