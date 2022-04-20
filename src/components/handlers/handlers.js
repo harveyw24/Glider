@@ -1,3 +1,4 @@
+
 // this function results in uneven movement since holding down a key is equivalent to rapidly firing the keypress. However, you have to hold the key down for quite some time before the keypress events are evenly spaced. Deprecated
 // export function handleKeyPress(scene, name, event) {
 //     let obj = scene.getObjectByName(name);
@@ -68,6 +69,7 @@ export function handleCharacterControls(scene, keypress, character, camera) {
     
     // obj.position.y = clamp(obj.position.y, -h,h);
     // obj.position.x = clamp(obj.position.x, -w,w);
+
 
 
 }

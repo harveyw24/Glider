@@ -8,7 +8,7 @@ import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js';
 import MODEL from './scene.gltf';
 
 class Falcon extends Group {
-    constructor() {
+    constructor(parent) {
         // Call parent Group() constructor
         super();
 
@@ -78,7 +78,7 @@ class Falcon extends Group {
         // mixer.update( delta )
 
         // Add self to parent's update list
-        // parent.addToUpdateList(this);
+        parent.addToUpdateList(this);
 
         // Populate GUI
         // this.state.gui.add(this.state, 'bob');
@@ -106,20 +106,21 @@ class Falcon extends Group {
     //     jumpUp.start();
     // }
 
-    // update(timeStamp) {
-    //     if (this.state.bob) {
-    //         // Bob back and forth
-    //         this.rotation.z = 0.05 * Math.sin(timeStamp / 300);
-    //     }
-    //     if (this.state.twirl > 0) {
-    //         // Lazy implementation of twirl
-    //         this.state.twirl -= Math.PI / 8;
-    //         this.rotation.y += Math.PI / 8;
-    //     }
+    update(timeStamp) {
+        // if (this.state.bob) {
+        //     // Bob back and forth
+        //     this.rotation.z = 0.05 * Math.sin(timeStamp / 300);
+        // }
+        // if (this.state.twirl > 0) {
+        //     // Lazy implementation of twirl
+        //     this.state.twirl -= Math.PI / 8;
+        //     this.rotation.y += Math.PI / 8;
+        // }
 
-    //     // Advance tween animations, if any exist
-    //     TWEEN.update();
-    // }
+        // // Advance tween animations, if any exist
+        // TWEEN.update();
+        
+    }
 }
 
 export default Falcon;
