@@ -58,10 +58,27 @@ export function handleKeyUp(event, keypress) {
 
 export function handleCharacterControls(scene, keypress, character, camera) {
     let obj = scene.getObjectByName(character);
-    if (keypress['up']) obj.position.y += 0.1;
-    if (keypress['down']) obj.position.y -= 0.1;
-    if (keypress['right']) obj.position.x += 0.1;
-    if (keypress['left']) obj.position.x -= 0.1;
+    if (keypress['up']) {
+        obj.position.y += 0.1;
+        obj.box.min.y += 0.1;
+        obj.box.max.y += 0.1;
+    }
+    if (keypress['down']) {
+        obj.position.y -= 0.1;
+        obj.box.min.y -= 0.1;
+        obj.box.max.y -= 0.1;
+    }
+    if (keypress['right']) {
+        obj.position.x += 0.1;
+        obj.box.min.x += 0.1;
+        obj.box.max.x += 0.1;
+    }
+    if (keypress['left']) {
+        obj.position.x -= 0.1;
+        obj.box.min.x -= 0.1;
+        obj.box.max.x -= 0.1;
+    }
+
 
     // clamp to viewport, not working
     // let h = visibleHeightAtZDepth(5, camera);
@@ -72,4 +89,13 @@ export function handleCharacterControls(scene, keypress, character, camera) {
 
 
 
+}
+
+// placeholder function for now to handle collisions. Needs to be generalizable to any obstacle. Needs to make the character do something instead of phase right through - for example, crash animation.
+export function handleCollisions(scene, character){
+    let land = scene.getObjectByName('land');
+    let obj = scene.getObjectByName(character);
+    if (obj.box.intersectsBox(land.box)) {
+        console.log("collision")
+    }
 }

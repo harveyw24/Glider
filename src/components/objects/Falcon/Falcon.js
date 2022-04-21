@@ -24,8 +24,10 @@ class Falcon extends Group {
 
         this.name = 'falcon';
         loader.load(MODEL, (gltf) => {
+            this.box = new THREE.Box3().setFromObject(gltf.scene);
             this.add(gltf.scene);
         });
+        // this.box = new THREE.Box3().setFromObject(this)
 
         // Load object
         // const loader = new GLTFLoader();
@@ -119,7 +121,6 @@ class Falcon extends Group {
 
         // // Advance tween animations, if any exist
         // TWEEN.update();
-        
     }
 }
 

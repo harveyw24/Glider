@@ -23,7 +23,7 @@ const character = 'falcon';
 const sealevel = 0;
 
 // Set up camera
-camera.position.set(0, 0, 8);
+camera.position.set(0, 3, 8);
 camera.lookAt(new Vector3(0, 0, 0));
 
 // Set up renderer, canvas, and minor CSS adjustments
@@ -35,12 +35,12 @@ document.body.style.overflow = 'hidden'; // Fix scrolling
 document.body.appendChild(canvas);
 
 // Set up controls
-// const controls = new OrbitControls(camera, canvas);
-// controls.enableDamping = true;
-// controls.enablePan = false;
-// controls.minDistance = 4;
-// controls.maxDistance = 16;
-// controls.update();
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+controls.enablePan = false;
+controls.minDistance = 4;
+controls.maxDistance = 16;
+controls.update();
 
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {
@@ -49,6 +49,7 @@ const onAnimationFrameHandler = (timeStamp) => {
     scene.update && scene.update(timeStamp);
     window.requestAnimationFrame(onAnimationFrameHandler);
     handlers.handleCharacterControls(scene, keypress, character, camera);
+    handlers.handleCollisions(scene, character);
     // console.log(scene.getObjectByName('falcon').position.y-sealevel)
 };
 window.requestAnimationFrame(onAnimationFrameHandler);
