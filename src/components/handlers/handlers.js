@@ -58,27 +58,30 @@ export function handleKeyUp(event, keypress) {
 
 export function handleCharacterControls(scene, keypress, character, camera) {
     let obj = scene.getObjectByName(character);
-    if (keypress['up']) {
+    if (keypress['up'] && obj.position.y < 2) {
         obj.position.y += 0.1;
         obj.box.min.y += 0.1;
         obj.box.max.y += 0.1;
     }
-    if (keypress['down']) {
+    if (keypress['down'] && obj.position.y > -2) {
         obj.position.y -= 0.1;
         obj.box.min.y -= 0.1;
         obj.box.max.y -= 0.1;
     }
-    if (keypress['right']) {
+    if (keypress['right'] && obj.position.x < 4) {
+        obj.position.x += 0.1;
         obj.position.x += 0.1;
         obj.box.min.x += 0.1;
-        obj.box.max.x += 0.1;
+        obj.rotation.z += 0.015;
+        // need to somehow rotate bounding box
     }
-    if (keypress['left']) {
+    if (keypress['left'] && obj.position.x > -4) {
+        obj.position.x -= 0.1;
         obj.position.x -= 0.1;
         obj.box.min.x -= 0.1;
-        obj.box.max.x -= 0.1;
+        obj.rotation.z -= 0.015;
+        // need to somehow rotate bounding box
     }
-
 
     // clamp to viewport, not working
     // let h = visibleHeightAtZDepth(5, camera);

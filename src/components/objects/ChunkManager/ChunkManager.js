@@ -19,7 +19,10 @@ class ChunkManager extends Group {
     
 
     update(timeStamp) {
-        
+        for (let chunk of this.chunks) {
+            chunk.terrain.position.y += 0.1;
+            chunk.terrain.position.z += 0.2;
+        }
     }
 }
 export default ChunkManager;

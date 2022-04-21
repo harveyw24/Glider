@@ -23,7 +23,7 @@ const character = 'falcon';
 const sealevel = 0;
 
 // Set up camera
-camera.position.set(0, 3, 8);
+camera.position.set(0, 2, 8);
 camera.lookAt(new Vector3(0, 0, 0));
 
 // Set up renderer, canvas, and minor CSS adjustments
