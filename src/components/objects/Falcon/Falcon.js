@@ -119,7 +119,7 @@ class Falcon extends Group {
 
         // // Advance tween animations, if any exist
         // TWEEN.update();
-        
+        // this.position.z -= 0.02;
     }
 }
 
