@@ -19,7 +19,7 @@ const renderer = new WebGLRenderer({ antialias: true });
 
 // Initialize global variables
 const keypress = {};
-const character = 'falcon';
+const character = 'paper';
 const sealevel = 0;
 
 // Set up camera

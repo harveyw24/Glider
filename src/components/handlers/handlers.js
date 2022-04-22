@@ -96,9 +96,9 @@ export function handleCharacterControls(scene, keypress, character, camera) {
 
 // placeholder function for now to handle collisions. Needs to be generalizable to any obstacle. Needs to make the character do something instead of phase right through - for example, crash animation.
 export function handleCollisions(scene, character){
-    let land = scene.getObjectByName('land');
-    let obj = scene.getObjectByName(character);
-    if (obj.box.intersectsBox(land.box)) {
-        console.log("collision")
-    }
+    // let land = scene.getObjectByName('land');
+    // let obj = scene.getObjectByName(character);
+    // if (obj.box.intersectsBox(land.box)) {
+    //     console.log("collision")
+    // }
 }
