@@ -10,6 +10,9 @@ import { WebGLRenderer, PerspectiveCamera, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SeedScene } from 'scenes';
 import  *  as handlers from './components/handlers/handlers.js';
+import './styles.css';
+import START from './start.html'
+
 
 
 // Initialize core ThreeJS components
@@ -19,6 +22,7 @@ const renderer = new WebGLRenderer({ antialias: true });
 
 // Initialize global variables
 const keypress = {};
+const screens = {"menu": true, "ending": false};
 const character = 'paper';
 const sealevel = 0;
 
@@ -32,7 +36,7 @@ const canvas = renderer.domElement;
 canvas.style.display = 'block'; // Removes padding below canvas
 document.body.style.margin = 0; // Removes margin around page
 document.body.style.overflow = 'hidden'; // Fix scrolling
-document.body.appendChild(canvas);
+// document.body.appendChild(canvas);
 
 // Set up controls
 const controls = new OrbitControls(camera, canvas);
@@ -45,12 +49,15 @@ controls.update();
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {
     // controls.update();
-    renderer.render(scene, camera);
-    scene.update && scene.update(timeStamp);
     window.requestAnimationFrame(onAnimationFrameHandler);
-    handlers.handleCharacterControls(scene, keypress, character, camera);
-    handlers.handleCollisions(scene, character);
+    if (!screens["menu"] && !screens["ending"]) {
+        renderer.render(scene, camera);
+        scene.update && scene.update(timeStamp);
+        handlers.handleCharacterControls(scene, keypress, character, camera);
+        handlers.handleCollisions(scene, character);
     // console.log(scene.getObjectByName('falcon').position.y-sealevel)
+    
+    }
 };
 window.requestAnimationFrame(onAnimationFrameHandler);
 
@@ -64,11 +71,17 @@ const windowResizeHandler = () => {
 windowResizeHandler();
 window.addEventListener('resize', windowResizeHandler, false);
 
-
-// deprecated
-// window.addEventListener('keydown', event => handleKeyPress(scene, "falcon", event), false);
-
 // Listen for user input (arrow keys)
+/**************************EVENT LISTENERS*****************************/
 window.addEventListener('keydown', event=> handlers.handleKeyDown(event, keypress), false);
 window.addEventListener('keyup', event => handlers.handleKeyUp(event, keypress), false);
+window.addEventListener('keydown', event => handlers.handleMenu(event, screens, document, canvas));
 
+
+/**************************HTML*****************************/
+// idea from https://github.com/efyang/portal-0.5/blob/main/src/app.js
+// https://github.com/efyang/portal-0.5/blob/main/src/instructions.html
+let menu = document.createElement('div');
+menu.id = 'menu';
+menu.innerHTML = START;
+document.body.appendChild(menu)

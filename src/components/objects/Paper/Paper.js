@@ -24,7 +24,7 @@ class Paper extends Group {
             gltf.scene.position.y += ( gltf.scene.position.y - center.y );
             gltf.scene.position.z += ( gltf.scene.position.z - center.z );
             this.add(gltf.scene);
-            this.box = new THREE.Box3().setFromObject(gltf.scene);
+            this.box = new THREE.Box3().setFromObject(gltf.scene, true);
         });
     }
 }

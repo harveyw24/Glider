@@ -1,0 +1,18 @@
+html * {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Source for centering: https://stackoverflow.com/questions/9862167/positioning-div-element-at-center-of-screen */
+#menu {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    text-align: center;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+#title {
+    font-size: 3rem;
+
+}

@@ -14,7 +14,7 @@ class Land extends Group {
 
         loader.load(MODEL, (gltf) => {
             this.add(gltf.scene);
-            this.box = new THREE.Box3().setFromObject(gltf.scene);
+            this.box = new THREE.Box3().setFromObject(gltf.scene, true);
         });
     }
 }
