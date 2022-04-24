@@ -17,6 +17,8 @@ class Chunk extends Group {
         this.terrain = new Terrain(parent, xOffset, yOffset, zOffset, plane_geometry)
         this.add(this.terrain);
   
+        this.setChunkPosition(xOffset, yOffset, zOffset);
+
         // if(parent.state.displayClouds == true) {
         //   this.cloud1 = new Cloud(parent,0);
         //   this.add(this.cloud1);
@@ -30,8 +32,8 @@ class Chunk extends Group {
         //   this.add(this.orb1);
         // }
   
-        this.position.x = -1000;
-        this.position.z = -1000;
+        // this.position.x = -1000;
+        // this.position.z = -1000;
     }
   
     updateNoise() {

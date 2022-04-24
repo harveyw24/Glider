@@ -6,29 +6,16 @@ const terrainSize = {width: 1000, height: 1000, vertsWidth: 100, vertsHeight: 10
 
 class Terrain extends Group {
 
-    constructor(parent) {
+    constructor(parent, xOffset, yOffset, zOffset) {
         // Call parent Group() constructor
         super();
 
-        // Init state
-        this.state = {
-            gui: parent.state.gui,
-            octaves: 16,
-            // amplitude: 1, // Does nothing
-            exaggeration: 20,
-            waterLevel: 0,
-            waterColor: new Color(50, 90, 145),
-            bankColor: new Color(0, 255, 0),
-            middleColor: new Color(255, 0, 0),
-            peakColor: new Color(0, 0, 255),
-            colorWiggle: 0.1,
-            middleGradient: 0.5,
-            randSeed: 4,
-            freq: 1,
-            breathOffset: 5,
-            breathLength: 5,
-            currentOffset: 0
-        };
+        // take state from parent = chunkManager
+        this.state = parent.state;
+
+        this.state.xOffset = xOffset;
+        this.state.yOffset = yOffset;
+        this.state.zOffset = zOffset;
 
         // create the plane
         this.geometry = new PlaneGeometry(terrainSize.width,terrainSize.height,
@@ -59,32 +46,8 @@ class Terrain extends Group {
         this.add(terrain);
 
         // Add self to parent's update list
-        parent.addToUpdateList(this);
+        // parent.addToUpdateList(this);
 
-        // Populate GUI
-        var folder1 = this.state.gui.addFolder( 'BREATH' );
-        folder1.add(this.state, 'breathLength', 0, 20);
-        folder1.add(this.state, 'breathOffset', 0, 100);
-
-        // Related to perlin noise, so call updateNoise which updates everything
-        var folder0 = this.state.gui.addFolder( 'TERRAIN GENERATION FACTORS' );
-        folder0.add(this.state, 'octaves', 1, 16).name("Jaggedness").onChange(() => this.updateNoise()) ;
-        // folder0.add(this.state, 'amplitude', 0, 10).onChange(() => this.updateNoise());
-        folder0.add(this.state, 'freq', 1, 10).name("Peaks").onChange(() => this.updateNoise());
-        folder0.add(this.state, 'randSeed', 0, 10).name("World Seed").onChange(() => this.updateSimplexSeed());
-
-        // Related to the look of the terrain and don't need to recalculate height map again
-        var folder = this.state.gui.addFolder( 'TERRAIN LOOK FACTORS' );
-        folder.add(this.state, 'exaggeration', 0, 70).onChange(() => this.updateTerrainGeo());
-        folder.add(this.state, 'waterLevel', -100, 100).name("Water Level").onChange(() => this.updateTerrainGeo());
-        folder.add(this.state, 'colorWiggle', -1, 1).name("Color Texturing").onChange(() => this.updateTerrainGeo());
-        folder.add(this.state, 'middleGradient', 0, 1).name("Peak Height").onChange(() => this.updateTerrainGeo());
-        folder.addColor(this.state, 'waterColor').name("Water Color").onChange(() => this.updateTerrainGeo());
-        folder.addColor(this.state, 'bankColor').name("Bank Color").onChange(() => this.updateTerrainGeo());
-        folder.addColor(this.state, 'middleColor').name("Middle Color").onChange(() => this.updateTerrainGeo());
-        folder.addColor(this.state, 'peakColor').name("Peak Color").onChange(() => this.updateTerrainGeo());
-
-        folder.open();
     }
 
     update(timeStamp, x, y, z) {
@@ -204,10 +167,14 @@ class Terrain extends Group {
           canvas[i] = new Array(terrainSize.vertsWidth);
         }
 
-        for(let i=0; i<terrainSize.vertsHeight; i++) {
+        console.log(this.state.zOffset);
+        for(let i = 0; i<terrainSize.vertsHeight; i++) {
             for(let j=0; j<terrainSize.vertsWidth; j++) {
-                let v =  this.octave(i/terrainSize.vertsWidth,j/terrainSize.vertsHeight,this.state.octaves, simplex)
-                canvas[i][j] = v
+                let nx = j/terrainSize.vertsWidth;;
+                let ny = (i + this.state.zOffset/10 - this.state.zOffset/this.state.chunkWidth)/terrainSize.vertsHeight;
+                let v =  this.octave(nx, ny, this.state.octaves, simplex);
+                if (j == 0) console.log(nx, ny);
+                canvas[i][j] = v;
             }
         }
         return canvas
