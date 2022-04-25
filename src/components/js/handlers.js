@@ -1,46 +1,11 @@
-
-// this function results in uneven movement since holding down a key is equivalent to rapidly firing the keypress. However, you have to hold the key down for quite some time before the keypress events are evenly spaced. Deprecated
-// export function handleKeyPress(scene, name, event) {
-//     let obj = scene.getObjectByName(name);
-//     let position = obj.position;
-//     if (event.key == "ArrowUp") {
-//        obj.position.set(position.x,position.y+0.2,position.z)
-//     }
-//     if (event.key == "ArrowDown") {
-//         obj.position.set(position.x,position.y-0.2,position.z)
-//     }
-//     if (event.key == "ArrowLeft") {
-//         obj.position.set(position.x - 0.2,position.y,position.z)
-//     }
-//     if (event.key == "ArrowRight") {
-//         obj.position.set(position.x + 0.2,position.y,position.z)
-//     }
-// }
-
 import * as THREE from "three";
+import * as pages from "./pages.js"
+import END from '../../ending.html'
+import START from '../../start.html'
 
 function clamp (val,min,max) {
     return Math.max(min,Math.min(max,val));
 }
-
-// https://discourse.threejs.org/t/functions-to-calculate-the-visible-width-height-at-a-given-z-depth-from-a-perspective-camera/269
-// const visibleHeightAtZDepth = ( depth, camera ) => {
-//     // compensate for cameras not positioned at z=0
-//     const cameraOffset = camera.position.z;
-//     if ( depth < cameraOffset ) depth -= cameraOffset;
-//     else depth += cameraOffset;
-  
-//     // vertical fov in radians
-//     const vFOV = camera.fov * Math.PI / 180; 
-  
-//     // Math.abs to ensure the result is always positive
-//     return 2 * Math.tan( vFOV / 2 ) * Math.abs( depth );
-//   };
-  
-//   const visibleWidthAtZDepth = ( depth, camera ) => {
-//     const height = visibleHeightAtZDepth( depth, camera );
-//     return height * camera.aspect;
-//   };
 
 export function handleKeyDown(event, keypress) {
     if (event.key == "ArrowUp") keypress['up'] = true;
@@ -94,14 +59,30 @@ export function handleCharacterControls(scene, keypress, character, camera) {
 
 }
 
-// Menu
-export function handleMenu(event, screens, document, canvas) {
-    if (event.key == " " && screens["menu"]) {
-        console.log('hello')
-        let menu = document.getElementById("menu");
-        menu.remove();
-        document.body.appendChild(canvas);
+// Handle screens
+export function handleScreens(event, screens, document, canvas, restart) {
+    if (event.key == 'q') {
+        screens['menu'] = false;
+        screens['paused'] = false;
+        screens['ending'] = true;
+        pages.quit(document);
+    }
+    else if (event.key == " " && screens["ending"]) {
+        screens["ending"] = false;
+        screens['pause'] = false;
+        screens['menu'] = true;
+        restart.value = true;
+        pages.init_page(document)
+    }
+    else if (event.key == " " && screens["menu"]) {
         screens["menu"] = false;
+        pages.start(document, canvas, restart);
+    }
+    else if (event.key == " " && screens["pause"]) {
+        screens["pause"] = false;
+    }
+    else if (event.key == " " && !screens["ending"]) {
+        screens["pause"] = true;
     }
 }
 
@@ -113,4 +94,6 @@ export function handleCollisions(scene, character){
         console.log("collision")
     }
 }
+
+
 

@@ -17,14 +17,14 @@ class Paper extends Group {
             // gltf.scene.position.x = 0; 
             // gltf.scene.position.y = 0;
             // gltf.scene.position.z = 0;
-            const box = new THREE.Box3().setFromObject( gltf.scene );
+            const box = new THREE.Box3().setFromObject( gltf.scene, true);
             const center = box.getCenter( new THREE.Vector3() );
 
             gltf.scene.position.x += ( gltf.scene.position.x - center.x );
             gltf.scene.position.y += ( gltf.scene.position.y - center.y );
             gltf.scene.position.z += ( gltf.scene.position.z - center.z );
             this.add(gltf.scene);
-            this.box = new THREE.Box3().setFromObject(gltf.scene, true);
+            this.box = box;
         });
     }
 }

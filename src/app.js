@@ -9,22 +9,24 @@
 import { WebGLRenderer, PerspectiveCamera, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SeedScene } from 'scenes';
-import  *  as handlers from './components/handlers/handlers.js';
+import  *  as handlers from './components/js/handlers.js';
+import * as pages from "./components/js/pages.js";
 import './styles.css';
-import START from './start.html'
+import * as THREE from 'three';
+import { apply } from 'file-loader';
 
 
 
 // Initialize core ThreeJS components
-const scene = new SeedScene();
+let scene = new SeedScene();
 const camera = new PerspectiveCamera();
 const renderer = new WebGLRenderer({ antialias: true });
 
 // Initialize global variables
 const keypress = {};
-const screens = {"menu": true, "ending": false};
+const screens = {"menu": true, "ending": false, "pause":false};
 const character = 'paper';
-const sealevel = 0;
+const restart = {value: false};
 
 // Set up camera
 camera.position.set(0, 2, 8);
@@ -33,10 +35,10 @@ camera.lookAt(new Vector3(0, 0, 0));
 // Set up renderer, canvas, and minor CSS adjustments
 renderer.setPixelRatio(window.devicePixelRatio);
 const canvas = renderer.domElement;
+canvas.id = 'canvas';
 canvas.style.display = 'block'; // Removes padding below canvas
 document.body.style.margin = 0; // Removes margin around page
 document.body.style.overflow = 'hidden'; // Fix scrolling
-// document.body.appendChild(canvas);
 
 // Set up controls
 const controls = new OrbitControls(camera, canvas);
@@ -48,13 +50,25 @@ controls.update();
 
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {
+    if (restart.value) {
+        restart.value = false;
+        scene = new SeedScene();
+    }
     // controls.update();
     window.requestAnimationFrame(onAnimationFrameHandler);
-    if (!screens["menu"] && !screens["ending"]) {
+    if (!screens["menu"] && !screens["ending"] && !screens["pause"]) {
         renderer.render(scene, camera);
         scene.update && scene.update(timeStamp);
         handlers.handleCharacterControls(scene, keypress, character, camera);
-        handlers.handleCollisions(scene, character);
+        // handlers.handleCollisions(scene, character);
+
+        // let land = scene.getObjectByName('land');
+        // let boxHelper = new THREE.BoxHelper( land, 0xffffff );
+        // scene.add(boxHelper);
+
+        // let plane = scene.getObjectByName('paper');
+        // let boxHelper2 = new THREE.BoxHelper( plane, 0xffffff );
+        // scene.add(boxHelper2);
     // console.log(scene.getObjectByName('falcon').position.y-sealevel)
     
     }
@@ -75,13 +89,8 @@ window.addEventListener('resize', windowResizeHandler, false);
 /**************************EVENT LISTENERS*****************************/
 window.addEventListener('keydown', event=> handlers.handleKeyDown(event, keypress), false);
 window.addEventListener('keyup', event => handlers.handleKeyUp(event, keypress), false);
-window.addEventListener('keydown', event => handlers.handleMenu(event, screens, document, canvas));
+window.addEventListener('keydown', event => handlers.handleScreens(event, screens, document, canvas, restart));
 
+/**********************************************************************/
 
-/**************************HTML*****************************/
-// idea from https://github.com/efyang/portal-0.5/blob/main/src/app.js
-// https://github.com/efyang/portal-0.5/blob/main/src/instructions.html
-let menu = document.createElement('div');
-menu.id = 'menu';
-menu.innerHTML = START;
-document.body.appendChild(menu)
+pages.init_page(document);
