@@ -9,8 +9,8 @@
 import { WebGLRenderer, PerspectiveCamera, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SeedScene } from 'scenes';
-import  *  as handlers from './components/js/handlers.js';
-import * as pages from "./components/js/pages.js";
+import  *  as handlers from './js/handlers.js';
+import * as pages from "./js/pages.js";
 import './styles.css';
 import * as THREE from 'three';
 import { apply } from 'file-loader';
@@ -60,7 +60,7 @@ const onAnimationFrameHandler = (timeStamp) => {
         renderer.render(scene, camera);
         scene.update && scene.update(timeStamp);
         handlers.handleCharacterControls(scene, keypress, character, camera);
-        // handlers.handleCollisions(scene, character);
+        handlers.handleCollisions(scene, character);
 
         // let land = scene.getObjectByName('land');
         // let boxHelper = new THREE.BoxHelper( land, 0xffffff );

@@ -1,7 +1,5 @@
 import * as THREE from "three";
 import * as pages from "./pages.js"
-import END from '../../ending.html'
-import START from '../../start.html'
 
 function clamp (val,min,max) {
     return Math.max(min,Math.min(max,val));
@@ -90,10 +88,24 @@ export function handleScreens(event, screens, document, canvas, restart) {
 export function handleCollisions(scene, character){
     let land = scene.getObjectByName('land');
     let obj = scene.getObjectByName(character);
-    if (obj.box.intersectsBox(land.box)) {
-        console.log("collision")
-    }
+    let meshes = [];
+    findType(land, 'Mesh', meshes)
+    let ray = new THREE.Raycaster(obj.position, new THREE.Vector3(0,-1,0));
+    let collisions = ray.intersectObjects(meshes);
+    collisions.forEach(collision => {
+        if (collision.distance < 0.2) console.log('collision');
+    })
+
 }
 
+// inspired by https://stackoverflow.com/questions/56680582/how-can-i-get-the-geometry-from-a-gltf-object
+function findType(object, type, arr) {
+    object.children.forEach((child) => {
+        if (child.type === type) {
+            arr.push(child)
+        }
+        findType(child, type, arr);
+    });
+}
 
 

@@ -1,6 +1,6 @@
-import START from "../../start.html"
-import FOOTER from "../../footer.html"
-import END from "../../ending.html"
+import START from "../start.html"
+import FOOTER from "../footer.html"
+import END from "../ending.html"
 
 
 // idea from https://github.com/efyang/portal-0.5/blob/main/src/app.js

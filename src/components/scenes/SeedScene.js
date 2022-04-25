@@ -29,7 +29,7 @@ class SeedScene extends Scene {
         // const terrain = new Terrain(this);
         const chunkManager = new ChunkManager(this);
         this.chunkManager = chunkManager;
-        this.add(lights, paper, chunkManager);
+        this.add(lights, land, paper, chunkManager);
         
 
 
