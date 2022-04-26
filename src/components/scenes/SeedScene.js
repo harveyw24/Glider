@@ -3,6 +3,8 @@ import { Scene, Color } from 'three';
 import { Flower, Land, Kite, Falcon, Paper, Terrain, ChunkManager} from 'objects';
 import { BasicLights } from 'lights';
 import * as THREE from 'three'
+import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js'
+import * as utils from "../../js/utils.js"
 
 class SeedScene extends Scene {
     constructor() {
@@ -23,7 +25,6 @@ class SeedScene extends Scene {
         
         // Add meshes to scene
         const land = new Land();
-        // const falcon = new Falcon(this);
         const paper = new Paper(this)
         const lights = new BasicLights();
         // const terrain = new Terrain(this);

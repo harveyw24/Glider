@@ -146,13 +146,12 @@ class Terrain extends Group {
             }
         }
         for (let i = treeIndex; i < this.trees.length; i++) this.trees[i].visible = false;
-        console.log(treeIndex);
     }
 
     updateNoise() {
         this.updateHeightMap();
         this.updateTerrainGeo();
-        // this.updateTrees();
+        this.updateTrees();
     }
 
     // from https://medium.com/@joshmarinacci/low-poly-style-terrain-generation-8a017ab02e7b

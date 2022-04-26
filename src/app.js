@@ -21,12 +21,25 @@ import { apply } from 'file-loader';
 let scene = new SeedScene();
 const camera = new PerspectiveCamera();
 const renderer = new WebGLRenderer({ antialias: true });
+const listener = new THREE.AudioListener();
+camera.add( listener );
+const sound = new THREE.Audio( listener );
+const clock = new THREE.Clock();
+
+const audioLoader = new THREE.AudioLoader();
+audioLoader.load( 'src/sounds/menu.wav', function( buffer ) {
+	sound.setBuffer( buffer );
+	sound.setLoop( true );
+	sound.setVolume( 0.5 );
+});
 
 // Initialize global variables
 const keypress = {};
 const screens = {"menu": true, "ending": false, "pause":false};
 const character = 'paper';
-const restart = {value: false};
+let score;
+let score_num = 0;
+let oldTime = 0;
 
 // Set up camera
 camera.position.set(0, 2, 8);
@@ -48,11 +61,13 @@ controls.minDistance = 4;
 controls.maxDistance = 16;
 controls.update();
 
+clock.start()
+
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {
-    if (restart.value) {
-        restart.value = false;
+    if (screens['menu']) {
         scene = new SeedScene();
+        score_num = 0;
     }
     // controls.update();
     window.requestAnimationFrame(onAnimationFrameHandler);
@@ -60,7 +75,15 @@ const onAnimationFrameHandler = (timeStamp) => {
         renderer.render(scene, camera);
         scene.update && scene.update(timeStamp);
         handlers.handleCharacterControls(scene, keypress, character, camera);
-        handlers.handleCollisions(scene, character);
+        let elapsed = clock.getElapsedTime();
+        if (elapsed - oldTime > 0.2) { 
+            handlers.handleCollisions(scene, character);
+            oldTime = elapsed;
+        }
+        score_num += 0.01;
+        score = score_num.toFixed(2);
+        handlers.updateScore(document, score)
+        // console.log(score)
 
         // let land = scene.getObjectByName('land');
         // let boxHelper = new THREE.BoxHelper( land, 0xffffff );
@@ -89,7 +112,7 @@ window.addEventListener('resize', windowResizeHandler, false);
 /**************************EVENT LISTENERS*****************************/
 window.addEventListener('keydown', event=> handlers.handleKeyDown(event, keypress), false);
 window.addEventListener('keyup', event => handlers.handleKeyUp(event, keypress), false);
-window.addEventListener('keydown', event => handlers.handleScreens(event, screens, document, canvas, restart));
+window.addEventListener('keydown', event => handlers.handleScreens(event, screens, document, canvas, sound, score));
 
 /**********************************************************************/
 

@@ -4,14 +4,14 @@ body, html {
 }
 
 /* Source for centering: https://stackoverflow.com/questions/9862167/positioning-div-element-at-center-of-screen */
-#menu {
+#menu, #ending {
     background-image: url(images/sky.png);
     background-size: cover;
     background-position-y: center;
     height: 100%;
 }
 
-#start {
+#start, #end {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -20,10 +20,9 @@ body, html {
     transform: translate(-50%, -50%);
 }
 
-#title {
+#title, #finalScore {
     font-size: 3rem;
 }
-
 /* Inspired by https://cssdeck.com/blog/how-to-create-a-sticky-footer-using-css/ */
 #footer{
     position: fixed;
@@ -34,4 +33,27 @@ body, html {
     background: white;
     color: rgb(255, 122, 60);
     padding-left: 50px;
+}
+
+#score{
+    position: fixed;
+    right: 0px;
+    top: 0px;
+    height: 50px;
+    width: 100%;
+    color: white;
+    font-weight: bold;
+    font-size: 2rem;
+}
+
+#instructions{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    height: 50px;
+    width: 100%;
+    margin-right: 0;
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    color: white;
 }

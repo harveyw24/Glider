@@ -11,6 +11,8 @@ class ChunkManager extends Group {
 
         super();
 
+        this.name = 'chunkManager';
+
         this.state = {
             gui: parent.state.gui,
             parent: parent,
@@ -113,7 +115,6 @@ class ChunkManager extends Group {
             this.chunks.push(this.chunks.shift());
 
             this.anchor.z = this.position.z;
-            console.log("Moving anchor to", this.anchor.z);
         }
     }
 }

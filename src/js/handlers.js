@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import * as pages from "./pages.js"
+import * as utils from "./utils.js"
 
 function clamp (val,min,max) {
     return Math.max(min,Math.min(max,val));
@@ -56,56 +57,85 @@ export function handleCharacterControls(scene, keypress, character, camera) {
 
 
 }
-
 // Handle screens
-export function handleScreens(event, screens, document, canvas, restart) {
+export function handleScreens(event, screens, document, canvas, sound, score) {
+    // quit: game -> ending
     if (event.key == 'q') {
         screens['menu'] = false;
         screens['paused'] = false;
         screens['ending'] = true;
-        pages.quit(document);
+        pages.quit(document, score);
+        sound.stop()
     }
+    // restart: ending -> menu
     else if (event.key == " " && screens["ending"]) {
         screens["ending"] = false;
         screens['pause'] = false;
         screens['menu'] = true;
-        restart.value = true;
         pages.init_page(document)
     }
+    // start: menu -> game
     else if (event.key == " " && screens["menu"]) {
         screens["menu"] = false;
-        pages.start(document, canvas, restart);
+        pages.start(document, canvas);
+        sound.play()
     }
+     // unpause: pause -> game
     else if (event.key == " " && screens["pause"]) {
         screens["pause"] = false;
+        sound.setVolume(0.5);
     }
+   // unpause: pause -> game
     else if (event.key == " " && !screens["ending"]) {
         screens["pause"] = true;
+        sound.setVolume(0.2);
     }
 }
 
 // placeholder function for now to handle collisions. Needs to be generalizable to any obstacle. Needs to make the character do something instead of phase right through - for example, crash animation.
 export function handleCollisions(scene, character){
     let land = scene.getObjectByName('land');
+    let chunkManager = scene.getObjectByName('chunkManager');
     let obj = scene.getObjectByName(character);
     let meshes = [];
-    findType(land, 'Mesh', meshes)
-    let ray = new THREE.Raycaster(obj.position, new THREE.Vector3(0,-1,0));
-    let collisions = ray.intersectObjects(meshes);
-    collisions.forEach(collision => {
-        if (collision.distance < 0.2) console.log('collision');
-    })
+    let plane = [];
+    utils.findType(land, 'Mesh', meshes)
+    utils.findType(chunkManager, 'Mesh', meshes)
+
+    utils.findType(obj, 'Mesh', plane);
+    let pos = plane[0].geometry.attributes.position;
+    let norm = plane[0].geometry.attributes.normal;
+    let matWorld = plane[0].matrixWorld;
+    const vector_pos = new THREE.Vector3();
+    const vector_norm = new THREE.Vector3();
+    
+    for (let i = 0; i < pos.count; i += 30) {
+        vector_pos.fromBufferAttribute(pos, i);
+        vector_pos.applyMatrix4(matWorld);
+        vector_norm.fromBufferAttribute(norm, i);
+        vector_norm.applyMatrix4(matWorld);
+        let ray = new THREE.Raycaster(vector_pos, vector_norm);
+        let collisions = ray.intersectObjects(meshes, false);
+        collisions.forEach(collision => {
+            if (collision.distance < 0.2) console.log('collision');
+        })
+    }
+   
+
+    // let ray = new THREE.Raycaster(obj.position, new THREE.Vector3(0,-1,0));
+    // let collisions = ray.intersectObjects(meshes);
+    // collisions.forEach(collision => {
+    //     if (collision.distance < 0.2) console.log('collision');
+    // })
 
 }
 
-// inspired by https://stackoverflow.com/questions/56680582/how-can-i-get-the-geometry-from-a-gltf-object
-function findType(object, type, arr) {
-    object.children.forEach((child) => {
-        if (child.type === type) {
-            arr.push(child)
-        }
-        findType(child, type, arr);
-    });
+
+export function updateScore(document, score) {
+    let scoreCounter = document.getElementById('score');
+    scoreCounter.innerHTML = 'Score: '.concat(score)
 }
+
+
 
 
