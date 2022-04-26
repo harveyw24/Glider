@@ -1,7 +1,8 @@
 import { Group, Color, PlaneBufferGeometry, VertexColors, PlaneGeometry, MeshStandardMaterial, MeshLambertMaterial, Mesh, Vector2 } from 'three';
 import SimplexNoise from 'simplex-noise';
 //import { Water } from 'three/examples/js/objects/Water.js';
-import { Land } from '../Land';
+import { Tree } from '../Tree';
+import { Cloud } from '../Cloud';
 
 class Terrain extends Group {
 
@@ -26,11 +27,15 @@ class Terrain extends Group {
         this.geometry.colorsNeedUpdate = true;
 
 
-        this.trees = Array.from(Array(this.CMState.maxTreeNum), () => new Land());
+        this.trees = Array.from(Array(this.CMState.maxTreeNum), () => new Tree());
+        this.clouds = Array.from(Array(this.CMState.maxCloudNum), () => new Cloud());
         for (const tree of this.trees) {
             this.add(tree);
             tree.visible = false;
-            tree.scale.set(2, 10, 2);
+        }
+        for (const cloud of this.clouds) {
+            this.add(cloud);
+            cloud.visible = false;
         }
 
         const terrain = new Mesh(this.geometry, new MeshLambertMaterial({
@@ -41,8 +46,7 @@ class Terrain extends Group {
         this.add(terrain);
 
         // update location on the map
-        this.groundY = -200 //-249;
-        terrain.position.y = this.groundY - 1;
+        terrain.position.y = this.CMState.groundY - 1;
         terrain.rotation.x = -Math.PI / 2;
         terrain.receiveShadow = true;
 
@@ -131,8 +135,9 @@ class Terrain extends Group {
         this.geometry.computeFlatVertexNormals();
     }
 
-    updateTrees() {
+    updateObstacles() {
         let treeIndex = 0;
+        let cloudIndex = 0;
 
         for (let i = 0; i < this.heightMap.length; i++) {
             for (let j = 0; j < this.heightMap[0].length; j++) {
@@ -140,18 +145,23 @@ class Terrain extends Group {
                 const v = this.geometry.vertices[index];
                 if (treeIndex < this.trees.length && this.CMState.treeHeightMin < v.z && Math.random() < .02) {
                     this.trees[treeIndex].visible = true;
-                    this.trees[treeIndex].position.set(v.x, v.z + this.groundY, -v.y); // plane is rotated
+                    this.trees[treeIndex].position.set(v.x, v.z + this.CMState.groundY, -v.y); // plane is rotated
                     treeIndex++;
+                } else if (cloudIndex < this.clouds.length && Math.random() < .005) {
+                    this.clouds[cloudIndex].visible = true;
+                    this.clouds[cloudIndex].position.set(v.x, 0, -v.y); // plane is rotated
+                    cloudIndex++;
                 }
             }
         }
         for (let i = treeIndex; i < this.trees.length; i++) this.trees[i].visible = false;
+        for (let i = cloudIndex; i < this.clouds.length; i++) this.clouds[i].visible = false;
     }
 
     updateNoise() {
         this.updateHeightMap();
         this.updateTerrainGeo();
-        this.updateTrees();
+        this.updateObstacles();
     }
 
     // from https://medium.com/@joshmarinacci/low-poly-style-terrain-generation-8a017ab02e7b

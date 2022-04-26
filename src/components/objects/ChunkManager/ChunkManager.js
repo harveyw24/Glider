@@ -2,7 +2,7 @@ import { Group, Color, PlaneBufferGeometry, PlaneGeometry } from 'three';
 import { Chunk } from '../Chunk';
 
 // SET THESE TO CHANGE CHUNK DIMENSIONS
-const startYBelow = 200;
+const groundY = -200;
 const chunkPxWidth = 1000;
 const chunkVertexWidth = 100;
 
@@ -19,6 +19,7 @@ class ChunkManager extends Group {
             chunkWidth: chunkPxWidth,
             chunkVertWidth: chunkVertexWidth,
             totalVertWidth: chunkVertexWidth * 3, // chunkVertWidth * 3
+            groundY: groundY,
             currentXOffset: 0,
             currentZOffset: 0,
             breathOffset: 5,
@@ -37,6 +38,7 @@ class ChunkManager extends Group {
             freq: 4.4,
             currentOffset: 0,
             maxTreeNum: 100,
+            maxCloudNum: 100,
             treeHeightMin: 0,
         }
 
