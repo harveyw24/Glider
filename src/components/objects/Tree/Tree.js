@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Group } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
-import MODEL from './land.gltf'; // change to scene.gltf when tree is fixed
+import MODEL from './scene.gltf'; // change to scene.gltf when tree is fixed
 
 class Tree extends Group {
     constructor(parent) {
@@ -14,6 +14,7 @@ class Tree extends Group {
 
         this.name = 'tree';
         loader.load(MODEL, (gltf) => {
+            gltf.scene.scale.multiplyScalar(0.5);
             this.box = new THREE.Box3().setFromObject(gltf.scene);
             this.add(gltf.scene);
         });
