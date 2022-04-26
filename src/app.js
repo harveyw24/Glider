@@ -72,9 +72,7 @@ const onAnimationFrameHandler = (timeStamp) => {
         plane.position.y = 0;
         plane.position.z = 0;
 
-        chunkManager.position.x = 0;
         chunkManager.position.y = 0;
-        chunkManager.position.z = 10;
 
         score_num = 0;
     }
