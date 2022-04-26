@@ -66,7 +66,16 @@ clock.start()
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {
     if (screens['menu']) {
-        scene = new SeedScene();
+        let plane = scene.getObjectByName(character);
+        let chunkManager = scene.getObjectByName('chunkManager');
+        plane.position.x = 0;
+        plane.position.y = 0;
+        plane.position.z = 0;
+
+        chunkManager.position.x = 0;
+        chunkManager.position.y = 0;
+        chunkManager.position.z = 10;
+
         score_num = 0;
     }
     // controls.update();
@@ -76,7 +85,7 @@ const onAnimationFrameHandler = (timeStamp) => {
         scene.update && scene.update(timeStamp);
         handlers.handleCharacterControls(scene, keypress, character, camera);
         let elapsed = clock.getElapsedTime();
-        if (elapsed - oldTime > 0.2) { 
+        if (elapsed - oldTime > 0.1) { 
             handlers.handleCollisions(scene, character);
             oldTime = elapsed;
         }

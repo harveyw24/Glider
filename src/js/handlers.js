@@ -36,14 +36,14 @@ export function handleCharacterControls(scene, keypress, character, camera) {
         obj.position.x += 0.1;
         obj.position.x += 0.1;
         obj.box.min.x += 0.1;
-        obj.rotation.z += 0.015;
+        // obj.rotation.z += 0.015;
         // need to somehow rotate bounding box
     }
     if (keypress['left'] && obj.position.x > -4) {
         obj.position.x -= 0.1;
         obj.position.x -= 0.1;
         obj.box.min.x -= 0.1;
-        obj.rotation.z -= 0.015;
+        // obj.rotation.z -= 0.015;
         // need to somehow rotate bounding box
     }
 
@@ -94,39 +94,39 @@ export function handleScreens(event, screens, document, canvas, sound, score) {
 
 // placeholder function for now to handle collisions. Needs to be generalizable to any obstacle. Needs to make the character do something instead of phase right through - for example, crash animation.
 export function handleCollisions(scene, character){
-    // let land = scene.getObjectByName('land');
-    // let chunkManager = scene.getObjectByName('chunkManager');
-    // let obj = scene.getObjectByName(character);
-    // let meshes = [];
-    // let plane = [];
-    // utils.findType(land, 'Mesh', meshes)
+    let land = scene.getObjectByName('land');
+    let chunkManager = scene.getObjectByName('chunkManager');
+    let obj = scene.getObjectByName(character);
+    let meshes = [];
+    let plane = [];
+    utils.findType(land, 'Mesh', meshes)
     // utils.findType(chunkManager, 'Mesh', meshes)
 
-    // utils.findType(obj, 'Mesh', plane);
-    // let pos = plane[0].geometry.attributes.position;
-    // let norm = plane[0].geometry.attributes.normal;
-    // let matWorld = plane[0].matrixWorld;
-    // const vector_pos = new THREE.Vector3();
-    // const vector_norm = new THREE.Vector3();
+    utils.findType(obj, 'Mesh', plane);
+    let pos = plane[0].geometry.attributes.position;
+    let norm = plane[0].geometry.attributes.normal;
+    let matWorld = plane[0].matrixWorld;
+    const vector_pos = new THREE.Vector3();
+    const vector_norm = new THREE.Vector3();
     
-    // for (let i = 0; i < pos.count; i += 30) {
-    //     vector_pos.fromBufferAttribute(pos, i);
-    //     vector_pos.applyMatrix4(matWorld);
-    //     vector_norm.fromBufferAttribute(norm, i);
-    //     vector_norm.applyMatrix4(matWorld);
-    //     let ray = new THREE.Raycaster(vector_pos, vector_norm);
-    //     let collisions = ray.intersectObjects(meshes, false);
-    //     collisions.forEach(collision => {
-    //         if (collision.distance < 0.2) console.log('collision');
-    //     })
-    // }
-   
+    for (let i = 0; i < pos.count; i += 1) {
+        vector_pos.fromBufferAttribute(pos, i);
+        vector_pos.applyMatrix4(matWorld);
+        vector_norm.fromBufferAttribute(norm, i);
+        vector_norm.applyMatrix4(matWorld);
+        let ray = new THREE.Raycaster(vector_pos, vector_norm);
+        let collisions = ray.intersectObjects(meshes, false);
+        collisions.forEach(collision => {
+            if (collision.distance < 2) {
+                chunkManager.position.y += 3;
+                // obj.position = obj.position.add(vector_norm.multiplyScalar(1))
+                // obj.position.x -= vector_norm.x * 0.1;
+                // obj.position.y -= vector_norm.y * 0.1;
 
-    // let ray = new THREE.Raycaster(obj.position, new THREE.Vector3(0,-1,0));
-    // let collisions = ray.intersectObjects(meshes);
-    // collisions.forEach(collision => {
-    //     if (collision.distance < 0.2) console.log('collision');
-    // })
+                // console.log('collision');
+            }
+        })
+    }
 
 }
 
