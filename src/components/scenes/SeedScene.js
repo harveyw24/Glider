@@ -21,12 +21,15 @@ class SeedScene extends Scene {
         // Set background to a nice color
         this.background = new Color(0x7ec0ee);
 
+        // Add fog
+        this.fog =  new THREE.FogExp2(0xADD8E6, 0.0015);
+        // this.fog =  new THREE.Fog(0xADD8E6, 10, 1500);
+
         // Add meshes to scene
         const land = new Land();
         // const paper = new Paper(this)
         const airplane = new Airplane(this)
         const lights = new BasicLights();
-        // const terrain = new Terrain(this);
         const chunkManager = new ChunkManager(this);
         this.chunkManager = chunkManager;
         this.add(lights, land, airplane, chunkManager);

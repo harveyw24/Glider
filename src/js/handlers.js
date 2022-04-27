@@ -145,8 +145,6 @@ export function handleCollisions(scene, character, screens, sound, score){
     const vector_pos = new THREE.Vector3();
     const vector_norm = new THREE.Vector3();
 
-    console.log(obj.position);
-
     let raytip = new THREE.Raycaster(plane[0].tip, new THREE.Vector3(0,0,-1));
     let raycollisions = raytip.intersectObjects(meshes, false);
         if (raycollisions.length != 0 && raycollisions[0].distance < 0.5) {
@@ -217,9 +215,10 @@ export function handleCollisions(scene, character, screens, sound, score){
     // console.log("HEIGHT: ", v1.z);
 
     // Collide with terrain
+    // target is how much the ground has risen, -v1.z is terrain height at cur point
     let target = new THREE.Vector3();
     terrain.getWorldPosition(target);
-    if (target.y + chunkManager.state.groundY > - v1.z) {
+    if (target.y + chunkManager.state.groundY - obj.position.y > -v1.z) {
         screens['menu'] = false;
         screens['paused'] = false;
         screens['ending'] = true;

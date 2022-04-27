@@ -28,8 +28,6 @@ export function quit(document, score) {
     finalScore.innerHTML = 'Score: '.concat(score);
     let canvas = document.getElementById("canvas");
     canvas.remove();
-    let scoreCounter = document.getElementById('score');
-    scoreCounter.remove();
     let instructions = document.getElementById('instructions');
     instructions.remove();
 }
@@ -38,9 +36,15 @@ export function start(document, canvas) {
     let menu = document.getElementById("menu");
     menu.remove();
     document.body.appendChild(canvas);
-    let scoreCounter = document.createElement('div');
-    scoreCounter.id = 'score';
-    document.body.appendChild(scoreCounter)
+    let scoreCounter = document.getElementById('score');
+    if (scoreCounter) {
+        scoreCounter.remove();
+    } else {
+        scoreCounter = document.createElement('div');
+        scoreCounter.id = 'score';
+        document.body.appendChild(scoreCounter);
+    }
+    
     let instructions = document.createElement('div');
     instructions.id = 'instructions';
     instructions.innerHTML = INSTRUCTIONS;
