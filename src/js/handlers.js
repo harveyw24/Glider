@@ -108,7 +108,8 @@ export function handleCollisions(scene, character, screens, sound, score){
             // vector_pos.copy(child.position);
             // vector_pos.applyMatrix4(matWorld);
             // console.log(vector_pos)
-            let vector_pos = child.getWorldPosition()
+            let vector_pos = new THREE.Vector3();
+            child.getWorldPosition(vector_pos);
 
             if (vector_pos.z > -100 && vector_pos.z < 1000 && vector_pos.x > -100 && vector_pos.x < 100) {
                 clouds.push(child); 
@@ -144,6 +145,8 @@ export function handleCollisions(scene, character, screens, sound, score){
     const vector_pos = new THREE.Vector3();
     const vector_norm = new THREE.Vector3();
 
+    console.log(obj.position);
+
     let raytip = new THREE.Raycaster(plane[0].tip, new THREE.Vector3(0,0,-1));
     let raycollisions = raytip.intersectObjects(meshes, false);
         if (raycollisions.length != 0 && raycollisions[0].distance < 0.5) {
@@ -154,7 +157,7 @@ export function handleCollisions(scene, character, screens, sound, score){
             fillScreen.classList.add('red');
             setTimeout(function() {
                 fillScreen.classList.remove('red');
-        }, 500);
+            }, 500);
             // obj.position = obj.position.add(vector_norm.multiplyScalar(1))
             // obj.position.x -= vector_norm.x * 0.1;
             // obj.position.y -= vector_norm.y * 0.1;
@@ -181,7 +184,7 @@ export function handleCollisions(scene, character, screens, sound, score){
             fillScreen.classList.add('red');
             setTimeout(function() {
                 fillScreen.classList.remove('red');
-        }, 500);
+            }, 500);
             // obj.position = obj.position.add(vector_norm.multiplyScalar(1))
             // obj.position.x -= vector_norm.x * 0.1;
             // obj.position.y -= vector_norm.y * 0.1;
@@ -195,39 +198,23 @@ export function handleCollisions(scene, character, screens, sound, score){
 
     let chunkManagerPos = chunkManager.position;
     let chunkWidth = chunkManager.state.chunkWidth;
-    let chunkVertWidth = chunkManager.state.chunkVertWidth;
-
-
-    var terrain;
-    if (chunkManagerPos.z % chunkWidth > 500) {
-        terrain = chunkManager.chunks[1].terrain;
-    } else {
-        terrain = chunkManager.chunks[0].terrain;
-    }
-
+    let terrain = chunkManager.chunks[0].terrain;
     let heightMap = terrain.heightMap;
     
-    console.log("--------------");
-    console.log(chunkManagerPos.z);
-    // console.log(chunkManager.state.firstChunk);
+    // let j = Math.floor((chunkManagerPos.x + chunkWidth/2 + obj.position.x + 2 * Math.sign(obj.position.x)) / chunkWidth * (heightMap.length));
     let j = Math.floor((chunkManagerPos.x + chunkWidth/2) / chunkWidth * (heightMap.length));
-    var i;
-    // if (chunkManager.state.firstChunk) {
-    //     i = Math.floor((chunkWidth - ((chunkManagerPos.z + chunkWidth/2) % chunkWidth)) / chunkWidth * (heightMap.length));
-    // } else {
-    //     i = Math.floor((chunkWidth - (chunkManagerPos.z % chunkWidth)) / chunkWidth * (heightMap.length)) - 1;
-    // }
-    i = Math.round((chunkWidth - ((chunkManagerPos.z + chunkWidth/2) % chunkWidth)) / chunkWidth * (heightMap.length - 1));
+    let i = Math.round((chunkWidth - (chunkManagerPos.z % chunkWidth)) / chunkWidth * (heightMap.length - 1));
 
     const index = (i * (heightMap.length) + j);
     const v1 = terrain.geometry.vertices[index];
-    // console.log(index)
-    // console.log(terrain.geometry.vertices);
-    // console.log("j", j);
-    console.log("i", i);
-    console.log(v1);
+
+    // DEBUG LOGGING
+    // console.log("--------------");
+    // console.log(chunkManagerPos.z);
+    // console.log("i", i);
+    // console.log(v1);
     // terrain.clouds[0].position.set(v1.x, 0, -v1.y);
-    console.log("HEIGHT: ", v1.z);
+    // console.log("HEIGHT: ", v1.z);
 
     // Collide with terrain
     let target = new THREE.Vector3();

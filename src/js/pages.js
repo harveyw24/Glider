@@ -47,5 +47,6 @@ export function start(document, canvas) {
     document.body.appendChild(instructions)
     let fillScreen = document.createElement('div');
     fillScreen.id = 'fillScreen';
+    fillScreen.style.pointerEvents = "none";
     document.body.appendChild(fillScreen);
 }

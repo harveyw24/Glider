@@ -37,7 +37,7 @@ class ChunkManager extends Group {
             randSeed: 3.8,
             freq: 4.4,
             currentOffset: 0,
-            maxTreeNum: 100,
+            maxTreeNum: 10,
             maxCloudNum: 50,
             treeHeightMin: 0,
             treeHeightMax: 50,
