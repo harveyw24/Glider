@@ -29,16 +29,18 @@ class Airplane extends Group {
         const loader = new GLTFLoader();
         loader.load(MODEL, (gltf) => {
             gltf.scene.scale.multiplyScalar(3);
-            // gltf.scene.position.x = 0; 
-            // gltf.scene.position.y = 0;
-            // gltf.scene.position.z = 0;
+            gltf.scene.position.x = 0; 
+            gltf.scene.position.y = 0;
+            gltf.scene.position.z = 0;
             const box = new THREE.Box3().setFromObject( gltf.scene, true);
-            const center = box.getCenter( new THREE.Vector3() );
+            // const center = box.getCenter( new THREE.Vector3() );
 
             gltf.scene.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI);
-            gltf.scene.position.x += ( gltf.scene.position.x - center.x );
-            gltf.scene.position.y += ( gltf.scene.position.y - center.y );
-            gltf.scene.position.z += ( gltf.scene.position.z - center.z );
+            // gltf.scene.position.x += ( gltf.scene.position.x - center.x );
+            // gltf.scene.position.y += ( gltf.scene.position.y - center.y );
+            // gltf.scene.position.z += ( gltf.scene.position.z - center.z );
+            // console.log(center)
+            console.log(gltf.scene.position)
 
             // add mixer to state
             this.state.mixer = new THREE.AnimationMixer(gltf.scene);
