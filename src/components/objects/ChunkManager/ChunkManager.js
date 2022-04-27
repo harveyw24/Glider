@@ -107,7 +107,7 @@ class ChunkManager extends Group {
     update(timeStamp) {
         // Chunk positions are relative to terrain, so updating terrain position is sufficient
         this.position.z += 2;
-        this.position.y += 0;
+        this.position.y += 0.1;
         if (this.position.z >= this.state.chunkWidth / 2) {
             this.state.firstChunk = false;
         }
