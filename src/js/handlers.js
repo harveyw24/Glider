@@ -93,7 +93,7 @@ export function handleScreens(event, screens, document, canvas, sound, score) {
 }
 
 // placeholder function for now to handle collisions. Needs to be generalizable to any obstacle. Needs to make the character do something instead of phase right through - for example, crash animation.
-export function handleCollisions(scene, character){
+export function handleCollisions(scene, character, screens, sound, score){
     let land = scene.getObjectByName('land');
     let chunkManager = scene.getObjectByName('chunkManager');
     let obj = scene.getObjectByName(character);
@@ -128,6 +128,52 @@ export function handleCollisions(scene, character){
         })
     }
 
+    let chunkManagerPos = chunkManager.position;
+    let chunkWidth = chunkManager.state.chunkWidth;
+    let chunkVertWidth = chunkManager.state.chunkVertWidth;
+
+
+    var terrain;
+    if (chunkManagerPos.z % chunkWidth > 500) {
+        terrain = chunkManager.chunks[1].terrain;
+    } else {
+        terrain = chunkManager.chunks[0].terrain;
+    }
+
+    let heightMap = terrain.heightMap;
+    
+    console.log("--------------");
+    console.log(chunkManagerPos.z);
+    // console.log(chunkManager.state.firstChunk);
+    let j = Math.floor((chunkManagerPos.x + chunkWidth/2) / chunkWidth * (heightMap.length));
+    var i;
+    // if (chunkManager.state.firstChunk) {
+    //     i = Math.floor((chunkWidth - ((chunkManagerPos.z + chunkWidth/2) % chunkWidth)) / chunkWidth * (heightMap.length));
+    // } else {
+    //     i = Math.floor((chunkWidth - (chunkManagerPos.z % chunkWidth)) / chunkWidth * (heightMap.length)) - 1;
+    // }
+    i = Math.round((chunkWidth - ((chunkManagerPos.z + chunkWidth/2) % chunkWidth)) / chunkWidth * (heightMap.length - 1));
+
+    const index = (i * (heightMap.length) + j);
+    const v1 = terrain.geometry.vertices[index];
+    // console.log(index)
+    // console.log(terrain.geometry.vertices);
+    // console.log("j", j);
+    console.log("i", i);
+    console.log(v1);
+    // terrain.clouds[0].position.set(v1.x, 0, -v1.y);
+    console.log("HEIGHT: ", v1.z);
+
+    // Collide with terrain
+    let target = new THREE.Vector3();
+    terrain.getWorldPosition(target);
+    if (target.y + chunkManager.state.groundY > - v1.z) {
+        screens['menu'] = false;
+        screens['paused'] = false;
+        screens['ending'] = true;
+        pages.quit(document, score);
+        sound.stop()
+    }
 }
 
 
