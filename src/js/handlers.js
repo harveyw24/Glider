@@ -98,16 +98,17 @@ export function handleScreens(event, screens, document, canvas, sound, score) {
 export function handleCollisions(scene, character, document){
 
     if (buffer) return;
-    let land = scene.getObjectByName('land');
+    // let land = scene.getObjectByName('land');
     let chunkManager = scene.getObjectByName('chunkManager');
     let clouds = [];
     scene.traverseVisible(function(child) {
         if (child.name === "cloud") {
             let matWorld = child.matrixWorld;
-            let vector_pos = new THREE.Vector3(0,0,0);
-            vector_pos.copy(child.position);
-            vector_pos.applyMatrix4(matWorld);
+            // let vector_pos = new THREE.Vector3(0,0,0);
+            // vector_pos.copy(child.position);
+            // vector_pos.applyMatrix4(matWorld);
             // console.log(vector_pos)
+            let vector_pos = child.getWorldPosition()
 
             if (vector_pos.z > -100 && vector_pos.z < 1000 && vector_pos.x > -100 && vector_pos.x < 100) {
                 clouds.push(child); 
@@ -119,8 +120,6 @@ export function handleCollisions(scene, character, document){
                 // console.log(vector_pos.x);
                 // console.log(vector_pos.y);
                 // console.log(vector_pos.z);
-
-                console.log('-')
             }
             else {
                 child.mesh.material.color.setHex(0xffffff)
@@ -130,7 +129,6 @@ export function handleCollisions(scene, character, document){
         }
       });
 
-    console.log(clouds)
     let obj = scene.getObjectByName(character);
     let meshes = [];
     let plane = [];
@@ -139,22 +137,44 @@ export function handleCollisions(scene, character, document){
         utils.findType(cloud, 'Mesh', meshes)
     })
     // utils.findType(chunkManager, 'Mesh', meshes)
-
     utils.findType(obj, 'Mesh', plane);
     let pos = plane[0].geometry.attributes.position;
     let norm = plane[0].geometry.attributes.normal;
     let matWorld = plane[0].matrixWorld;
     const vector_pos = new THREE.Vector3();
     const vector_norm = new THREE.Vector3();
+
+    let raytip = new THREE.Raycaster(plane[0].tip, new THREE.Vector3(0,0,-1));
+    let raycollisions = raytip.intersectObjects(meshes, false);
+        if (raycollisions.length != 0 && raycollisions[0].distance < 0.5) {
+            console.log('here')
+            buffer = true;
+            chunkManager.position.y += 30;
+            let fillScreen = document.getElementById('fillScreen');
+            fillScreen.classList.add('red');
+            setTimeout(function() {
+                fillScreen.classList.remove('red');
+        }, 500);
+            // obj.position = obj.position.add(vector_norm.multiplyScalar(1))
+            // obj.position.x -= vector_norm.x * 0.1;
+            // obj.position.y -= vector_norm.y * 0.1;
+
+            // console.log('collision');
+            setTimeout (function(){ buffer = false}, 5000);
+            return;
+        }
+
     
     for (let i = 0; i < pos.count; i += 1) {
         vector_pos.fromBufferAttribute(pos, i);
-        vector_pos.applyMatrix4(matWorld);
+        // vector_pos.applyMatrix4(matWorld);
         vector_norm.fromBufferAttribute(norm, i);
-        vector_norm.applyMatrix4(matWorld);
+        // vector_norm.applyMatrix4(matWorld);
         let ray = new THREE.Raycaster(vector_pos, vector_norm);
+        // scene.add(new THREE.ArrowHelper(ray.ray.direction, ray.ray.origin, 5, 0xff0000) );
+
         let collisions = ray.intersectObjects(meshes, false);
-        if (collisions.length != 0 && collisions[0].distance < 0.5) {
+        if (collisions.length != 0 && collisions[0].distance < 5) {
             buffer = true;
             chunkManager.position.y += 30;
             let fillScreen = document.getElementById('fillScreen');

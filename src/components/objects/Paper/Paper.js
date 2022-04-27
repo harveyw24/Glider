@@ -11,6 +11,7 @@ class Paper extends Group {
         const loader = new GLTFLoader();
 
         this.name = 'paper';
+        this.tip = new THREE.Vector3(0,0,0);
 
         loader.load(MODEL, (gltf) => {
             gltf.scene.scale.multiplyScalar(5);
