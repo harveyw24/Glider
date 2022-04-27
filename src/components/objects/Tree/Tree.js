@@ -14,7 +14,9 @@ class Tree extends Group {
 
         this.name = 'tree';
         loader.load(MODEL, (gltf) => {
-            gltf.scene.scale.multiplyScalar(0.5);
+            const scale = .05;
+            gltf.scene.position.add(new THREE.Vector3(-463, -16, 173).multiplyScalar(scale));
+            gltf.scene.scale.multiplyScalar(scale);
             this.box = new THREE.Box3().setFromObject(gltf.scene);
             this.add(gltf.scene);
         });

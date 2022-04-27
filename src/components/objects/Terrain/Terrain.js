@@ -4,6 +4,11 @@ import SimplexNoise from 'simplex-noise';
 import { Tree } from '../Tree';
 import { Cloud } from '../Cloud';
 
+
+function random(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
 class Terrain extends Group {
 
     constructor(parent) {
@@ -143,17 +148,18 @@ class Terrain extends Group {
             for (let j = 0; j < this.heightMap[0].length; j++) {
                 const index = (j * (this.heightMap.length) + i);
                 const v = this.geometry.vertices[index];
-                if (treeIndex < this.trees.length && this.CMState.treeHeightMin < v.z && Math.random() < .02) {
+                if (treeIndex < this.trees.length && this.CMState.treeHeightMin < v.z && v.z < this.CMState.treeHeightMax && Math.random() < .03) {
                     this.trees[treeIndex].visible = true;
                     this.trees[treeIndex].position.set(v.x, v.z + this.CMState.groundY, -v.y); // plane is rotated
                     treeIndex++;
                 } else if (cloudIndex < this.clouds.length && Math.random() < .005) {
                     this.clouds[cloudIndex].visible = true;
-                    this.clouds[cloudIndex].position.set(v.x, 0, -v.y); // plane is rotated
+                    this.clouds[cloudIndex].position.set(v.x, random(this.CMState.cloudYMin, this.CMState.cloudYMax), -v.y);
                     cloudIndex++;
                 }
             }
         }
+        console.log("trees & clouds: ", treeIndex, cloudIndex);
         for (let i = treeIndex; i < this.trees.length; i++) this.trees[i].visible = false;
         for (let i = cloudIndex; i < this.clouds.length; i++) this.clouds[i].visible = false;
     }
