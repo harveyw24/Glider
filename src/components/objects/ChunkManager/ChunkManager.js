@@ -45,6 +45,7 @@ class ChunkManager extends Group {
             cloudYMax: 0,
             // cloudYMin: -100,
             // cloudYMax: -50,
+            firstChunk: true
         }
 
 
@@ -107,9 +108,13 @@ class ChunkManager extends Group {
     // if the plane leaves the first chunk, then the first chunk needs to be popped and moved to the back
     update(timeStamp) {
         // Chunk positions are relative to terrain, so updating terrain position is sufficient
-        this.position.z += 5;
-        this.position.y += 0.01;
+        this.position.z += 2;
+        this.position.y += 0.1;
+        if (this.position.z >= this.state.chunkWidth / 2) {
+            this.state.firstChunk = false;
+        }
         if (this.position.z - this.anchor.z >= this.state.chunkWidth) {
+            console.log("NEW CHUNK");
             this.chunks[0].setChunkPosition(
                 this.chunks[0].position.x,
                 this.chunks[0].position.y,

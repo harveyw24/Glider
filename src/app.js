@@ -83,10 +83,10 @@
          scene.update && scene.update(timeStamp);
          handlers.handleCharacterControls(scene, keypress, character, camera);
          let elapsed = clock.getElapsedTime();
-         handlers.handleCollisions(scene, character, document);
+         handlers.handleCollisions(scene, character, screens, sound, score);
          oldTime = elapsed;
          // if (elapsed - oldTime > 0.01) { 
-         //     handlers.handleCollisions(scene, character, document);
+         //     handlers.handleCollisions(scene, character, screens, sound, score);
          //     oldTime = elapsed;
          // }
          score_num += 0.01;
