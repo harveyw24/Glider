@@ -7,12 +7,7 @@ import INSTRUCTIONS from "../instructions.html";
 // idea from https://github.com/efyang/portal-0.5/blob/main/src/app.js
 // https://github.com/efyang/portal-0.5/blob/main/src/instructions.html
 export function init_page(document) {
-    // let gui = document.getElementsByClassName('dg ac');
-    // let arr = [].slice.call(gui);
     document.body.innerHTML = '';
-    // console.log(arr[0])
-    // document.appendChild(arr[0]);
-    // console.log(gui)
     let menu = document.createElement('div');
     menu.id = 'menu';
     menu.innerHTML = START;
@@ -50,4 +45,7 @@ export function start(document, canvas) {
     instructions.id = 'instructions';
     instructions.innerHTML = INSTRUCTIONS;
     document.body.appendChild(instructions)
+    let fillScreen = document.createElement('div');
+    fillScreen.id = 'fillScreen';
+    document.body.appendChild(fillScreen);
 }

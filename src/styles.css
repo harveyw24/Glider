@@ -57,3 +57,34 @@ body, html {
     font-size: 0.75rem;
     color: white;
 }
+
+#fillScreen{
+    position:fixed;
+    padding:0;
+    margin:0;
+
+    top:0;
+    left:0;
+
+    width: 100%;
+    height: 100%;
+}
+
+/*https://stackoverflow.com/questions/16791851/a-flash-of-color-using-pure-css-transitions*/
+.red {
+    -webkit-animation-name: flash-animation;
+    -webkit-animation-duration: 0.3s;
+
+    animation-name: flash-animation;
+    animation-duration: 0.3s;
+}
+
+@-webkit-keyframes flash-animation {  
+    from { background: red; }
+    to   { background: default; }
+}
+
+@keyframes flash-animation {  
+    from { background: red; }
+    to   { background: default; }
+}

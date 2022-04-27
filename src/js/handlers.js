@@ -2,6 +2,8 @@ import * as THREE from "three";
 import * as pages from "./pages.js"
 import * as utils from "./utils.js"
 
+let buffer = false;
+
 function clamp (val,min,max) {
     return Math.max(min,Math.min(max,val));
 }
@@ -22,7 +24,7 @@ export function handleKeyUp(event, keypress) {
 
 export function handleCharacterControls(scene, keypress, character, camera) {
     let obj = scene.getObjectByName(character);
-    if (keypress['up'] && obj.position.y < 2) {
+    if (keypress['up'] && obj.position.y < 3) {
         obj.position.y += 0.1;
         obj.box.min.y += 0.1;
         obj.box.max.y += 0.1;
@@ -93,13 +95,49 @@ export function handleScreens(event, screens, document, canvas, sound, score) {
 }
 
 // placeholder function for now to handle collisions. Needs to be generalizable to any obstacle. Needs to make the character do something instead of phase right through - for example, crash animation.
-export function handleCollisions(scene, character){
+export function handleCollisions(scene, character, document){
+
+    if (buffer) return;
     let land = scene.getObjectByName('land');
     let chunkManager = scene.getObjectByName('chunkManager');
+    let clouds = [];
+    scene.traverseVisible(function(child) {
+        if (child.name === "cloud") {
+            let matWorld = child.matrixWorld;
+            let vector_pos = new THREE.Vector3(0,0,0);
+            vector_pos.copy(child.position);
+            vector_pos.applyMatrix4(matWorld);
+            // console.log(vector_pos)
+
+            if (vector_pos.z > -100 && vector_pos.z < 1000 && vector_pos.x > -100 && vector_pos.x < 100) {
+                clouds.push(child); 
+                child.mesh.material.color.setHex(0x000000)
+                // console.log(child.position.x)
+                // console.log(child.position.y)
+                // console.log(child.position.z)
+
+                // console.log(vector_pos.x);
+                // console.log(vector_pos.y);
+                // console.log(vector_pos.z);
+
+                console.log('-')
+            }
+            else {
+                child.mesh.material.color.setHex(0xffffff)
+
+            }
+          
+        }
+      });
+
+    console.log(clouds)
     let obj = scene.getObjectByName(character);
     let meshes = [];
     let plane = [];
-    utils.findType(land, 'Mesh', meshes)
+    // utils.findType(land, 'Mesh', meshes)
+    clouds.forEach(cloud => {
+        utils.findType(cloud, 'Mesh', meshes)
+    })
     // utils.findType(chunkManager, 'Mesh', meshes)
 
     utils.findType(obj, 'Mesh', plane);
@@ -116,16 +154,23 @@ export function handleCollisions(scene, character){
         vector_norm.applyMatrix4(matWorld);
         let ray = new THREE.Raycaster(vector_pos, vector_norm);
         let collisions = ray.intersectObjects(meshes, false);
-        collisions.forEach(collision => {
-            if (collision.distance < 2) {
-                chunkManager.position.y += 3;
-                // obj.position = obj.position.add(vector_norm.multiplyScalar(1))
-                // obj.position.x -= vector_norm.x * 0.1;
-                // obj.position.y -= vector_norm.y * 0.1;
+        if (collisions.length != 0 && collisions[0].distance < 0.5) {
+            buffer = true;
+            chunkManager.position.y += 30;
+            let fillScreen = document.getElementById('fillScreen');
+            fillScreen.classList.add('red');
+            setTimeout(function() {
+                fillScreen.classList.remove('red');
+        }, 500);
+            // obj.position = obj.position.add(vector_norm.multiplyScalar(1))
+            // obj.position.x -= vector_norm.x * 0.1;
+            // obj.position.y -= vector_norm.y * 0.1;
 
-                // console.log('collision');
-            }
-        })
+            // console.log('collision');
+            setTimeout (function(){ buffer = false}, 5000)
+            break;
+        }
+    
     }
 
 }

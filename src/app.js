@@ -83,10 +83,12 @@ const onAnimationFrameHandler = (timeStamp) => {
         scene.update && scene.update(timeStamp);
         handlers.handleCharacterControls(scene, keypress, character, camera);
         let elapsed = clock.getElapsedTime();
-        if (elapsed - oldTime > 0.1) { 
-            handlers.handleCollisions(scene, character);
-            oldTime = elapsed;
-        }
+        handlers.handleCollisions(scene, character, document);
+        oldTime = elapsed;
+        // if (elapsed - oldTime > 0.01) { 
+        //     handlers.handleCollisions(scene, character, document);
+        //     oldTime = elapsed;
+        // }
         score_num += 0.01;
         score = score_num.toFixed(2);
         handlers.updateScore(document, score)
