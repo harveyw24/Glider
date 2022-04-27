@@ -52,10 +52,9 @@ class ChunkManager extends Group {
 
         this.anchor = this.position.clone();
         const coordinates = [
-            [0, 0, 0],
-            [0, 0, -this.state.chunkWidth],
-            [0, 0, -2 * this.state.chunkWidth],
-            [0, 0, -3 * this.state.chunkWidth]
+            [0, 0, -.5 * this.state.chunkWidth],
+            [0, 0, -1.5 * this.state.chunkWidth],
+            [0, 0, -2.5 * this.state.chunkWidth],
         ];
 
 
