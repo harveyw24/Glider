@@ -63,8 +63,6 @@ class ChunkManager extends Group {
 
         parent.addToUpdateList(this);
 
-
-
         // Populate GUI
         var folder1 = this.state.gui.addFolder('BREATH');
         folder1.add(this.state, 'breathLength', 0, 20);

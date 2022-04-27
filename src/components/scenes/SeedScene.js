@@ -1,6 +1,6 @@
 import * as Dat from 'dat.gui';
 import { Scene, Color } from 'three';
-import { Flower, Land, Kite, Falcon, Paper, Terrain, ChunkManager} from 'objects';
+import { Flower, Land, Kite, Falcon, Paper, Terrain, Airplane, ChunkManager} from 'objects';
 import { BasicLights } from 'lights';
 import * as THREE from 'three'
 import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js'
@@ -21,16 +21,15 @@ class SeedScene extends Scene {
         // Set background to a nice color
         this.background = new Color(0x7ec0ee);
 
-
-        
         // Add meshes to scene
         const land = new Land();
-        const paper = new Paper(this)
+        // const paper = new Paper(this)
+        const airplane = new Airplane(this)
         const lights = new BasicLights();
         // const terrain = new Terrain(this);
         const chunkManager = new ChunkManager(this);
         this.chunkManager = chunkManager;
-        this.add(lights, land, paper, chunkManager);
+        this.add(lights, land, airplane, chunkManager);
         
 
 

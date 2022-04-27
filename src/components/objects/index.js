@@ -8,3 +8,4 @@ export * from './Paper';
 export * from './Terrain';
 export * from './Chunk';
 export * from './ChunkManager';
+export * from './Airplane';
