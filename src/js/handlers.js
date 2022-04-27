@@ -148,9 +148,8 @@ export function handleCollisions(scene, character, screens, sound, score){
     let raytip = new THREE.Raycaster(plane[0].tip, new THREE.Vector3(0,0,-1));
     let raycollisions = raytip.intersectObjects(meshes, false);
         if (raycollisions.length != 0 && raycollisions[0].distance < 0.5) {
-            console.log('here')
             buffer = true;
-            chunkManager.position.y += 30;
+            // chunkManager.position.y += 30;
             let fillScreen = document.getElementById('fillScreen');
             fillScreen.classList.add('red');
             setTimeout(function() {
@@ -176,8 +175,10 @@ export function handleCollisions(scene, character, screens, sound, score){
 
         let collisions = ray.intersectObjects(meshes, false);
         if (collisions.length != 0 && collisions[0].distance < 5) {
+            obj.state.hit = true;
             buffer = true;
-            chunkManager.position.y += 30;
+            // console.log(obj.state)
+            // chunkManager.position.y += 30;
             let fillScreen = document.getElementById('fillScreen');
             fillScreen.classList.add('red');
             setTimeout(function() {
@@ -189,6 +190,7 @@ export function handleCollisions(scene, character, screens, sound, score){
 
             // console.log('collision');
             setTimeout (function(){ buffer = false}, 5000)
+            // obj.state.hit = false;
             break;
         }
     

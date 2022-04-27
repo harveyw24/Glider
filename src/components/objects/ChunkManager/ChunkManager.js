@@ -108,7 +108,7 @@ class ChunkManager extends Group {
     // if the plane leaves the first chunk, then the first chunk needs to be popped and moved to the back
     update(timeStamp) {
         // Chunk positions are relative to terrain, so updating terrain position is sufficient
-        this.position.z += 2;
+        this.position.z += 10;
         this.position.y += 0.1;
         if (this.position.z >= this.state.chunkWidth / 2) {
             this.state.firstChunk = false;

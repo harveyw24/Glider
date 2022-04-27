@@ -15,10 +15,14 @@ class Airplane extends Group {
             parent: parent,
             animation: null,
             action: null,
+            hit: null,
+            hitTime: null,
+            speed: 1000
         };
 
         this.name = 'plane';
         this.tip = new THREE.Vector3(0,0,0);
+        this.state.hit = false;
         this.addPlane()
 
         // Add update list
@@ -56,18 +60,34 @@ class Airplane extends Group {
     }
 
     update(timeStamp) {
+        // console.log(this.state.hit)
         if (this.state.prevTimeStamp === null) {
             this.state.prevTimeStamp = timeStamp;
-          }
+        }
     
-          // calculate delta
-          const delta = (timeStamp - this.state.prevTimeStamp)/1000;
-    
-          // update previous time stamp
-          this.state.prevTimeStamp = timeStamp;
-    
-          // update animation
-          this.state.mixer.update(delta);
+        let delta;
+        if (this.state.hit) {
+            console.log('HI')
+            this.state.hit = false
+            this.state.hitTime = timeStamp
+            this.state.speed = 100
+        } 
+
+        // wobble if hit previously
+        if ((timeStamp - this.state.hitTime) < 5000) {
+            this.state.speed += (timeStamp - this.state.hitTime) / 1000;
+        } else {
+            // calculate delta
+            this.state.speed = 1000;
+        }
+        delta = (timeStamp - this.state.prevTimeStamp)/this.state.speed;
+        
+
+        // update previous time stamp
+        this.state.prevTimeStamp = timeStamp;
+
+        // update animation
+        this.state.mixer.update(delta);
     }
 
 }
