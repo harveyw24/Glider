@@ -6,8 +6,9 @@ import INSTRUCTIONS from "../instructions.html";
 
 // idea from https://github.com/efyang/portal-0.5/blob/main/src/app.js
 // https://github.com/efyang/portal-0.5/blob/main/src/instructions.html
-export function init_page(document) {
+export function init_page(document, menuCanvas) {
     document.body.innerHTML = '';
+    document.body.appendChild(menuCanvas);
     let menu = document.createElement('div');
     menu.id = 'menu';
     menu.innerHTML = START;
@@ -32,26 +33,34 @@ export function quit(document, score) {
     document.body.appendChild(ending)
     let finalScore = document.getElementById('finalScore');
     finalScore.innerHTML = 'Score: '.concat(score);
-    let scoreCounter = document.getElementById('score');
-    scoreCounter.remove();
-    let canvas = document.getElementById("canvas");
-    canvas.remove();
-    let instructions = document.getElementById('instructions');
-    instructions.remove();
+
+    let scoreComment = document.getElementById('scoreComment');
+    if (score <5) scoreComment.innerHTML = 'Were you even trying?'
+    else if (score < 15) scoreComment.innerHTML = 'You could do better.'
+    else if (score < 30) scoreComment.innerHTML = 'Not too shabby.'
+    else if (score < 45) scoreComment.innerHTML = 'Maybe you have potential after all.'
+    else if (score < 60) scoreComment.innerHTML = 'You\'re a true pilot.'
+    else if (score < 75) scoreComment.innerHTML = 'I\'m impressed!'
+    else scoreComment.innerHTML = 'You have transcended the mortal realm.'
+
+    document.getElementById('score').remove();
+    document.getElementById("canvas").remove();
+    document.getElementById('instructions').remove();
 }
 
 export function start(document, canvas) {
-    let menu = document.getElementById("menu");
-    menu.remove();
+    document.getElementById("menu").remove();
+    document.getElementById('menuCanvas').remove()
     document.body.appendChild(canvas);
     let scoreCounter = document.createElement('div');
     scoreCounter.id = 'score';
-    document.body.appendChild(scoreCounter);
+    scoreCounter.classList.add('audioFont')
 
-    let instructions = document.createElement('div');
-    instructions.id = 'instructions';
-    instructions.innerHTML = INSTRUCTIONS;
-    document.body.appendChild(instructions)
+    let reminders = document.createElement('div');
+    reminders.id = 'reminders';
+    reminders.innerHTML = INSTRUCTIONS;
+    reminders.prepend(scoreCounter)
+    document.body.appendChild(reminders)
     let fillScreen = document.createElement('div');
     fillScreen.id = 'fillScreen';
     fillScreen.style.pointerEvents = "none";

@@ -1,17 +1,33 @@
 body, html {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: "Radio Canada", sans-serif;
     height: 100%;
+    color: white;
 }
 
+hr {
+    height: 10px;
+    width: 100%;
+    background-color: white;
+    border: 0 none;
+}
 /* Source for centering: https://stackoverflow.com/questions/9862167/positioning-div-element-at-center-of-screen */
 #menu, #ending {
-    background-image: url(images/sky.png);
+    background-color: black;
     background-size: cover;
     background-position-y: center;
     height: 100%;
 }
 
-#start, #end {
+#start {
+    position: fixed;
+    top: 50%;
+    left: 75%;
+    /* text-align: center; */
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+#end {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -20,8 +36,13 @@ body, html {
     transform: translate(-50%, -50%);
 }
 
+.audioFont {
+    font-family: "Audiowide", sans-serif;
+}
+
 #title, #finalScore {
-    font-size: 3rem;
+    color: white;
+    font-size: 4rem;
 }
 /* Inspired by https://cssdeck.com/blog/how-to-create-a-sticky-footer-using-css/ */
 #footer{
@@ -36,26 +57,22 @@ body, html {
 }
 
 #score{
-    position: fixed;
-    right: 0px;
-    top: 0px;
-    height: 50px;
-    width: 100%;
-    color: white;
-    font-weight: bold;
     font-size: 2rem;
 }
 
-#instructions{
+#reminders{
     position: absolute;
-    right: 0px;
     top: 0px;
     height: 50px;
     width: 100%;
     margin-right: 0;
-    margin-top: 1rem;
-    font-size: 0.75rem;
+    margin-left: 20px;
+    margin-top: 20px;
     color: white;
+}
+
+#instructions {
+    font-size: 0.75rem;
 }
 
 #fillScreen{

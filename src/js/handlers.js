@@ -93,9 +93,9 @@ export function handleCharacterControls(scene, keypress, character, camera) {
 
 }
 // Handle screens
-export function handleScreens(event, screens, document, canvas, sounds, score) {
+export function handleScreens(event, screens, document, canvas, menuCanvas, sounds, score) {
     // quit: game -> ending
-    if (event.key == 'q') {
+    if (event.key == 'q' && !screens['ending'] && !screens['menu']) {
         screens['menu'] = false;
         screens['paused'] = false;
         screens['ending'] = true;
@@ -109,7 +109,7 @@ export function handleScreens(event, screens, document, canvas, sounds, score) {
         screens["ending"] = false;
         screens['pause'] = false;
         screens['menu'] = true;
-        pages.init_page(document)
+        pages.init_page(document, menuCanvas)
     }
     // start: menu -> game
     else if (event.key == " " && screens["menu"]) {
