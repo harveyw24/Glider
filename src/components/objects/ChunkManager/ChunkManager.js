@@ -155,10 +155,9 @@ class ChunkManager extends Group {
         }
 
         // Gradual climbing
-        console.log(this.state.climbing);
         if (this.state.climbing > 0) {
-            if (this.state.climbing < 50) {
-                let offset = Math.pow(80 - this.state.climbing, 0.3) / 3;
+            if (this.state.climbing < 60) {
+                let offset = Math.pow(100 - this.state.climbing, 0.3) / 3;
                 this.state.climbing += offset;
                 this.position.y -= offset;
             } else {
@@ -177,7 +176,7 @@ class ChunkManager extends Group {
             this.chunks.push(this.chunks.shift());
 
             this.anchor.z = this.position.z;
-            console.log(this.anchor.z);
+            console.log("NEW ANCHOR: ", this.anchor.z);
         }
 
         if (this.position.z + this.rewards[this.rewardIndex].position.z > 0) {

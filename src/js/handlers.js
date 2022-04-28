@@ -25,7 +25,7 @@ export function handleKeyUp(event, keypress) {
 export function handleCharacterControls(scene, keypress, character, camera) {
     let plane = scene.getObjectByName(character);
     let chunkManager = scene.getObjectByName('chunkManager');
-    const maxRotation = 0.45;
+    const maxRotation = 0.5;
     const maxPitch = 0.2;
     const rotationRate = 0.02;
 
@@ -53,8 +53,8 @@ export function handleCharacterControls(scene, keypress, character, camera) {
         }
     }
     if (keypress['right']) {
-        const delta = 0.4;
-        chunkManager.position.x -= delta;
+        const delta = 0.9;
+        chunkManager.position.x -= delta - (maxRotation - Math.abs(plane.rotation.z)/2);
         // plane.state.rotation = "right";
         if (plane.rotation.z > -maxRotation) {
             if (plane.rotation.z < -maxRotation + 0.02) {
@@ -66,8 +66,8 @@ export function handleCharacterControls(scene, keypress, character, camera) {
         // need to somehow rotate bounding box
     }
     if (keypress['left']) {
-        const delta = 0.4;
-        chunkManager.position.x += delta;
+        const delta = 0.9;
+        chunkManager.position.x += delta - (maxRotation - Math.abs(plane.rotation.z)/2);
         // plane.state.rotation = "left";
         if (plane.rotation.z < maxRotation) {
             if (plane.rotation.z > maxRotation - 0.02) {
@@ -134,7 +134,7 @@ export function handleScreens(event, screens, document, canvas, menuCanvas, soun
 }
 
     // let land = scene.getObjectByName('land');
-export function handleCollisions(document, scene, character, screens, sounds, score){
+export function handleCollisions(document, scene, character, screens, sounds, score, camera){
     if (buffer) return;
 
     let land = scene.getObjectByName('land');
@@ -164,15 +164,36 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
     let chunk = chunkManager.chunks[0].chunk;
     let heightMap = chunk.heightMap;
 
-    let j = Math.floor((-chunkManagerPos.x + chunkWidth / 2) / chunkWidth * (heightMap.length));
+    console.log(chunkManagerPos);
+
+    let j = (-chunkManagerPos.x + chunkWidth / 2) / chunkWidth * (heightMap.length - 1);
     let i = Math.round((chunkWidth - (chunkManagerPos.z % chunkWidth)) / chunkWidth * (heightMap.length - 1));
 
-    const index = (i * (heightMap.length) + j);
-    const v1 = chunk.geometry.vertices[index];
+    const index1 = (i * (heightMap.length) + Math.floor(j));
+    const index2 = (i * (heightMap.length) + Math.ceil(j));
+    const v1 = chunk.geometry.vertices[index1];
+    const v2 = chunk.geometry.vertices[index2];
+
+    let vertexHeight = Math.min(v1.z, v2.z);
+    console.log("VERTEX HEIGHT: ", vertexHeight);
+
+    // console.log(v1.z);
 
     let target = new THREE.Vector3();
     chunk.getWorldPosition(target);
-    if (target.y + chunkManager.state.groundY - obj.position.y > -v1.z) {
+    // if (target.y + chunkManager.state.groundY - obj.position.y > -v1.z) {
+    //     screens['menu'] = false;
+    //     screens['paused'] = false;
+    //     screens['ending'] = true;
+    //     pages.quit(document, score);
+    //     sounds['whirring'].stop()
+    //     document.getElementById('audio').pause()
+    //     // sounds['menu'].stop()
+    // }
+
+    console.log(target.y + chunkManager.state.groundY + vertexHeight);
+
+    if (target.y + chunkManager.state.groundY + vertexHeight > 2) {
         screens['menu'] = false;
         screens['paused'] = false;
         screens['ending'] = true;
@@ -315,13 +336,13 @@ export function updateScore(document, score) {
 
 export function updateAudioSpeed(document, sounds, scene) {
     let chunkManager = scene.getObjectByName('chunkManager');
-    let height = chunkManager.getWorldPosition().y;
+    let target = new THREE.Vector3();
+    chunkManager.getWorldPosition(target);
+    let height = target.y;
     let newPlaybackSpeed = height/400+1;
     let newPitch = -(newPlaybackSpeed-1) * 1200;
     let audio = document.getElementById('audio');
     audio.playbackRate = newPlaybackSpeed;
-    
- 
 }
 
 

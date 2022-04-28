@@ -171,7 +171,7 @@ audioLoader.load( 'src/sounds/powerup.wav', function( buffer ) {
          renderer.render(scene, camera);
          scene.update && scene.update(timeStamp);
          handlers.handleCharacterControls(scene, keypress, character, camera);
-         handlers.handleCollisions(document, scene, character, screens, sounds, score);
+         handlers.handleCollisions(document, scene, character, screens, sounds, score, camera);
          handlers.updateAudioSpeed(document, sounds, scene);
 
         //  let elapsed = clock.getElapsedTime();
