@@ -10,7 +10,7 @@ function random(min, max) {
     return Math.random() * (max - min) + min;
 }
 
-class Terrain extends Group {
+class Chunk extends Group {
 
     constructor(parent) {
         // Call parent Group() constructor
@@ -44,17 +44,17 @@ class Terrain extends Group {
             cloud.visible = false;
         }
 
-        const terrain = new Mesh(this.geometry, new MeshLambertMaterial({
+        const chunk = new Mesh(this.geometry, new MeshLambertMaterial({
             // wireframe:true,
             vertexColors: VertexColors,
             flatShading: true, //required for flat shading
         }))
-        this.add(terrain);
+        this.add(chunk);
 
         // update location on the map
-        terrain.position.y = this.CMState.groundY - 1;
-        terrain.rotation.x = -Math.PI / 2;
-        terrain.receiveShadow = true;
+        chunk.position.y = this.CMState.groundY - 1;
+        chunk.rotation.x = -Math.PI / 2;
+        chunk.receiveShadow = true;
 
 
         this.heightMap = Array.from(Array(this.CMState.chunkVertWidth), () => Array(this.CMState.chunkVertWidth));
@@ -90,7 +90,7 @@ class Terrain extends Group {
     }
 
     // returns the position of the vertex corresponding to this.heightMap[i][j]
-    // relative to terrain.position
+    // relative to chunk.position
     getPositionAtCoords(i, j) {
         const v = this.getVertexAtCoords(i, j);
         return new THREE.Vector3(v.x, v.z + this.CMState.groundY, -v.y)
@@ -227,4 +227,4 @@ class Terrain extends Group {
 
 }
 
-export default Terrain;
+export default Chunk;

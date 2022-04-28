@@ -97,27 +97,27 @@ export function handleCollisions(scene, character, screens, sound, score) {
     let chunkManager = scene.getObjectByName('chunkManager');
     let chunkManagerPos = chunkManager.position;
     let chunkWidth = chunkManager.state.chunkWidth;
-    let terrain = chunkManager.chunks[0].terrain;
-    let heightMap = terrain.heightMap;
+    let chunk = chunkManager.chunks[0].chunk;
+    let heightMap = chunk.heightMap;
 
     let j = Math.floor((-chunkManagerPos.x + chunkWidth / 2) / chunkWidth * (heightMap.length));
     let i = Math.round((chunkWidth - (chunkManagerPos.z % chunkWidth)) / chunkWidth * (heightMap.length - 1));
 
     const index = (i * (heightMap.length) + j);
-    const v1 = terrain.geometry.vertices[index];
+    const v1 = chunk.geometry.vertices[index];
 
     // DEBUG LOGGING
     // console.log("--------------");
     // console.log(chunkManagerPos.z);
     // console.log("i", i);
     // console.log(v1);
-    // terrain.clouds[0].position.set(v1.x, 0, -v1.y);
+    // chunk.clouds[0].position.set(v1.x, 0, -v1.y);
     // console.log("HEIGHT: ", v1.z);
 
-    // Collide with terrain
-    // target is how much the ground has risen, -v1.z is terrain height at cur point
+    // Collide with chunk
+    // target is how much the ground has risen, -v1.z is chunk height at cur point
     let target = new THREE.Vector3();
-    terrain.getWorldPosition(target);
+    chunk.getWorldPosition(target);
     if (target.y + chunkManager.state.groundY - obj.position.y > -v1.z) {
         screens['menu'] = false;
         screens['paused'] = false;

@@ -53,8 +53,6 @@ class ChunkManager extends Group {
         }
 
 
-        // this.state.simplex = new SimplexNoise(this.state.randSeed);
-
         this.anchor = this.position.clone();
         const coordinates = [
             [0, 0, -.5 * this.state.chunkWidth],
@@ -69,6 +67,8 @@ class ChunkManager extends Group {
             this.chunks.push(new_chunk);
         }
 
+
+        // setup "rewards"; i.e. objectives
         this.rewardIndex = 0;
         this.maxRewardNum = 10;
         this.maxRewardY = 100 + groundY;
@@ -114,7 +114,7 @@ class ChunkManager extends Group {
 
     updateReward() {
         const jCoord = this.getRewardJCoord(this.rewardIndex);
-        const pos = this.chunks[1].terrain.getPositionAtCoords(Math.floor(random(0, this.state.chunkVertWidth - 1)), jCoord);
+        const pos = this.chunks[1].chunk.getPositionAtCoords(Math.floor(random(0, this.state.chunkVertWidth - 1)), jCoord);
         pos.add(this.chunks[1].position);
         this.currentReward.position.set(pos.x, random(pos.y, this.maxRewardY), pos.z);
         // this.currentReward.position.set(0, 0, pos.z);
