@@ -25,35 +25,39 @@ export function handleKeyUp(event, keypress) {
 export function handleCharacterControls(scene, keypress, character, camera) {
     let obj = scene.getObjectByName(character);
     if (keypress['up'] && obj.position.y < 20) {
-        obj.position.y += 0.1;
-        obj.box.min.y += 0.1;
-        obj.box.max.y += 0.1;
+        const delta = 0.2;
+        obj.position.y += delta;
+        obj.box.min.y += delta;
+        obj.box.max.y += delta;
 
-        camera.position.y += 0.1;
+        camera.position.y += delta;
     }
     if (keypress['down']) {
-        obj.position.y -= 0.1;
-        obj.box.min.y -= 0.1;
-        obj.box.max.y -= 0.1;
+        const delta = 0.4;
+        obj.position.y -= delta;
+        obj.box.min.y -= delta;
+        obj.box.max.y -= delta;
 
-        camera.position.y -= 0.1;
+        camera.position.y -= delta;
     }
     if (keypress['right']) {
-        obj.position.x += 0.2;
-        obj.box.min.x += 0.1;
-        obj.box.max.x += 0.1;
+        const delta = 0.4;
+        obj.position.x += delta;
+        obj.box.min.x += delta;
+        obj.box.max.x += delta;
         // obj.rotation.z += 0.015;
         // need to somehow rotate bounding box
 
-        camera.position.x += 0.2;
+        camera.position.x += delta;
     }
     if (keypress['left']) {
-        obj.position.x -= 0.2;
-        obj.box.min.x -= 0.1;
-        obj.box.max.x -= 0.1;
+        const delta = 0.4;
+        obj.position.x -= delta;
+        obj.box.min.x -= delta;
+        obj.box.max.x -= delta;
         // obj.rotation.z -= 0.015;
         // need to somehow rotate bounding box
-        camera.position.x -= 0.2;
+        camera.position.x -= delta;
     }
 
     // clamp to viewport, not working
@@ -168,7 +172,8 @@ export function handleCollisions(scene, character, screens, sound, score) {
         // obj.position.y -= vector_norm.y * 0.1;
 
         // console.log('collision');
-        setTimeout(function() { buffer = false }, 5000);
+        setTimeout(function() { buffer = false; console.log("UNBUFFERED!"); }, 5000);
+        console.log("collision!");
         return;
     }
 
@@ -198,8 +203,9 @@ export function handleCollisions(scene, character, screens, sound, score) {
             setTimeout(function() {
                 fillScreen.classList.remove('red');
             }, 500);
-            setTimeout(function() { buffer = false }, 5000)
+            setTimeout(function() { buffer = false; console.log("UNBUFFERED!"); }, 5000)
             // obj.state.hit = false;
+            console.log("collision!");
             break;
         }
 
@@ -209,8 +215,8 @@ export function handleCollisions(scene, character, screens, sound, score) {
     let chunkWidth = chunkManager.state.chunkWidth;
     let terrain = chunkManager.chunks[0].terrain;
     let heightMap = terrain.heightMap;
-    
-    let j = Math.floor((chunkManagerPos.x + chunkWidth/2 + obj.position.x + 2 * Math.sign(obj.position.x)) / chunkWidth * (heightMap.length));
+
+    let j = Math.floor((chunkManagerPos.x + chunkWidth / 2 + obj.position.x + 2 * Math.sign(obj.position.x)) / chunkWidth * (heightMap.length));
     let i = Math.round((chunkWidth - (chunkManagerPos.z % chunkWidth)) / chunkWidth * (heightMap.length - 1));
 
     const index = (i * (heightMap.length) + j);
@@ -238,8 +244,8 @@ export function handleCollisions(scene, character, screens, sound, score) {
 
 
     const dummy = new THREE.Vector3();
-    console.log("to current reward", obj.position.distanceTo(chunkManager.currentReward.getWorldPosition(dummy)));
-    if (obj.position.distanceTo(chunkManager.currentReward.getWorldPosition(dummy)) < 10) {
+    // console.log("to current reward", obj.position.distanceTo(chunkManager.currentReward.getWorldPosition(dummy)));
+    if (obj.position.distanceTo(chunkManager.currentReward.getWorldPosition(dummy)) < 20) {
         console.log("!!!")
         chunkManager.position.y -= 50;
     }

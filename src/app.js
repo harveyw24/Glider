@@ -72,7 +72,7 @@ const onAnimationFrameHandler = (timeStamp) => {
         chunkManager.position.y = 0;
 
         // Set up camera
-        camera.position.set(0, 0, 8);
+        camera.position.set(0, 2, 8);
         camera.lookAt(new Vector3(0, 0, 0));
 
         score_num = 0;
