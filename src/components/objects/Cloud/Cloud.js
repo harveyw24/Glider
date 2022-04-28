@@ -54,7 +54,7 @@ class Cloud extends Group {
 
 
 
-        const tuft = new SphereGeometry(1.5 * scale, 7, 8);
+        const tuft = new SphereGeometry(2, 7, 8);
         geo.merge(tuft);
 
         const cloud = new Mesh(geo, material);

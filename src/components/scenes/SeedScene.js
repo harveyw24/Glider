@@ -26,13 +26,13 @@ class SeedScene extends Scene {
         // this.fog =  new THREE.Fog(0xADD8E6, 10, 1500);
 
         // Add meshes to scene
-        const land = new Land();
+        // const land = new Land();
         // const paper = new Paper(this)
         const airplane = new Airplane(this)
         const lights = new BasicLights();
         const chunkManager = new ChunkManager(this);
         this.chunkManager = chunkManager;
-        this.add(lights, land, airplane, chunkManager);
+        this.add(lights, airplane, chunkManager);
         
 
 

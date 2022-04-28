@@ -24,24 +24,24 @@ export function handleKeyUp(event, keypress) {
 
 export function handleCharacterControls(scene, keypress, character, camera) {
     let obj = scene.getObjectByName(character);
-    if (keypress['up'] && obj.position.y < 3) {
+    if (keypress['up'] && obj.position.y < 5) {
         obj.position.y += 0.1;
         obj.box.min.y += 0.1;
         obj.box.max.y += 0.1;
     }
-    if (keypress['down'] && obj.position.y > -2) {
+    if (keypress['down'] && obj.position.y > -5) {
         obj.position.y -= 0.1;
         obj.box.min.y -= 0.1;
         obj.box.max.y -= 0.1;
     }
-    if (keypress['right'] && obj.position.x < 4) {
+    if (keypress['right'] && obj.position.x < 10) {
         obj.position.x += 0.1;
         obj.position.x += 0.1;
         obj.box.min.x += 0.1;
         // obj.rotation.z += 0.015;
         // need to somehow rotate bounding box
     }
-    if (keypress['left'] && obj.position.x > -4) {
+    if (keypress['left'] && obj.position.x > -10) {
         obj.position.x -= 0.1;
         obj.position.x -= 0.1;
         obj.box.min.x -= 0.1;
@@ -111,9 +111,9 @@ export function handleCollisions(scene, character, screens, sound, score){
             let vector_pos = new THREE.Vector3();
             child.getWorldPosition(vector_pos);
 
-            if (vector_pos.z > -100 && vector_pos.z < 1000 && vector_pos.x > -100 && vector_pos.x < 100) {
+            if (vector_pos.z > -100 && vector_pos.z < 100 && vector_pos.x > -50 && vector_pos.x < 50) {
                 clouds.push(child); 
-                child.mesh.material.color.setHex(0x000000)
+                child.mesh.material.color.setHex(0xff0000)
                 // console.log(child.position.x)
                 // console.log(child.position.y)
                 // console.log(child.position.z)
@@ -167,14 +167,17 @@ export function handleCollisions(scene, character, screens, sound, score){
     
     for (let i = 0; i < pos.count; i += 1) {
         vector_pos.fromBufferAttribute(pos, i);
+        vector_pos.add(obj.position)
+        vector_pos.z -= 12;
+        vector_pos.y -= 2.5;
         // vector_pos.applyMatrix4(matWorld);
         vector_norm.fromBufferAttribute(norm, i);
         // vector_norm.applyMatrix4(matWorld);
         let ray = new THREE.Raycaster(vector_pos, vector_norm);
-        // scene.add(new THREE.ArrowHelper(ray.ray.direction, ray.ray.origin, 5, 0xff0000) );
+        // scene.add(new THREE.ArrowHelper(ray.ray.direction, ray.ray.origin, 0.5, 0xff0000) );
 
         let collisions = ray.intersectObjects(meshes, false);
-        if (collisions.length != 0 && collisions[0].distance < 5) {
+        if (collisions.length != 0 && collisions[0].distance < 0.5) {
             obj.state.hit = true;
             buffer = true;
             // console.log(obj.state)
@@ -184,11 +187,6 @@ export function handleCollisions(scene, character, screens, sound, score){
             setTimeout(function() {
                 fillScreen.classList.remove('red');
             }, 500);
-            // obj.position = obj.position.add(vector_norm.multiplyScalar(1))
-            // obj.position.x -= vector_norm.x * 0.1;
-            // obj.position.y -= vector_norm.y * 0.1;
-
-            // console.log('collision');
             setTimeout (function(){ buffer = false}, 5000)
             // obj.state.hit = false;
             break;
