@@ -17,6 +17,12 @@ export function init_page(document) {
     footer.id = 'footer';
     footer.innerHTML = FOOTER;
     document.body.appendChild(footer)
+
+    let audio = document.createElement('audio');
+    audio.setAttribute('src','src/sounds/menu.wav');
+    audio.id = 'audio'
+    audio.loop = true;
+    document.body.appendChild(audio)
 }
 
 export function quit(document, score) {

@@ -9,3 +9,5 @@ export * from './Chunk';
 export * from './ChunkLine';
 export * from './ChunkManager';
 export * from './Airplane';
+export * from './Fan';
+

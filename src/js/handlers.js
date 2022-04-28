@@ -57,14 +57,16 @@ export function handleCharacterControls(scene, keypress, character, camera) {
 
 }
 // Handle screens
-export function handleScreens(event, screens, document, canvas, sound, score) {
+export function handleScreens(event, screens, document, canvas, sounds, score) {
     // quit: game -> ending
     if (event.key == 'q') {
         screens['menu'] = false;
         screens['paused'] = false;
         screens['ending'] = true;
         pages.quit(document, score);
-        sound.stop()
+        sounds['whirring'].stop()
+        document.getElementById('audio').pause();
+
     }
     // restart: ending -> menu
     else if (event.key == " " && screens["ending"]) {
@@ -77,24 +79,50 @@ export function handleScreens(event, screens, document, canvas, sound, score) {
     else if (event.key == " " && screens["menu"]) {
         screens["menu"] = false;
         pages.start(document, canvas);
-        sound.play()
+        sounds['whirring'].play()
+        document.getElementById('audio').play()
     }
     // unpause: pause -> game
     else if (event.key == " " && screens["pause"]) {
         screens["pause"] = false;
-        sound.setVolume(0.5);
+        sounds['whirring'].setVolume(0.4);
+        document.getElementById('audio').volume = 1;
     }
-    // unpause: pause -> game
+    // pause: game -> pause
     else if (event.key == " " && !screens["ending"]) {
         screens["pause"] = true;
-        sound.setVolume(0.2);
+        sounds['whirring'].setVolume(0.1);
+        document.getElementById('audio').volume = 0.5;
+
     }
 }
 
-// let land = scene.getObjectByName('land');
-export function handleCollisions(scene, character, screens, sound, score) {
-    let obj = scene.getObjectByName(character);
+    // let land = scene.getObjectByName('land');
+export function handleCollisions(document, scene, character, screens, sounds, score){
+    if (buffer) return;
+
+    let land = scene.getObjectByName('land');
     let chunkManager = scene.getObjectByName('chunkManager');
+    let clouds = [];
+    scene.traverseVisible(function(child) {
+        if (child.name === "cloud") {
+            let matWorld = child.matrixWorld;
+            let vector_pos = new THREE.Vector3();
+            child.getWorldPosition(vector_pos);
+
+            if (vector_pos.z > -100 && vector_pos.z < 100 && vector_pos.x > -50 && vector_pos.x < 50) {
+                clouds.push(child); 
+                child.mesh.material.color.setHex(0xff0000)
+            }
+            else {
+                child.mesh.material.color.setHex(0xffffff)
+
+            }
+          
+        }
+      });
+
+    let obj = scene.getObjectByName(character);
     let chunkManagerPos = chunkManager.position;
     let chunkWidth = chunkManager.state.chunkWidth;
     let chunk = chunkManager.chunks[0].chunk;
@@ -106,16 +134,6 @@ export function handleCollisions(scene, character, screens, sound, score) {
     const index = (i * (heightMap.length) + j);
     const v1 = chunk.geometry.vertices[index];
 
-    // DEBUG LOGGING
-    // console.log("--------------");
-    // console.log(chunkManagerPos.z);
-    // console.log("i", i);
-    // console.log(v1);
-    // chunk.clouds[0].position.set(v1.x, 0, -v1.y);
-    // console.log("HEIGHT: ", v1.z);
-
-    // Collide with chunk
-    // target is how much the ground has risen, -v1.z is chunk height at cur point
     let target = new THREE.Vector3();
     chunk.getWorldPosition(target);
     if (target.y + chunkManager.state.groundY - obj.position.y > -v1.z) {
@@ -123,7 +141,9 @@ export function handleCollisions(scene, character, screens, sound, score) {
         screens['paused'] = false;
         screens['ending'] = true;
         pages.quit(document, score);
-        sound.stop()
+        sounds['whirring'].stop()
+        document.getElementById('audio').pause()
+        // sounds['menu'].stop()
     }
 
 
@@ -132,6 +152,13 @@ export function handleCollisions(scene, character, screens, sound, score) {
     if (obj.position.distanceTo(chunkManager.currentReward.getWorldPosition(dummy)) < 20) {
         console.log("!!!")
         chunkManager.position.y -= 50;
+        sounds['powerup'].play();
+        sounds['whirring'].setVolume(1)
+
+        setTimeout(function() {
+            sounds['whirring'].setVolume(0.4)
+        }, 2000);
+       
     }
 
 
@@ -188,6 +215,7 @@ export function handleCollisions(scene, character, screens, sound, score) {
             setTimeout(function() {
                 fillScreen.classList.remove('red');
             }, 500);
+            sounds['damage'].play();
             // obj.position = obj.position.add(vector_norm.multiplyScalar(1))
             // obj.position.x -= vector_norm.x * 0.1;
             // obj.position.y -= vector_norm.y * 0.1;
@@ -224,6 +252,8 @@ export function handleCollisions(scene, character, screens, sound, score) {
                 setTimeout(function() {
                     fillScreen.classList.remove('red');
                 }, 500);
+                sounds['damage'].play();
+
                 setTimeout(function() { buffer = false; console.log("UNBUFFERED!"); }, 5000)
                 // obj.state.hit = false;
                 console.log("collision!");
@@ -240,6 +270,15 @@ export function updateScore(document, score) {
     scoreCounter.innerHTML = 'Score: '.concat(score)
 }
 
-
+export function updateAudioSpeed(document, sounds, scene) {
+    let chunkManager = scene.getObjectByName('chunkManager');
+    let height = chunkManager.getWorldPosition().y;
+    let newPlaybackSpeed = height/400+1;
+    let newPitch = -(newPlaybackSpeed-1) * 1200;
+    let audio = document.getElementById('audio');
+    audio.playbackRate = newPlaybackSpeed;
+    
+ 
+}
 
 
