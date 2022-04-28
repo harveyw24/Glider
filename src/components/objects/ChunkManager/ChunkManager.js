@@ -1,5 +1,5 @@
 import { Group, Color, PlaneBufferGeometry, PlaneGeometry } from 'three';
-import { Chunk } from '../Chunk';
+import { ChunkLine } from '../ChunkLine';
 import { Tree } from '../Tree';
 
 function random(min, max) {
@@ -50,7 +50,6 @@ class ChunkManager extends Group {
             treeHeightMax: 50 + waterHeight,
             cloudYMin: 100 + groundY,
             cloudYMax: 150 + groundY,
-            firstChunk: true
         }
 
 
@@ -60,13 +59,12 @@ class ChunkManager extends Group {
         const coordinates = [
             [0, 0, -.5 * this.state.chunkWidth],
             [0, 0, -1.5 * this.state.chunkWidth],
-            [0, 0, -2.5 * this.state.chunkWidth],
         ];
 
 
         this.chunks = [];
         for (let i = 0; i < coordinates.length; i++) {
-            const new_chunk = new Chunk(this, coordinates[i][0], coordinates[i][1], coordinates[i][2]);
+            const new_chunk = new ChunkLine(this, coordinates[i][0], coordinates[i][1], coordinates[i][2]);
             this.add(new_chunk);
             this.chunks.push(new_chunk);
         }
@@ -152,9 +150,6 @@ class ChunkManager extends Group {
             } else {
                 this.state.falling = 0;
             }
-        }
-        if (this.position.z >= this.state.chunkWidth / 2) {
-            this.state.firstChunk = false;
         }
         if (this.position.z - this.anchor.z >= this.state.chunkWidth) {
             this.chunks[0].setChunkPosition(

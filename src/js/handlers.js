@@ -24,40 +24,26 @@ export function handleKeyUp(event, keypress) {
 
 export function handleCharacterControls(scene, keypress, character, camera) {
     let obj = scene.getObjectByName(character);
+    let chunkManager = scene.getObjectByName('chunkManager');
     if (keypress['up'] && obj.position.y < 20) {
         const delta = 0.2;
-        obj.position.y += delta;
-        obj.box.min.y += delta;
-        obj.box.max.y += delta;
-
-        camera.position.y += delta;
+        chunkManager.position.y -= delta;
     }
     if (keypress['down']) {
         const delta = 0.4;
-        obj.position.y -= delta;
-        obj.box.min.y -= delta;
-        obj.box.max.y -= delta;
-
-        camera.position.y -= delta;
+        chunkManager.position.y += delta;
     }
     if (keypress['right']) {
         const delta = 0.4;
-        obj.position.x += delta;
-        obj.box.min.x += delta;
-        obj.box.max.x += delta;
+        chunkManager.position.x -= delta;
         // obj.rotation.z += 0.015;
         // need to somehow rotate bounding box
-
-        camera.position.x += delta;
     }
     if (keypress['left']) {
         const delta = 0.4;
-        obj.position.x -= delta;
-        obj.box.min.x -= delta;
-        obj.box.max.x -= delta;
+        chunkManager.position.x += delta;
         // obj.rotation.z -= 0.015;
         // need to somehow rotate bounding box
-        camera.position.x -= delta;
     }
 
     // clamp to viewport, not working
@@ -107,116 +93,14 @@ export function handleScreens(event, screens, document, canvas, sound, score) {
 
 // let land = scene.getObjectByName('land');
 export function handleCollisions(scene, character, screens, sound, score) {
-    if (buffer) return;
-
-    let land = scene.getObjectByName('land');
-    let chunkManager = scene.getObjectByName('chunkManager');
-    let clouds = [];
-
-    const childPosition = new THREE.Vector3();
-    scene.traverseVisible(function(child) {
-        if (child.name === "cloud") {
-            let matWorld = child.matrixWorld;
-            // let vector_pos = new THREE.Vector3(0,0,0);
-            // vector_pos.copy(child.position);
-            // vector_pos.applyMatrix4(matWorld);
-            // console.log(vector_pos)
-            let vector_pos = new THREE.Vector3();
-            child.getWorldPosition(vector_pos);
-
-            if (vector_pos.z > -100 && vector_pos.z < 100 && vector_pos.x > -50 && vector_pos.x < 50) {
-                clouds.push(child);
-                child.mesh.material.color.setHex(0xff0000)
-                // console.log(child.position.x)
-                // console.log(child.position.y)
-                // console.log(child.position.z)
-
-                // console.log(vector_pos.x);
-                // console.log(vector_pos.y);
-                // console.log(vector_pos.z);
-            }
-            else {
-                child.mesh.material.color.setHex(0xffffff)
-
-            }
-
-        }
-    });
-
     let obj = scene.getObjectByName(character);
-    let meshes = [];
-    let plane = [];
-    clouds.forEach(cloud => {
-        utils.findType(cloud, 'Mesh', meshes)
-    })
-    // utils.findType(chunkManager, 'Mesh', meshes)
-    utils.findType(obj, 'Mesh', plane);
-    let pos = plane[0].geometry.attributes.position;
-    let norm = plane[0].geometry.attributes.normal;
-    let matWorld = plane[0].matrixWorld;
-    const vector_pos = new THREE.Vector3();
-    const vector_norm = new THREE.Vector3();
-
-    let raytip = new THREE.Raycaster(plane[0].tip, new THREE.Vector3(0, 0, -1));
-    let raycollisions = raytip.intersectObjects(meshes, false);
-    if (raycollisions.length != 0 && raycollisions[0].distance < 0.5) {
-        buffer = true;
-        // chunkManager.position.y += 30;
-        let fillScreen = document.getElementById('fillScreen');
-        fillScreen.classList.add('red');
-        setTimeout(function() {
-            fillScreen.classList.remove('red');
-        }, 500);
-        // obj.position = obj.position.add(vector_norm.multiplyScalar(1))
-        // obj.position.x -= vector_norm.x * 0.1;
-        // obj.position.y -= vector_norm.y * 0.1;
-
-        // console.log('collision');
-        setTimeout(function() { buffer = false; console.log("UNBUFFERED!"); }, 5000);
-        console.log("collision!");
-        return;
-    }
-
-    for (let i = 0; i < pos.count; i += 1) {
-        vector_pos.fromBufferAttribute(pos, i);
-        vector_pos.add(obj.position)
-        vector_pos.z -= 12;
-        vector_pos.y -= 2.5;
-        // vector_pos.applyMatrix4(matWorld);
-        vector_norm.fromBufferAttribute(norm, i);
-
-        vector_pos.add(obj.position);
-        let ray = new THREE.Raycaster(vector_pos, vector_norm);
-        // scene.add(new THREE.ArrowHelper(ray.ray.direction, ray.ray.origin, 0.5, 0xff0000) );
-
-        let collisions = ray.intersectObjects(meshes, false);
-        if (collisions.length != 0 && collisions[0].distance < 0.5) {
-            obj.state.hit = true;
-            buffer = true;
-            // console.log(obj.state)
-            if (chunkManager.state.falling == 0) {
-                chunkManager.state.falling = 1;
-            }
-            // chunkManager.position.y += 30;
-            let fillScreen = document.getElementById('fillScreen');
-            fillScreen.classList.add('red');
-            setTimeout(function() {
-                fillScreen.classList.remove('red');
-            }, 500);
-            setTimeout(function() { buffer = false; console.log("UNBUFFERED!"); }, 5000)
-            // obj.state.hit = false;
-            console.log("collision!");
-            break;
-        }
-
-    }
-
+    let chunkManager = scene.getObjectByName('chunkManager');
     let chunkManagerPos = chunkManager.position;
     let chunkWidth = chunkManager.state.chunkWidth;
     let terrain = chunkManager.chunks[0].terrain;
     let heightMap = terrain.heightMap;
 
-    let j = Math.floor((chunkManagerPos.x + chunkWidth / 2 + obj.position.x + 2 * Math.sign(obj.position.x)) / chunkWidth * (heightMap.length));
+    let j = Math.floor((-chunkManagerPos.x + chunkWidth / 2) / chunkWidth * (heightMap.length));
     let i = Math.round((chunkWidth - (chunkManagerPos.z % chunkWidth)) / chunkWidth * (heightMap.length - 1));
 
     const index = (i * (heightMap.length) + j);
@@ -248,6 +132,105 @@ export function handleCollisions(scene, character, screens, sound, score) {
     if (obj.position.distanceTo(chunkManager.currentReward.getWorldPosition(dummy)) < 20) {
         console.log("!!!")
         chunkManager.position.y -= 50;
+    }
+
+
+    if (!buffer) {
+        let clouds = [];
+
+        scene.traverseVisible(function(child) {
+            if (child.name === "cloud") {
+                // let vector_pos = new THREE.Vector3(0,0,0);
+                // vector_pos.copy(child.position);
+                // vector_pos.applyMatrix4(matWorld);
+                // console.log(vector_pos)
+                let vector_pos = new THREE.Vector3();
+                child.getWorldPosition(vector_pos);
+
+                if (vector_pos.z > -100 && vector_pos.z < 100 && vector_pos.x > -50 && vector_pos.x < 50) {
+                    clouds.push(child);
+                    child.mesh.material.color.setHex(0xff0000)
+                    // console.log(child.position.x)
+                    // console.log(child.position.y)
+                    // console.log(child.position.z)
+
+                    // console.log(vector_pos.x);
+                    // console.log(vector_pos.y);
+                    // console.log(vector_pos.z);
+                }
+                else {
+                    child.mesh.material.color.setHex(0xffffff)
+
+                }
+
+            }
+        });
+
+        let meshes = [];
+        let plane = [];
+        clouds.forEach(cloud => {
+            utils.findType(cloud, 'Mesh', meshes)
+        })
+        // utils.findType(chunkManager, 'Mesh', meshes)
+        utils.findType(obj, 'Mesh', plane);
+        let pos = plane[0].geometry.attributes.position;
+        let norm = plane[0].geometry.attributes.normal;
+        const vector_pos = new THREE.Vector3();
+        const vector_norm = new THREE.Vector3();
+
+        let raytip = new THREE.Raycaster(plane[0].tip, new THREE.Vector3(0, 0, -1));
+        let raycollisions = raytip.intersectObjects(meshes, false);
+        if (raycollisions.length != 0 && raycollisions[0].distance < 0.5) {
+            buffer = true;
+            // chunkManager.position.y += 30;
+            let fillScreen = document.getElementById('fillScreen');
+            fillScreen.classList.add('red');
+            setTimeout(function() {
+                fillScreen.classList.remove('red');
+            }, 500);
+            // obj.position = obj.position.add(vector_norm.multiplyScalar(1))
+            // obj.position.x -= vector_norm.x * 0.1;
+            // obj.position.y -= vector_norm.y * 0.1;
+
+            // console.log('collision');
+            setTimeout(function() { buffer = false; console.log("UNBUFFERED!"); }, 5000);
+            console.log("collision!");
+            return;
+        }
+
+        for (let i = 0; i < pos.count; i += 1) {
+            vector_pos.fromBufferAttribute(pos, i);
+            vector_pos.add(obj.position)
+            vector_pos.z -= 12;
+            vector_pos.y -= 2.5;
+            // vector_pos.applyMatrix4(matWorld);
+            vector_norm.fromBufferAttribute(norm, i);
+
+            vector_pos.add(obj.position);
+            let ray = new THREE.Raycaster(vector_pos, vector_norm);
+            // scene.add(new THREE.ArrowHelper(ray.ray.direction, ray.ray.origin, 0.5, 0xff0000) );
+
+            let collisions = ray.intersectObjects(meshes, false);
+            if (collisions.length != 0 && collisions[0].distance < 0.5) {
+                obj.state.hit = true;
+                buffer = true;
+                // console.log(obj.state)
+                if (chunkManager.state.falling == 0) {
+                    chunkManager.state.falling = 1;
+                }
+                // chunkManager.position.y += 30;
+                let fillScreen = document.getElementById('fillScreen');
+                fillScreen.classList.add('red');
+                setTimeout(function() {
+                    fillScreen.classList.remove('red');
+                }, 500);
+                setTimeout(function() { buffer = false; console.log("UNBUFFERED!"); }, 5000)
+                // obj.state.hit = false;
+                console.log("collision!");
+                break;
+            }
+
+        }
     }
 }
 

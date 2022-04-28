@@ -1,7 +1,7 @@
 import { Group } from 'three';
 import { Terrain } from '../Terrain';
 
-class Chunk extends Group {
+class ChunkLine extends Group {
     constructor(parent, xOffset, yOffset, zOffset) {
         // console.log("CONSTRUCTOR CHUNK x: " + xOffset + " t: " + yOffset + " z: " + zOffset)
         // Call parent Group() constructor
@@ -11,6 +11,7 @@ class Chunk extends Group {
         this.state = {
             gui: parent.state.gui,
             parent: parent,
+            chunkManager: parent,
         };
 
         // feed in the parent (chunk manager) as it has the proper terrain variables
@@ -19,18 +20,6 @@ class Chunk extends Group {
         this.add(this.terrain);
 
 
-        // if(parent.state.displayClouds == true) {
-        //   this.cloud1 = new Cloud(parent,0);
-        //   this.add(this.cloud1);
-
-        //   this.cloud2 = new Cloud(parent,1);
-        //   this.add(this.cloud2);
-        // }
-
-        // if(parent.state.displayOrbs == true) {
-        //   this.orb1 = new Orb(parent);
-        //   this.add(this.orb1);
-        // }
     }
 
 
@@ -52,26 +41,8 @@ class Chunk extends Group {
     disposeOf() {
         this.terrain.disposeOf()
         this.remove(this.terrain)
-
-        //   if(this.cloud1 != null) {
-        //     this.cloud1.disposeOf()
-        //     this.remove(this.cloud1)
-        //   }
-
-        //   if(this.cloud2 != null) {
-        //     this.cloud2.disposeOf()
-        //     this.remove(this.cloud2)
-        //   }
-
-        //   if(this.orb1 != null) {
-        //     this.orb1.disposeOf()
-        //     this.remove(this.orb1)
-        //   }
-
-
-        return this.terrain.disposeOf()
     }
 
 }
 
-export default Chunk;
+export default ChunkLine;

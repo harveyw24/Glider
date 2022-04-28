@@ -19,7 +19,7 @@ class Terrain extends Group {
         this.state = {
             gui: parent.state.gui,
             parent: parent,
-            chunkManager: parent.state.parent
+            chunkManager: parent.state.chunkManager
         };
 
         // take state from parent.parent = chunkManager
@@ -168,7 +168,7 @@ class Terrain extends Group {
                     this.trees[treeIndex].position.set(pos.x, pos.y, pos.z); // plane is rotated
                     treeIndex++;
                 }
-                if (cloudIndex < this.clouds.length && Math.random() < .0025) {
+                if (cloudIndex < this.clouds.length && Math.random() < 25 / this.geometry.vertices.length) {
                     this.clouds[cloudIndex].visible = true;
                     this.clouds[cloudIndex].position.set(v.x, random(this.CMState.cloudYMin, this.CMState.cloudYMax), -v.y);
                     cloudIndex++;
