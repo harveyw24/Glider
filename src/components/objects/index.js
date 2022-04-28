@@ -10,4 +10,4 @@ export * from './ChunkLine';
 export * from './ChunkManager';
 export * from './Airplane';
 export * from './Fan';
-
+export * from './Sky';

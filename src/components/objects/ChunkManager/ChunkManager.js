@@ -50,6 +50,8 @@ class ChunkManager extends Group {
             treeHeightMax: 50 + waterHeight,
             cloudYMin: 100 + groundY,
             cloudYMax: 150 + groundY,
+            falling: 0,
+            climbing: 0
         }
 
 
@@ -138,19 +140,32 @@ class ChunkManager extends Group {
     update(timeStamp) {
         // Chunk positions are relative to terrain, so updating terrain position is sufficient
         this.position.z += 3;
-        this.position.y += 0.2;
+        this.position.y += 0.25;
 
         // Gradual collision falling collision
         if (this.state.falling > 0) {
-            if (this.state.falling < 60) {
-                let offset = Math.pow(90 - this.state.falling, 0.3) / 3;
+            if (this.state.falling < 40) {
+                let offset = Math.pow(70 - this.state.falling, 0.3) / 3;
                 this.state.falling += offset;
                 this.position.y += offset;
-
             } else {
                 this.state.falling = 0;
             }
         }
+
+        // Gradual climbing
+        console.log(this.state.climbing);
+        if (this.state.climbing > 0) {
+            if (this.state.climbing < 50) {
+                let offset = Math.pow(80 - this.state.climbing, 0.3) / 3;
+                this.state.climbing += offset;
+                this.position.y -= offset;
+            } else {
+                this.state.climbing = 0;
+            }
+        }
+
+
         if (this.position.z - this.anchor.z >= this.state.chunkWidth) {
             this.chunks[0].setChunkPosition(
                 this.chunks[0].position.x,

@@ -16,7 +16,50 @@
  import { apply } from 'file-loader';
  
  
- 
+ function initSky(sky, sun, renderer, gui) {
+    /// GUI
+
+    const effectController = {
+        turbidity: 10,
+        rayleigh: 3,
+        mieCoefficient: 0.005,
+        mieDirectionalG: 0.7,
+        elevation: 2,
+        azimuth: 180,
+        exposure: renderer.toneMappingExposure
+    };
+
+    function guiChanged() {
+
+        const uniforms = sky.material.uniforms;
+        uniforms[ 'turbidity' ].value = effectController.turbidity;
+        uniforms[ 'rayleigh' ].value = effectController.rayleigh;
+        uniforms[ 'mieCoefficient' ].value = effectController.mieCoefficient;
+        uniforms[ 'mieDirectionalG' ].value = effectController.mieDirectionalG;
+
+        const phi = THREE.MathUtils.degToRad( 90 - effectController.elevation );
+        const theta = THREE.MathUtils.degToRad( effectController.azimuth );
+
+        sun.setFromSphericalCoords( 1, phi, theta );
+
+        uniforms[ 'sunPosition' ].value.copy( sun );
+
+        renderer.toneMappingExposure = effectController.exposure;
+        renderer.render( scene, camera );
+
+    }
+
+    gui.add( effectController, 'turbidity', 0.0, 20.0, 0.1 ).onChange( guiChanged );
+    gui.add( effectController, 'rayleigh', 0.0, 4, 0.001 ).onChange( guiChanged );
+    gui.add( effectController, 'mieCoefficient', 0.0, 0.1, 0.001 ).onChange( guiChanged );
+    gui.add( effectController, 'mieDirectionalG', 0.0, 1, 0.001 ).onChange( guiChanged );
+    gui.add( effectController, 'elevation', 0, 90, 0.1 ).onChange( guiChanged );
+    gui.add( effectController, 'azimuth', - 180, 180, 0.1 ).onChange( guiChanged );
+    gui.add( effectController, 'exposure', 0, 1, 0.0001 ).onChange( guiChanged );
+
+    guiChanged();
+}
+
  // Initialize core ThreeJS components
  let scene = new SeedScene();
  const camera = new PerspectiveCamera();
@@ -36,6 +79,8 @@
 
 
  const clock = new THREE.Clock();
+
+ initSky(scene.sky, scene.sun, renderer, scene.state.gui);
  
  const audioLoader = new THREE.AudioLoader();
  audioLoader.load( 'src/sounds/menu.wav', function( buffer ) {
@@ -70,7 +115,7 @@ audioLoader.load( 'src/sounds/powerup.wav', function( buffer ) {
  let oldTime = 0;
  
  // Set up camera
- camera.position.set(0, 0, 20);
+ camera.position.set(0, 2, 20);
  camera.lookAt(new Vector3(0, 0, 0));
  
  // Set up renderer, canvas, and minor CSS adjustments

@@ -23,28 +23,64 @@ export function handleKeyUp(event, keypress) {
 }
 
 export function handleCharacterControls(scene, keypress, character, camera) {
-    let obj = scene.getObjectByName(character);
+    let plane = scene.getObjectByName(character);
     let chunkManager = scene.getObjectByName('chunkManager');
-    if (keypress['up'] && obj.position.y < 20) {
+    const maxRotation = 0.45;
+    const maxPitch = 0.2;
+    const rotationRate = 0.02;
+
+    if (keypress['up'] && plane.position.y < 20) {
         const delta = 0.2;
         chunkManager.position.y -= delta;
+        if (plane.rotation.x < maxPitch) {
+            if (plane.rotation.x > maxPitch - 0.02) {
+                plane.rotation.x += rotationRate / 4;
+            } else {
+                plane.rotation.x += rotationRate;
+            }
+        }
     }
     if (keypress['down']) {
         const delta = 0.4;
         chunkManager.position.y += delta;
+
+        if (plane.rotation.x > -maxPitch) {
+            if (plane.rotation.x < -maxPitch + 0.02) {
+                plane.rotation.x -= rotationRate / 4;
+            } else {
+                plane.rotation.x -= rotationRate;
+            }
+        }
     }
     if (keypress['right']) {
         const delta = 0.4;
         chunkManager.position.x -= delta;
-        // obj.rotation.z += 0.015;
+        // plane.state.rotation = "right";
+        if (plane.rotation.z > -maxRotation) {
+            if (plane.rotation.z < -maxRotation + 0.02) {
+                plane.rotation.z -= rotationRate / 4;
+            } else {
+                plane.rotation.z -= rotationRate;
+            }
+        }
         // need to somehow rotate bounding box
     }
     if (keypress['left']) {
         const delta = 0.4;
         chunkManager.position.x += delta;
-        // obj.rotation.z -= 0.015;
+        // plane.state.rotation = "left";
+        if (plane.rotation.z < maxRotation) {
+            if (plane.rotation.z > maxRotation - 0.02) {
+                plane.rotation.z += rotationRate / 4;
+            } else {
+                plane.rotation.z += rotationRate;
+            }
+        }
+        
         // need to somehow rotate bounding box
     }
+    camera.rotation.z = plane.rotation.z / 3;
+    camera.position.y = 2 + plane.rotation.x * 2;
 
     // clamp to viewport, not working
     // let h = visibleHeightAtZDepth(5, camera);
@@ -151,7 +187,6 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
     // console.log("to current reward", obj.position.distanceTo(chunkManager.currentReward.getWorldPosition(dummy)));
     if (obj.position.distanceTo(chunkManager.currentReward.getWorldPosition(dummy)) < 20) {
         console.log("!!!")
-        chunkManager.position.y -= 50;
         sounds['powerup'].play();
         sounds['whirring'].setVolume(1)
 
@@ -159,6 +194,10 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
             sounds['whirring'].setVolume(0.4)
         }, 2000);
        
+        // chunkManager.position.y -= 50;
+        if (chunkManager.state.climbing == 0) {
+            chunkManager.state.climbing = 1;
+        }
     }
 
 
@@ -208,7 +247,12 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
         let raytip = new THREE.Raycaster(plane[0].tip, new THREE.Vector3(0, 0, -1));
         let raycollisions = raytip.intersectObjects(meshes, false);
         if (raycollisions.length != 0 && raycollisions[0].distance < 0.5) {
+            obj.state.hit = true;
             buffer = true;
+            // console.log(obj.state)
+            if (chunkManager.state.falling == 0) {
+                chunkManager.state.falling = 1;
+            }
             // chunkManager.position.y += 30;
             let fillScreen = document.getElementById('fillScreen');
             fillScreen.classList.add('red');
@@ -221,8 +265,8 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
             // obj.position.y -= vector_norm.y * 0.1;
 
             // console.log('collision');
-            setTimeout(function() { buffer = false; console.log("UNBUFFERED!"); }, 5000);
-            console.log("collision!");
+            setTimeout(function() { buffer = false; console.log("UNBUFFERED!"); }, 3000)
+            console.log("collision! (v0");
             return;
         }
 
@@ -254,9 +298,9 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
                 }, 500);
                 sounds['damage'].play();
 
-                setTimeout(function() { buffer = false; console.log("UNBUFFERED!"); }, 5000)
+                setTimeout(function() { buffer = false; console.log("UNBUFFERED!"); }, 3000)
                 // obj.state.hit = false;
-                console.log("collision!");
+                console.log("collision! (v1)");
                 break;
             }
 

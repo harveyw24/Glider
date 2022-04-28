@@ -17,7 +17,8 @@ class Airplane extends Group {
             action: null,
             hit: null,
             hitTime: null,
-            speed: 1000
+            speed: 1000,
+            rotation: "none"
         };
 
         this.name = 'plane';
@@ -64,6 +65,23 @@ class Airplane extends Group {
         if (this.state.prevTimeStamp === null) {
             this.state.prevTimeStamp = timeStamp;
         }
+
+        // Angle correction
+        if (Math.abs(this.rotation.z) < 0.005) {
+                this.rotation.z = 0;
+        } else {
+                this.rotation.z -= Math.sign(this.rotation.z) * 0.005;
+        }
+        if (Math.abs(this.rotation.x) < 0.005) {
+            this.rotation.x = 0;
+        } else {
+                this.rotation.x -= Math.sign(this.rotation.x) * 0.005;
+        }
+        
+        if (this.parent.chunkManager.state.climbing > 0) {
+            this.rotation.x += 0.01;
+        }
+        // this.rotation.z -= Math.sign(this.rotation.z) * 0.005;
 
         let delta;
         if (this.state.hit) {
