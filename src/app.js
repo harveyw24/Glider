@@ -41,9 +41,6 @@ let score;
 let score_num = 0;
 let oldTime = 0;
 
-// Set up camera
-camera.position.set(0, 0, 20);
-camera.lookAt(new Vector3(0, 0, 0));
 
 // Set up renderer, canvas, and minor CSS adjustments
 renderer.setPixelRatio(window.devicePixelRatio);
@@ -73,6 +70,10 @@ const onAnimationFrameHandler = (timeStamp) => {
         plane.position.z = 0;
 
         chunkManager.position.y = 0;
+
+        // Set up camera
+        camera.position.set(0, 0, 8);
+        camera.lookAt(new Vector3(0, 0, 0));
 
         score_num = 0;
     }

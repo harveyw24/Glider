@@ -142,7 +142,6 @@ export function handleCollisions(scene, character, screens, sound, score) {
     let obj = scene.getObjectByName(character);
     let meshes = [];
     let plane = [];
-    utils.findType(land, 'Mesh', meshes)
     clouds.forEach(cloud => {
         utils.findType(cloud, 'Mesh', meshes)
     })
