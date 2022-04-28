@@ -1,9 +1,13 @@
 import { Group } from 'three';
 import { Chunk } from '../Chunk';
+import { Turbine } from '../Turbine';
+
+function random(min, max) {
+    return Math.random() * (max - min) + min;
+}
 
 class ChunkLine extends Group {
     constructor(parent, xOffset, yOffset, zOffset) {
-        // console.log("CONSTRUCTOR CHUNK x: " + xOffset + " t: " + yOffset + " z: " + zOffset)
         // Call parent Group() constructor
         super();
 
@@ -13,52 +17,64 @@ class ChunkLine extends Group {
             parent: parent,
             chunkManager: parent,
         };
-        
         this.CMState = this.state.chunkManager.state;
-        
-        
-        // this.chunks = [];
-        // for (let i = 0; i < coordinates.length; i++) {
-        //     const new_chunk = new ChunkLine(this, coordinates[i][0], coordinates[i][1], coordinates[i][2]);
-        //     this.add(new_chunk);
-        //     this.chunks.push(new_chunk);
-        // }
-
-        // 
-        // // setup "rewards"; i.e. objectives
-        // this.rewardIndex = 0;
-        // this.maxRewardNum = 10;
-        // this.maxRewardY = 100 + groundY;
-        // this.rewards = Array.from(Array(this.maxRewardNum), () => new Tree());
-        // this.currentReward = this.rewards[this.rewardIndex];
-        // for (let k = 0; k < this.maxRewardNum; k++) {
-        //     this.updateReward();
-        //     this.add(this.currentReward);
-        // }
-
-        // feed in the parent (chunk manager) as it has the proper chunk variables
-        this.setChunkPosition(xOffset, yOffset, zOffset);
-        this.chunk = new Chunk(this)
-        this.add(this.chunk);
+        this.setChunkLinePosition(xOffset, yOffset, zOffset);
 
 
+
+        const coordinates = [
+            [0, 0, -.5 * this.CMState.chunkWidth],
+            [0, 0, -1.5 * this.CMState.chunkWidth],
+            [0, 0, -2.5 * this.CMState.chunkWidth],
+        ];
+        this.chunks = [];
+        for (let i = 0; i < coordinates.length; i++) {
+            const new_chunk = new Chunk(this, coordinates[i][0], coordinates[i][1], coordinates[i][2]);
+            this.add(new_chunk);
+            this.chunks.push(new_chunk);
+        }
+
+
+        // setup "rewards"; i.e. objectives
+        this.rewards = Array(this.CMState.maxRewardNum);
+        for (let k = 0; k < this.CMState.maxRewardNum; k++) {
+            const reward = new Turbine(this);
+            this.rewards[k] = reward;
+            this.updateRewardAtIndex(k);
+            this.add(reward);
+        }
+
+
+    }
+
+    setChunkLinePosition(x, y, z) {
+        this.position.x = x;
+        this.position.z = z;
+        this.position.y = y;
+    }
+
+
+    getRewardJCoord(rewardIndex) {
+        return Math.floor(this.CMState.chunkVertWidth * (this.CMState.maxRewardNum - rewardIndex - 1) / this.CMState.maxRewardNum);
+    }
+
+    updateRewardAtIndex(rewardIndex) {
+        const reward = this.rewards[rewardIndex];
+        const jCoord = this.getRewardJCoord(rewardIndex);
+        const pos = this.chunks[1].getPositionAtCoords(Math.floor(random(0, this.CMState.chunkVertWidth - 1)), jCoord);
+        pos.add(this.chunks[1].position);
+        reward.position.set(pos.x, random(pos.y, this.CMState.maxRewardY), pos.z);
     }
 
 
     updateNoise() {
-        this.chunk.updateNoise();
+        for (const chunk of this.chunks) chunk.updateNoise();
     }
 
     updateTerrainGeo() {
-        this.chunk.updateTerrainGeo();
+        for (const chunk of this.chunks) chunk.updateTerrainGeo();
     }
 
-    setChunkPosition(x, y, z) {
-        this.position.x = x;
-        this.position.z = z;
-        this.position.y = y;
-        this.updateMatrix();
-    }
 
     disposeOf() {
         this.chunk.disposeOf()

@@ -5,18 +5,18 @@
  * Scene and Camera. It also starts the render loop and
  * handles window resizes.
  *
- */
- import { WebGLRenderer, PerspectiveCamera, Vector3 } from 'three';
- import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
- import { SeedScene, MenuScene } from 'scenes';
- import  *  as handlers from './js/handlers.js';
- import * as pages from "./js/pages.js";
- import './styles.css';
- import * as THREE from 'three';
- import { apply } from 'file-loader';
- 
- 
- function initSky(sky, sun, renderer, gui) {
+*/
+import { WebGLRenderer, PerspectiveCamera, Vector3 } from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { SeedScene, MenuScene } from 'scenes';
+import *  as handlers from './js/handlers.js';
+import * as pages from "./js/pages.js";
+import './styles.css';
+import * as THREE from 'three';
+import { apply } from 'file-loader';
+
+
+function initSky(sky, sun, renderer, gui) {
     /// GUI
 
     const effectController = {
@@ -32,128 +32,134 @@
     function guiChanged() {
 
         const uniforms = sky.material.uniforms;
-        uniforms[ 'turbidity' ].value = effectController.turbidity;
-        uniforms[ 'rayleigh' ].value = effectController.rayleigh;
-        uniforms[ 'mieCoefficient' ].value = effectController.mieCoefficient;
-        uniforms[ 'mieDirectionalG' ].value = effectController.mieDirectionalG;
+        uniforms['turbidity'].value = effectController.turbidity;
+        uniforms['rayleigh'].value = effectController.rayleigh;
+        uniforms['mieCoefficient'].value = effectController.mieCoefficient;
+        uniforms['mieDirectionalG'].value = effectController.mieDirectionalG;
 
-        const phi = THREE.MathUtils.degToRad( 90 - effectController.elevation );
-        const theta = THREE.MathUtils.degToRad( effectController.azimuth );
+        const phi = THREE.MathUtils.degToRad(90 - effectController.elevation);
+        const theta = THREE.MathUtils.degToRad(effectController.azimuth);
 
-        sun.setFromSphericalCoords( 1, phi, theta );
+        sun.setFromSphericalCoords(1, phi, theta);
 
-        uniforms[ 'sunPosition' ].value.copy( sun );
+        uniforms['sunPosition'].value.copy(sun);
 
         renderer.toneMappingExposure = effectController.exposure;
-        renderer.render( scene, camera );
+        renderer.render(scene, camera);
 
     }
 
-    gui.add( effectController, 'turbidity', 0.0, 20.0, 0.1 ).onChange( guiChanged );
-    gui.add( effectController, 'rayleigh', 0.0, 4, 0.001 ).onChange( guiChanged );
-    gui.add( effectController, 'mieCoefficient', 0.0, 0.1, 0.001 ).onChange( guiChanged );
-    gui.add( effectController, 'mieDirectionalG', 0.0, 1, 0.001 ).onChange( guiChanged );
-    gui.add( effectController, 'elevation', 0, 90, 0.1 ).onChange( guiChanged );
-    gui.add( effectController, 'azimuth', - 180, 180, 0.1 ).onChange( guiChanged );
-    gui.add( effectController, 'exposure', 0, 1, 0.0001 ).onChange( guiChanged );
+    gui.add(effectController, 'turbidity', 0.0, 20.0, 0.1).onChange(guiChanged);
+    gui.add(effectController, 'rayleigh', 0.0, 4, 0.001).onChange(guiChanged);
+    gui.add(effectController, 'mieCoefficient', 0.0, 0.1, 0.001).onChange(guiChanged);
+    gui.add(effectController, 'mieDirectionalG', 0.0, 1, 0.001).onChange(guiChanged);
+    gui.add(effectController, 'elevation', 0, 90, 0.1).onChange(guiChanged);
+    gui.add(effectController, 'azimuth', - 180, 180, 0.1).onChange(guiChanged);
+    gui.add(effectController, 'exposure', 0, 1, 0.0001).onChange(guiChanged);
 
     guiChanged();
 }
 
- // Initialize core ThreeJS components
- let scene = new SeedScene();
- const camera = new PerspectiveCamera();
- const renderer = new WebGLRenderer({ antialias: true });
- const listener = new THREE.AudioListener();
+// Initialize core ThreeJS components
+let scene = new SeedScene();
+const camera = new PerspectiveCamera();
+const renderer = new WebGLRenderer({ antialias: true });
+const listener = new THREE.AudioListener();
 
- let menuScene = new MenuScene();
- const menuCamera = new PerspectiveCamera();
- const menuRenderer = new WebGLRenderer({antialias: true});
+let menuScene = new MenuScene();
+const menuCamera = new PerspectiveCamera();
+const menuRenderer = new WebGLRenderer({ antialias: true });
 
 
- camera.add( listener );
- const sounds = [];
- const menu = new THREE.Audio( listener );
- const whirring = new THREE.Audio(listener);
- const damage = new THREE.Audio(listener);
- const powerup = new THREE.Audio(listener);
+camera.add(listener);
+const sounds = [];
+const menu = new THREE.Audio(listener);
+const whirring = new THREE.Audio(listener);
+const damage = new THREE.Audio(listener);
+const powerup = new THREE.Audio(listener);
 //  sounds['menu'] = menu;
- sounds['whirring'] = whirring;
- sounds['damage'] = damage;
- sounds['powerup'] = powerup;
+sounds['whirring'] = whirring;
+sounds['damage'] = damage;
+sounds['powerup'] = powerup;
 
 
- const clock = new THREE.Clock();
+const clock = new THREE.Clock();
 
- initSky(scene.sky, scene.sun, renderer, scene.state.gui);
- initSky(menuScene.sky, scene.sun, menuRenderer, menuScene.state.gui)
- const audioLoader = new THREE.AudioLoader();
- audioLoader.load( 'src/sounds/menu.wav', function( buffer ) {
-     menu.setBuffer( buffer );
-     menu.setLoop( true );
-     menu.setVolume(1);
- });
-
- audioLoader.load( 'src/sounds/whirring.wav', function( buffer ) {
-    whirring.setBuffer( buffer );
-    whirring.setLoop( true );
-    whirring.setVolume( 0.4 );
+initSky(scene.sky, scene.sun, renderer, scene.state.gui);
+initSky(menuScene.sky, scene.sun, menuRenderer, menuScene.state.gui)
+const audioLoader = new THREE.AudioLoader();
+audioLoader.load('src/sounds/menu.wav', function(buffer) {
+    menu.setBuffer(buffer);
+    menu.setLoop(true);
+    menu.setVolume(1);
 });
 
-audioLoader.load( 'src/sounds/damage.wav', function( buffer ) {
-    damage.setBuffer( buffer );
-    damage.setLoop( false );
-    damage.setVolume( 0.6 );
+audioLoader.load('src/sounds/whirring.wav', function(buffer) {
+    whirring.setBuffer(buffer);
+    whirring.setLoop(true);
+    whirring.setVolume(0.4);
 });
-audioLoader.load( 'src/sounds/powerup.wav', function( buffer ) {
-    powerup.setBuffer( buffer );
-    powerup.setLoop( false );
-    powerup.setVolume( 0.6 );
+
+audioLoader.load('src/sounds/whirring.wav', function(buffer) {
+    whirring.setBuffer(buffer);
+    whirring.setLoop(true);
+    whirring.setVolume(0.4);
 });
- 
- // Initialize global variables
- const keypress = {};
- const screens = {"menu": true, "ending": false, "pause":false};
- const character = 'plane';
- let score;
- let score_num = 0;
- let oldTime = 0;
- 
- // Set up camera
- camera.position.set(0, 2, 20);
- camera.lookAt(new Vector3(0, 0, 0));
 
- menuCamera.position.set(-0.5, 0.5, -3)
- menuCamera.lookAt(new Vector3(-2,0.5,0))
- 
- // Set up renderer, canvas, and minor CSS adjustments
- renderer.setPixelRatio(window.devicePixelRatio);
- const canvas = renderer.domElement;
- canvas.id = 'canvas';
- canvas.style.display = 'block'; // Removes padding below canvas
- document.body.style.margin = 0; // Removes margin around page
- document.body.style.overflow = 'hidden'; // Fix scrolling
+audioLoader.load('src/sounds/damage.wav', function(buffer) {
+    damage.setBuffer(buffer);
+    damage.setLoop(false);
+    damage.setVolume(0.6);
+});
+audioLoader.load('src/sounds/powerup.wav', function(buffer) {
+    powerup.setBuffer(buffer);
+    powerup.setLoop(false);
+    powerup.setVolume(0.6);
+});
 
- // menu scene
- menuRenderer.setPixelRatio(window.devicePixelRatio);
- const menuCanvas = menuRenderer.domElement;
- menuCanvas.id = 'menuCanvas';
- menuCanvas.style.display = 'block'; // Removes padding below canvas
+// Initialize global variables
+const keypress = {};
+const screens = { "menu": true, "ending": false, "pause": false };
+const character = 'plane';
+let score;
+let score_num = 0;
+let oldTime = 0;
 
- 
- // Set up controls
- const controls = new OrbitControls(camera, canvas);
- controls.enableDamping = true;
- controls.enablePan = false;
- controls.minDistance = 4;
- controls.maxDistance = 16;
- controls.update();
- 
- clock.start()
- 
- // Render loop
- const onAnimationFrameHandler = (timeStamp) => {
-     if (screens['menu']) {
+// Set up camera
+camera.position.set(0, 2, 20);
+camera.lookAt(new Vector3(0, 0, 0));
+
+menuCamera.position.set(-0.5, 0.5, -3)
+menuCamera.lookAt(new Vector3(-2, 0.5, 0))
+
+// Set up renderer, canvas, and minor CSS adjustments
+renderer.setPixelRatio(window.devicePixelRatio);
+const canvas = renderer.domElement;
+canvas.id = 'canvas';
+canvas.style.display = 'block'; // Removes padding below canvas
+document.body.style.margin = 0; // Removes margin around page
+document.body.style.overflow = 'hidden'; // Fix scrolling
+
+// menu scene
+menuRenderer.setPixelRatio(window.devicePixelRatio);
+const menuCanvas = menuRenderer.domElement;
+menuCanvas.id = 'menuCanvas';
+menuCanvas.style.display = 'block'; // Removes padding below canvas
+
+
+// Set up controls
+const controls = new OrbitControls(camera, canvas);
+controls.enableDamping = true;
+controls.enablePan = false;
+controls.minDistance = 4;
+controls.maxDistance = 16;
+controls.update();
+
+clock.start()
+
+// Render loop
+const onAnimationFrameHandler = (timeStamp) => {
+    if (screens['menu']) {
         menuRenderer.render(menuScene, menuCamera)
          let plane = scene.getObjectByName(character);
          let chunkManager = scene.getObjectByName('chunkManager');
@@ -179,59 +185,61 @@ audioLoader.load( 'src/sounds/powerup.wav', function( buffer ) {
         //     handlers.updateAudioSpeed(sounds, scene);
         //      oldTime = elapsed;
         //  }
-         score_num += 0.01;
-         score = score_num.toFixed(2);
-         handlers.updateScore(document, score)
-         // console.log(score)
- 
-         // let land = scene.getObjectByName('land');
-         // let boxHelper = new THREE.BoxHelper( land, 0xffffff );
-         // scene.add(boxHelper);
- 
-         // let plane = scene.getObjectByName('paper');
-         // let boxHelper2 = new THREE.BoxHelper( plane, 0xffffff );
-         // scene.add(boxHelper2);
-     // console.log(scene.getObjectByName('falcon').position.y-sealevel)
-     
-     }
- };
- window.requestAnimationFrame(onAnimationFrameHandler);
- 
- // Resize Handler
- const windowResizeHandler = () => {
-     const { innerHeight, innerWidth } = window;
-     renderer.setSize(innerWidth, innerHeight);
-     camera.aspect = innerWidth / innerHeight;
-     camera.updateProjectionMatrix();
+        if (!screens["menu"] && !screens["ending"] && !screens["pause"]) {
+            score_num += 0.01;
+            score = score_num.toFixed(2);
+            handlers.updateScore(document, score)
+        }
+        // console.log(score)
 
-     menuRenderer.setSize(innerWidth, innerHeight);
-     menuCamera.aspect = innerWidth / innerHeight;
-     menuCamera.updateProjectionMatrix();
- };
- windowResizeHandler();
- window.addEventListener('resize', windowResizeHandler, false);
- 
- // Listen for user input (arrow keys)
- /**************************EVENT LISTENERS*****************************/
- window.addEventListener('keydown', event=> handlers.handleKeyDown(event, keypress), false);
- window.addEventListener('keyup', event => handlers.handleKeyUp(event, keypress), false);
- window.addEventListener('keydown', event => handlers.handleScreens(event, screens, document, canvas, menuCanvas, sounds, score));
- 
- /**********************************************************************/
- let titleFont = document.createElement('link');
- titleFont.id = 'titleFont'
- titleFont.rel = "stylesheet";
- titleFont.href = "https://fonts.googleapis.com/css?family=Audiowide";
- document.head.appendChild(titleFont)
+        // let land = scene.getObjectByName('land');
+        // let boxHelper = new THREE.BoxHelper( land, 0xffffff );
+        // scene.add(boxHelper);
 
- let font = document.createElement('link');
- font.id = 'font'
- font.rel = "stylesheet";
- font.href = "https://fonts.googleapis.com/css?family=Radio+Canada";
- document.head.appendChild(font)
+        // let plane = scene.getObjectByName('paper');
+        // let boxHelper2 = new THREE.BoxHelper( plane, 0xffffff );
+        // scene.add(boxHelper2);
+        // console.log(scene.getObjectByName('falcon').position.y-sealevel)
+
+    }
+};
+window.requestAnimationFrame(onAnimationFrameHandler);
+
+// Resize Handler
+const windowResizeHandler = () => {
+    const { innerHeight, innerWidth } = window;
+    renderer.setSize(innerWidth, innerHeight);
+    camera.aspect = innerWidth / innerHeight;
+    camera.updateProjectionMatrix();
+
+    menuRenderer.setSize(innerWidth, innerHeight);
+    menuCamera.aspect = innerWidth / innerHeight;
+    menuCamera.updateProjectionMatrix();
+};
+windowResizeHandler();
+window.addEventListener('resize', windowResizeHandler, false);
+
+// Listen for user input (arrow keys)
+/**************************EVENT LISTENERS*****************************/
+window.addEventListener('keydown', event => handlers.handleKeyDown(event, keypress), false);
+window.addEventListener('keyup', event => handlers.handleKeyUp(event, keypress), false);
+window.addEventListener('keydown', event => handlers.handleScreens(event, screens, document, canvas, menuCanvas, sounds, score));
+
+/**********************************************************************/
+let titleFont = document.createElement('link');
+titleFont.id = 'titleFont'
+titleFont.rel = "stylesheet";
+titleFont.href = "https://fonts.googleapis.com/css?family=Audiowide";
+document.head.appendChild(titleFont)
+
+let font = document.createElement('link');
+font.id = 'font'
+font.rel = "stylesheet";
+font.href = "https://fonts.googleapis.com/css?family=Radio+Canada";
+document.head.appendChild(font)
 
 
- pages.init_page(document, menuCanvas);
+pages.init_page(document, menuCanvas);
 
 
 

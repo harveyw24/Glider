@@ -3,13 +3,10 @@ import { ChunkLine } from '../ChunkLine';
 import { Turbine } from '../Turbine';
 import { Tree } from '../Tree';
 
-function random(min, max) {
-    return Math.random() * (max - min) + min;
-}
 
 // SET THESE TO CHANGE CHUNK DIMENSIONS
 const groundY = -200;
-const waterHeight = 0; 
+const waterHeight = 0;
 const chunkPxWidth = 1000;
 const chunkVertexWidth = 100;
 
@@ -45,42 +42,36 @@ class ChunkManager extends Group {
             freq: 4.4,
             currentOffset: 0,
             // maxTreeNum: 100,
-            maxTurbineNum: 0,
+            maxTreeNum: 0,
             maxCloudNum: 25,
-            turbineHeightMin: 0 + waterHeight,
-            turbineHeightMax: 50 + waterHeight,
+            treeHeightMin: 0 + waterHeight,
+            treeHeightMax: 50 + waterHeight,
             cloudYMin: 100 + groundY,
             cloudYMax: 150 + groundY,
+            rewardIndex: 0,
+            maxRewardNum: 10,
+            maxRewardY: 100 + groundY,
+            loadThreshold: 0.55,
             falling: 0,
-            climbing: 0
+            climbing: 0,
         }
 
 
         this.anchor = this.position.clone();
         const coordinates = [
-            [0, 0, -.5 * this.state.chunkWidth],
-            [0, 0, -1.5 * this.state.chunkWidth],
+            [-this.state.chunkWidth / 2, 0, 0],
+            [this.state.chunkWidth / 2, 0, 0],
         ];
 
 
-        this.chunks = [];
+        this.chunkLines = [];
         for (let i = 0; i < coordinates.length; i++) {
-            const new_chunk = new ChunkLine(this, coordinates[i][0], coordinates[i][1], coordinates[i][2]);
-            this.add(new_chunk);
-            this.chunks.push(new_chunk);
+            const chunk = new ChunkLine(this, coordinates[i][0], coordinates[i][1], coordinates[i][2]);
+            this.add(chunk);
+            this.chunkLines.push(chunk);
         }
 
 
-        // setup "rewards"; i.e. objectives
-        this.rewardIndex = 0;
-        this.maxRewardNum = 10;
-        this.maxRewardY = 100 + groundY;
-        this.rewards = Array.from(Array(this.maxRewardNum), () => new Turbine(parent));
-        this.currentReward = this.rewards[this.rewardIndex];
-        for (let k = 0; k < this.maxRewardNum; k++) {
-            this.updateReward();
-            this.add(this.currentReward);
-        }
 
         parent.addToUpdateList(this);
 
@@ -111,32 +102,17 @@ class ChunkManager extends Group {
 
     }
 
-    getRewardJCoord(rewardIndex) {
-        return Math.floor(this.state.chunkVertWidth * (this.maxRewardNum - rewardIndex - 1) / this.maxRewardNum);
-    }
-
-    updateReward() {
-        const jCoord = this.getRewardJCoord(this.rewardIndex);
-        const pos = this.chunks[1].chunk.getPositionAtCoords(Math.floor(random(0, this.state.chunkVertWidth - 1)), jCoord);
-        pos.add(this.chunks[1].position);
-        this.currentReward.position.set(pos.x, random(pos.y, this.maxRewardY), pos.z);
-        // this.currentReward.position.set(0, 0, pos.z);
-
-        this.rewardIndex++;
-        if (this.rewardIndex == this.maxRewardNum) this.rewardIndex = 0;
-        this.currentReward = this.rewards[this.rewardIndex];
-    }
 
 
     updateNoise() {
-        for (const chunk of this.chunks) chunk.updateNoise();
+        for (const chunkLine of this.chunkLines) chunkLine.updateNoise();
     }
 
     updateTerrainGeo() {
-        for (const chunk of this.chunks) chunk.updateTerrainGeo();
+        for (const chunkLine of this.chunkLines) chunkLine.updateTerrainGeo();
     }
 
-    // the key invariant to maintain here is that the plane is within the first chunk (i.e. this.chunks[0]);
+    // the key invariant to maintain here is that the plane is within the first chunk (i.e. this.chunkLines[0]);
     // if the plane leaves the first chunk, then the first chunk needs to be popped and moved to the back
     update(timeStamp) {
         // Chunk positions are relative to terrain, so updating terrain position is sufficient
@@ -166,22 +142,67 @@ class ChunkManager extends Group {
         }
 
 
+        // Move first chunk forward when player passes the chunk
         if (this.position.z - this.anchor.z >= this.state.chunkWidth) {
-            this.chunks[0].setChunkPosition(
-                this.chunks[0].position.x,
-                this.chunks[0].position.y,
-                this.chunks[this.chunks.length - 1].position.z - this.state.chunkWidth
-            );
-            this.chunks[0].updateNoise();
-            this.chunks.push(this.chunks.shift());
+            for (const chunkLine of this.chunkLines) {
+                chunkLine.chunks[0].setChunkPosition(
+                    chunkLine.chunks[0].position.x,
+                    chunkLine.chunks[0].position.y,
+                    chunkLine.chunks[chunkLine.chunks.length - 1].position.z - this.state.chunkWidth
+                );
+                chunkLine.chunks[0].updateNoise();
+                chunkLine.chunks.push(chunkLine.chunks.shift());
+            }
 
             this.anchor.z = this.position.z;
             console.log("NEW ANCHOR: ", this.anchor.z);
         }
 
-        if (this.position.z + this.rewards[this.rewardIndex].position.z > 0) {
+        // Move chunklines left/right if player crosses loadThreshold
+        if (this.position.x + this.chunkLines[0].position.x + (.5 - this.state.loadThreshold) * this.state.chunkWidth > 0) {
+            this.chunkLines[1].setChunkLinePosition(
+                this.chunkLines[0].position.x - this.state.chunkWidth,
+                this.chunkLines[1].position.y,
+                this.chunkLines[1].position.z
+            )
+            this.chunkLines[1].updateNoise();
+            this.chunkLines.unshift(this.chunkLines.pop());
+        } else if (this.position.x + this.chunkLines[0].position.x + (.5 + this.state.loadThreshold) * this.state.chunkWidth < 0) {
+            this.chunkLines[0].setChunkLinePosition(
+                this.chunkLines[1].position.x + this.state.chunkWidth,
+                this.chunkLines[0].position.y,
+                this.chunkLines[0].position.z
+            )
+            this.chunkLines[0].updateNoise();
+            this.chunkLines.push(this.chunkLines.shift());
+        }
+
+        if (this.position.z + this.chunkLines[0].rewards[this.state.rewardIndex].position.z > 0) {
             this.updateReward();
         }
+
+        this.getCurrentChunkLine();
+    }
+
+    updateReward() {
+        for (const chunkLine of this.chunkLines) chunkLine.updateRewardAtIndex(this.state.rewardIndex);
+        this.state.rewardIndex++;
+        if (this.state.rewardIndex == this.state.maxRewardNum) this.state.rewardIndex = 0;
+    }
+
+    getCurrentReward() {
+        return this.getCurrentChunkLine().rewards[this.state.rewardIndex];
+    }
+
+    getCurrentChunkLine() {
+        if (this.position.x + this.chunkLines[0].position.x + 0.5 * this.state.chunkWidth > 0) {
+            return this.chunkLines[0];
+        } else {
+            return this.chunkLines[1];
+        }
+    }
+    getCurrentChunk() {
+        return this.getCurrentChunkLine().chunks[0];
     }
 }
 

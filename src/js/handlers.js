@@ -76,7 +76,7 @@ export function handleCharacterControls(scene, keypress, character, camera) {
                 plane.rotation.z += rotationRate;
             }
         }
-        
+
         // need to somehow rotate bounding box
     }
     camera.rotation.z = plane.rotation.z / 3;
@@ -133,11 +133,7 @@ export function handleScreens(event, screens, document, canvas, menuCanvas, soun
     }
 }
 
-    // let land = scene.getObjectByName('land');
-export function handleCollisions(document, scene, character, screens, sounds, score, camera){
-    if (buffer) return;
-
-    let land = scene.getObjectByName('land');
+export function handleCollisions(document, scene, character, screens, sounds, score, camera) {
     let chunkManager = scene.getObjectByName('chunkManager');
     let clouds = [];
     scene.traverseVisible(function(child) {
@@ -147,38 +143,40 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
             child.getWorldPosition(vector_pos);
 
             if (vector_pos.z > -100 && vector_pos.z < 100 && vector_pos.x > -50 && vector_pos.x < 50) {
-                clouds.push(child); 
+                clouds.push(child);
                 child.mesh.material.color.setHex(0xff0000)
             }
             else {
                 child.mesh.material.color.setHex(0xffffff)
 
             }
-          
+
         }
-      });
+    });
 
     let obj = scene.getObjectByName(character);
     let chunkManagerPos = chunkManager.position;
     let chunkWidth = chunkManager.state.chunkWidth;
-    let chunk = chunkManager.chunks[0].chunk;
+    let chunkLine = chunkManager.getCurrentChunkLine(); // TODO: change to current chunk
+    let chunk = chunkManager.getCurrentChunk(); // TODO: change to current chunk
     let heightMap = chunk.heightMap;
 
     console.log(chunkManagerPos);
 
-    let j = (-chunkManagerPos.x + chunkWidth / 2) / chunkWidth * (heightMap.length - 1);
-    let i = Math.round((chunkWidth - (chunkManagerPos.z % chunkWidth)) / chunkWidth * (heightMap.length - 1));
+    let i = (-((chunkManagerPos.x + chunkLine.position.x) % chunkWidth) + chunkWidth / 2) / chunkWidth * (heightMap.length);
+    let j = Math.round((chunkWidth - (chunkManagerPos.z % chunkWidth)) / chunkWidth * (heightMap.length - 1));
 
-    const index1 = (i * (heightMap.length) + Math.floor(j));
-    const index2 = (i * (heightMap.length) + Math.ceil(j));
-    const v1 = chunk.geometry.vertices[index1];
-    const v2 = chunk.geometry.vertices[index2];
+    const v1 = chunk.getVertexAtCoords(Math.floor(i), j);
+    const v2 = chunk.getVertexAtCoords(Math.ceil(i), j);
 
     let vertexHeight = Math.min(v1.z, v2.z);
     console.log("VERTEX HEIGHT: ", vertexHeight);
 
     // console.log(v1.z);
 
+
+    // Collide with terrain (chunk)
+    // target is how much the ground has risen, -v1.z is chunk height at cur point
     let target = new THREE.Vector3();
     chunk.getWorldPosition(target);
     // if (target.y + chunkManager.state.groundY - obj.position.y > -v1.z) {
@@ -205,15 +203,15 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
 
 
     const dummy = new THREE.Vector3();
-    // console.log("to current reward", obj.position.distanceTo(chunkManager.currentReward.getWorldPosition(dummy)));
-    if (obj.position.distanceTo(chunkManager.currentReward.getWorldPosition(dummy)) < 15) {
+    // console.log("to current reward", obj.position.distanceTo(chunkManager.getCurrentReward().getWorldPosition(dummy)));
+    if (obj.position.distanceTo(chunkManager.getCurrentReward().getWorldPosition(dummy)) < 15) {
         sounds['powerup'].play();
         sounds['whirring'].setVolume(1)
 
         setTimeout(function() {
             sounds['whirring'].setVolume(0.4)
         }, 2000);
-       
+
         // chunkManager.position.y -= 50;
         if (chunkManager.state.climbing == 0) {
             chunkManager.state.climbing = 1;
@@ -331,7 +329,7 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
 
 export function updateScore(document, score) {
     let scoreCounter = document.getElementById('score');
-    scoreCounter.innerHTML = 'Score: '.concat(score)
+    scoreCounter.innerHTML = 'Score: '.concat(score);
 }
 
 export function updateAudioSpeed(document, sounds, scene) {
