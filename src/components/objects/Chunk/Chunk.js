@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import SimplexNoise from 'simplex-noise';
 //import { Water } from 'three/examples/js/objects/Water.js';
 import { Turbine } from '../Turbine';
+import { Tree } from '../Tree';
 import { Cloud } from '../Cloud';
 
 
@@ -12,9 +13,10 @@ function random(min, max) {
 
 class Chunk extends Group {
 
-    constructor(parent) {
+    constructor(parent, xOffset, yOffset, zOffset) {
         // Call parent Group() constructor
         super();
+        this.setChunkPosition(xOffset, yOffset, zOffset);
 
         this.state = {
             gui: parent.state.gui,
@@ -33,28 +35,28 @@ class Chunk extends Group {
         this.geometry.colorsNeedUpdate = true;
 
 
-        this.turbines = Array.from(Array(this.CMState.maxTurbineNum), () => new Turbine());
+        this.trees = Array.from(Array(this.CMState.maxTreeNum), () => new Tree());
         this.clouds = Array.from(Array(this.CMState.maxCloudNum), () => new Cloud());
-        for (const turbine of this.turbines) {
-            this.add(turbine);
-            turbine.visible = false;
+        for (const tree of this.trees) {
+            this.add(tree);
+            tree.visible = false;
         }
         for (const cloud of this.clouds) {
             this.add(cloud);
             cloud.visible = false;
         }
 
-        const chunk = new Mesh(this.geometry, new MeshLambertMaterial({
+        const terrain = new Mesh(this.geometry, new MeshLambertMaterial({
             // wireframe:true,
             vertexColors: VertexColors,
             flatShading: true, //required for flat shading
         }))
-        this.add(chunk);
+        this.add(terrain);
 
         // update location on the map
-        chunk.position.y = this.CMState.groundY - 1;
-        chunk.rotation.x = -Math.PI / 2;
-        chunk.receiveShadow = true;
+        terrain.position.y = this.CMState.groundY - 1;
+        terrain.rotation.x = -Math.PI / 2;
+        terrain.receiveShadow = true;
 
 
         this.heightMap = Array.from(Array(this.CMState.chunkVertWidth), () => Array(this.CMState.chunkVertWidth));
@@ -64,6 +66,12 @@ class Chunk extends Group {
         // Add self to parent's update list
         // parent.addToUpdateList(this);
 
+    }
+
+    setChunkPosition(x, y, z) {
+        this.position.x = x;
+        this.position.z = z;
+        this.position.y = y;
     }
 
     update(timeStamp, x, y, z) {
@@ -155,7 +163,7 @@ class Chunk extends Group {
     }
 
     updateObstacles() {
-        let turbineIndex = 0;
+        let treeIndex = 0;
         let cloudIndex = 0;
 
         for (let i = 0; i < this.heightMap.length; i++) {
@@ -163,10 +171,10 @@ class Chunk extends Group {
                 const v = this.getVertexAtCoords(i, j);
                 const pos = this.getPositionAtCoords(i, j);
                 const h = this.heightMap[i][j];
-                if (turbineIndex < this.turbines.length && this.CMState.turbineHeightMin < v.z && v.z < this.CMState.turbineHeightMax && Math.random() < .05 / (1 + Math.exp(h - .5))) {
-                    this.turbines[turbineIndex].visible = true;
-                    this.turbines[turbineIndex].position.set(pos.x, pos.y, pos.z); // plane is rotated
-                    turbineIndex++;
+                if (treeIndex < this.trees.length && this.CMState.treeHeightMin < v.z && v.z < this.CMState.treeHeightMax && Math.random() < .05 / (1 + Math.exp(h - .5))) {
+                    this.trees[treeIndex].visible = true;
+                    this.trees[treeIndex].position.set(pos.x, pos.y, pos.z); // plane is rotated
+                    treeIndex++;
                 }
                 if (cloudIndex < this.clouds.length && Math.random() < 25 / this.geometry.vertices.length) {
                     this.clouds[cloudIndex].visible = true;
@@ -175,8 +183,12 @@ class Chunk extends Group {
                 }
             }
         }
-        console.log("turbines & clouds: ", turbineIndex, cloudIndex);
-        for (let i = turbineIndex; i < this.turbines.length; i++) this.turbines[i].visible = false;
+        // want a hit rate that is close to 1.0 but not always 1.0
+        console.log(
+            "tree hit rate:", this.CMState.maxTreeNum != 0 ? treeIndex / this.CMState.maxTreeNum : "(maxTreeNum is 0); ",
+            "cloud hit rate:", this.CMState.maxCloudNum != 0 ? cloudIndex / this.CMState.maxCloudNum : "(maxCloudNum is 0)"
+        );
+        for (let i = treeIndex; i < this.trees.length; i++) this.trees[i].visible = false;
         for (let i = cloudIndex; i < this.clouds.length; i++) this.clouds[i].visible = false;
     }
 
@@ -216,8 +228,8 @@ class Chunk extends Group {
         for (let i = 0; i < this.heightMap.length; i++) {
             for (let j = 0; j < this.heightMap[0].length; j++) {
                 let h = this.octave(
-                    j / this.CMState.chunkVertWidth,
-                    (i + this.chunk.position.z / this.CMState.chunkWidth * (this.CMState.chunkVertWidth - 1)) / this.CMState.chunkVertWidth,
+                    (i + (this.position.z + this.chunk.position.z) / this.CMState.chunkWidth * (this.CMState.chunkVertWidth - 1)) / this.CMState.chunkVertWidth,
+                    (j + (this.position.x + this.chunk.position.x) / this.CMState.chunkWidth * (this.CMState.chunkVertWidth - 1)) / this.CMState.chunkVertWidth,
                     this.CMState.octaves, simplex);
                 this.heightMap[i][j] = h;
             }

@@ -53,7 +53,7 @@ export function handleCharacterControls(scene, keypress, character, camera) {
         }
     }
     if (keypress['right']) {
-        const delta = 0.4;
+        const delta = 0.8;
         chunkManager.position.x -= delta;
         // plane.state.rotation = "right";
         if (plane.rotation.z > -maxRotation) {
@@ -66,7 +66,7 @@ export function handleCharacterControls(scene, keypress, character, camera) {
         // need to somehow rotate bounding box
     }
     if (keypress['left']) {
-        const delta = 0.4;
+        const delta = 0.8;
         chunkManager.position.x += delta;
         // plane.state.rotation = "left";
         if (plane.rotation.z < maxRotation) {
@@ -76,7 +76,7 @@ export function handleCharacterControls(scene, keypress, character, camera) {
                 plane.rotation.z += rotationRate;
             }
         }
-        
+
         // need to somehow rotate bounding box
     }
     camera.rotation.z = plane.rotation.z / 3;
@@ -133,11 +133,7 @@ export function handleScreens(event, screens, document, canvas, menuCanvas, soun
     }
 }
 
-    // let land = scene.getObjectByName('land');
-export function handleCollisions(document, scene, character, screens, sounds, score){
-    if (buffer) return;
-
-    let land = scene.getObjectByName('land');
+export function handleCollisions(document, scene, character, screens, sounds, score) {
     let chunkManager = scene.getObjectByName('chunkManager');
     let clouds = [];
     scene.traverseVisible(function(child) {
@@ -147,29 +143,33 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
             child.getWorldPosition(vector_pos);
 
             if (vector_pos.z > -100 && vector_pos.z < 100 && vector_pos.x > -50 && vector_pos.x < 50) {
-                clouds.push(child); 
+                clouds.push(child);
                 child.mesh.material.color.setHex(0xff0000)
             }
             else {
                 child.mesh.material.color.setHex(0xffffff)
 
             }
-          
+
         }
-      });
+    });
 
     let obj = scene.getObjectByName(character);
     let chunkManagerPos = chunkManager.position;
     let chunkWidth = chunkManager.state.chunkWidth;
-    let chunk = chunkManager.chunks[0].chunk;
+    let chunkLine = chunkManager.getCurrentChunkLine(); // TODO: change to current chunk
+    let chunk = chunkManager.getCurrentChunk(); // TODO: change to current chunk
     let heightMap = chunk.heightMap;
 
-    let j = Math.floor((-chunkManagerPos.x + chunkWidth / 2) / chunkWidth * (heightMap.length));
-    let i = Math.round((chunkWidth - (chunkManagerPos.z % chunkWidth)) / chunkWidth * (heightMap.length - 1));
+    let i = Math.floor((-((chunkManagerPos.x + chunkLine.position.x) % chunkWidth) + chunkWidth / 2) / chunkWidth * (heightMap.length));
+    let j = Math.round((chunkWidth - (chunkManagerPos.z % chunkWidth)) / chunkWidth * (heightMap.length - 1));
 
-    const index = (i * (heightMap.length) + j);
-    const v1 = chunk.geometry.vertices[index];
+    const v1 = chunk.getVertexAtCoords(i, j);
+    // TODO: should probably check a square around v1
 
+
+    // Collide with terrain (chunk)
+    // target is how much the ground has risen, -v1.z is chunk height at cur point
     let target = new THREE.Vector3();
     chunk.getWorldPosition(target);
     if (target.y + chunkManager.state.groundY - obj.position.y > -v1.z) {
@@ -184,15 +184,15 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
 
 
     const dummy = new THREE.Vector3();
-    // console.log("to current reward", obj.position.distanceTo(chunkManager.currentReward.getWorldPosition(dummy)));
-    if (obj.position.distanceTo(chunkManager.currentReward.getWorldPosition(dummy)) < 15) {
+    // console.log("to current reward", obj.position.distanceTo(chunkManager.getCurrentReward().getWorldPosition(dummy)));
+    if (obj.position.distanceTo(chunkManager.getCurrentReward().getWorldPosition(dummy)) < 15) {
         sounds['powerup'].play();
         sounds['whirring'].setVolume(1)
 
         setTimeout(function() {
             sounds['whirring'].setVolume(0.4)
         }, 2000);
-       
+
         // chunkManager.position.y -= 50;
         if (chunkManager.state.climbing == 0) {
             chunkManager.state.climbing = 1;
@@ -310,18 +310,18 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
 
 export function updateScore(document, score) {
     let scoreCounter = document.getElementById('score');
-    scoreCounter.innerHTML = 'Score: '.concat(score)
+    scoreCounter.innerHTML = 'Score: '.concat(score);
 }
 
 export function updateAudioSpeed(document, sounds, scene) {
     let chunkManager = scene.getObjectByName('chunkManager');
-    let height = chunkManager.getWorldPosition().y;
-    let newPlaybackSpeed = height/400+1;
-    let newPitch = -(newPlaybackSpeed-1) * 1200;
+    let height = chunkManager.getWorldPosition(new THREE.Vector3()).y;
+    let newPlaybackSpeed = height / 400 + 1;
+    let newPitch = -(newPlaybackSpeed - 1) * 1200;
     let audio = document.getElementById('audio');
     audio.playbackRate = newPlaybackSpeed;
-    
- 
+
+
 }
 
 

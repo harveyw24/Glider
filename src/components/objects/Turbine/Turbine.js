@@ -20,12 +20,12 @@ class Turbine extends Group {
         };
 
         // Add update list
-        parent.addToUpdateList(this);
+        parent.state.parent.state.parent.addToUpdateList(this);
 
         loader.load(MODEL, (gltf) => {
             const scale = 7;
-            gltf.scene.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI/2)
-            gltf.scene.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI/2)
+            gltf.scene.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2)
+            gltf.scene.rotateOnAxis(new THREE.Vector3(0, 0, 1), Math.PI / 2)
             gltf.scene.scale.multiplyScalar(scale);
             this.box = new THREE.Box3().setFromObject(gltf.scene);
 
