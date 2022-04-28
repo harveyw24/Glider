@@ -140,7 +140,19 @@ class ChunkManager extends Group {
     update(timeStamp) {
         // Chunk positions are relative to terrain, so updating terrain position is sufficient
         this.position.z += 5;
-        this.position.y += 0.1;
+        this.position.y += 0.2;
+
+        // Gradual collision falling collision
+        if (this.state.falling > 0) {
+            if (this.state.falling < 60) {
+                let offset = Math.pow(90 -this.state.falling, 0.3) / 3;
+                this.state.falling += offset;
+                this.position.y += offset;
+                
+            } else {
+                this.state.falling = 0;
+            }
+        }
         if (this.position.z >= this.state.chunkWidth / 2) {
             this.state.firstChunk = false;
         }

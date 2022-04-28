@@ -189,6 +189,9 @@ export function handleCollisions(scene, character, screens, sound, score) {
             obj.state.hit = true;
             buffer = true;
             // console.log(obj.state)
+            if (chunkManager.state.falling == 0) {
+                chunkManager.state.falling = 1;
+            }
             // chunkManager.position.y += 30;
             let fillScreen = document.getElementById('fillScreen');
             fillScreen.classList.add('red');
@@ -206,9 +209,8 @@ export function handleCollisions(scene, character, screens, sound, score) {
     let chunkWidth = chunkManager.state.chunkWidth;
     let terrain = chunkManager.chunks[0].terrain;
     let heightMap = terrain.heightMap;
-
-    // let j = Math.floor((chunkManagerPos.x + chunkWidth/2 + obj.position.x + 2 * Math.sign(obj.position.x)) / chunkWidth * (heightMap.length));
-    let j = Math.floor((chunkManagerPos.x + chunkWidth / 2) / chunkWidth * (heightMap.length));
+    
+    let j = Math.floor((chunkManagerPos.x + chunkWidth/2 + obj.position.x + 2 * Math.sign(obj.position.x)) / chunkWidth * (heightMap.length));
     let i = Math.round((chunkWidth - (chunkManagerPos.z % chunkWidth)) / chunkWidth * (heightMap.length - 1));
 
     const index = (i * (heightMap.length) + j);
