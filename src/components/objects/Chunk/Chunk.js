@@ -2,7 +2,7 @@ import { Group, Color, PlaneBufferGeometry, VertexColors, PlaneGeometry, MeshSta
 import * as THREE from 'three';
 import SimplexNoise from 'simplex-noise';
 //import { Water } from 'three/examples/js/objects/Water.js';
-import { Tree } from '../Tree';
+import { Turbine } from '../Turbine';
 import { Cloud } from '../Cloud';
 
 
@@ -33,11 +33,11 @@ class Chunk extends Group {
         this.geometry.colorsNeedUpdate = true;
 
 
-        this.trees = Array.from(Array(this.CMState.maxTreeNum), () => new Tree());
+        this.turbines = Array.from(Array(this.CMState.maxTurbineNum), () => new Turbine());
         this.clouds = Array.from(Array(this.CMState.maxCloudNum), () => new Cloud());
-        for (const tree of this.trees) {
-            this.add(tree);
-            tree.visible = false;
+        for (const turbine of this.turbines) {
+            this.add(turbine);
+            turbine.visible = false;
         }
         for (const cloud of this.clouds) {
             this.add(cloud);
@@ -155,7 +155,7 @@ class Chunk extends Group {
     }
 
     updateObstacles() {
-        let treeIndex = 0;
+        let turbineIndex = 0;
         let cloudIndex = 0;
 
         for (let i = 0; i < this.heightMap.length; i++) {
@@ -163,10 +163,10 @@ class Chunk extends Group {
                 const v = this.getVertexAtCoords(i, j);
                 const pos = this.getPositionAtCoords(i, j);
                 const h = this.heightMap[i][j];
-                if (treeIndex < this.trees.length && this.CMState.treeHeightMin < v.z && v.z < this.CMState.treeHeightMax && Math.random() < .05 / (1 + Math.exp(h - .5))) {
-                    this.trees[treeIndex].visible = true;
-                    this.trees[treeIndex].position.set(pos.x, pos.y, pos.z); // plane is rotated
-                    treeIndex++;
+                if (turbineIndex < this.turbines.length && this.CMState.turbineHeightMin < v.z && v.z < this.CMState.turbineHeightMax && Math.random() < .05 / (1 + Math.exp(h - .5))) {
+                    this.turbines[turbineIndex].visible = true;
+                    this.turbines[turbineIndex].position.set(pos.x, pos.y, pos.z); // plane is rotated
+                    turbineIndex++;
                 }
                 if (cloudIndex < this.clouds.length && Math.random() < 25 / this.geometry.vertices.length) {
                     this.clouds[cloudIndex].visible = true;
@@ -175,8 +175,8 @@ class Chunk extends Group {
                 }
             }
         }
-        console.log("trees & clouds: ", treeIndex, cloudIndex);
-        for (let i = treeIndex; i < this.trees.length; i++) this.trees[i].visible = false;
+        console.log("turbines & clouds: ", turbineIndex, cloudIndex);
+        for (let i = turbineIndex; i < this.turbines.length; i++) this.turbines[i].visible = false;
         for (let i = cloudIndex; i < this.clouds.length; i++) this.clouds[i].visible = false;
     }
 

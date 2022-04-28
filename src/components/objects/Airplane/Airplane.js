@@ -45,7 +45,6 @@ class Airplane extends Group {
             // gltf.scene.position.y += ( gltf.scene.position.y - center.y );
             // gltf.scene.position.z += ( gltf.scene.position.z - center.z );
             // console.log(center)
-            console.log(gltf.scene.position)
 
             // add mixer to state
             this.state.mixer = new THREE.AnimationMixer(gltf.scene);

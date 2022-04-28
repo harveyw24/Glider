@@ -185,8 +185,7 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
 
     const dummy = new THREE.Vector3();
     // console.log("to current reward", obj.position.distanceTo(chunkManager.currentReward.getWorldPosition(dummy)));
-    if (obj.position.distanceTo(chunkManager.currentReward.getWorldPosition(dummy)) < 20) {
-        console.log("!!!")
+    if (obj.position.distanceTo(chunkManager.currentReward.getWorldPosition(dummy)) < 15) {
         sounds['powerup'].play();
         sounds['whirring'].setVolume(1)
 

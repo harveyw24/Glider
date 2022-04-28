@@ -1,5 +1,6 @@
 import { Group, Color, PlaneBufferGeometry, PlaneGeometry } from 'three';
 import { ChunkLine } from '../ChunkLine';
+import { Turbine } from '../Turbine';
 import { Tree } from '../Tree';
 
 function random(min, max) {
@@ -8,7 +9,7 @@ function random(min, max) {
 
 // SET THESE TO CHANGE CHUNK DIMENSIONS
 const groundY = -200;
-const waterHeight = 0;
+const waterHeight = 0; 
 const chunkPxWidth = 1000;
 const chunkVertexWidth = 100;
 
@@ -44,10 +45,10 @@ class ChunkManager extends Group {
             freq: 4.4,
             currentOffset: 0,
             // maxTreeNum: 100,
-            maxTreeNum: 0,
+            maxTurbineNum: 0,
             maxCloudNum: 25,
-            treeHeightMin: 0 + waterHeight,
-            treeHeightMax: 50 + waterHeight,
+            turbineHeightMin: 0 + waterHeight,
+            turbineHeightMax: 50 + waterHeight,
             cloudYMin: 100 + groundY,
             cloudYMax: 150 + groundY,
             falling: 0,
@@ -74,7 +75,7 @@ class ChunkManager extends Group {
         this.rewardIndex = 0;
         this.maxRewardNum = 10;
         this.maxRewardY = 100 + groundY;
-        this.rewards = Array.from(Array(this.maxRewardNum), () => new Tree());
+        this.rewards = Array.from(Array(this.maxRewardNum), () => new Turbine(parent));
         this.currentReward = this.rewards[this.rewardIndex];
         for (let k = 0; k < this.maxRewardNum; k++) {
             this.updateReward();

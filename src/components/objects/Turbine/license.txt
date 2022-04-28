@@ -1,0 +1,11 @@
+Model Information:
+* title:	Arrows Animated
+* source:	https://sketchfab.com/3d-models/arrows-animated-025581191d0a4452aa5fe3b51c68bc40
+* author:	AbsoluteMadLadd (https://sketchfab.com/AbsoluteMadLadd)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Arrows Animated" (https://sketchfab.com/3d-models/arrows-animated-025581191d0a4452aa5fe3b51c68bc40) by AbsoluteMadLadd (https://sketchfab.com/AbsoluteMadLadd) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
