@@ -21,7 +21,7 @@ class Airplane extends Group {
         };
 
         this.name = 'plane';
-        this.tip = new THREE.Vector3(0,0,0);
+        this.tip = new THREE.Vector3(0, 0, 0);
         this.state.hit = false;
         this.addPlane()
 
@@ -33,10 +33,10 @@ class Airplane extends Group {
         const loader = new GLTFLoader();
         loader.load(MODEL, (gltf) => {
             gltf.scene.scale.multiplyScalar(3);
-            gltf.scene.position.x = 0; 
+            gltf.scene.position.x = 0;
             gltf.scene.position.y = 0;
             gltf.scene.position.z = 0;
-            const box = new THREE.Box3().setFromObject( gltf.scene, true);
+            const box = new THREE.Box3().setFromObject(gltf.scene, true);
             // const center = box.getCenter( new THREE.Vector3() );
 
             gltf.scene.rotateOnAxis(new THREE.Vector3(0, 1, 0), Math.PI);
@@ -48,11 +48,11 @@ class Airplane extends Group {
 
             // add mixer to state
             this.state.mixer = new THREE.AnimationMixer(gltf.scene);
-    
+
             const clip = gltf.animations[0]
             this.state.action = this.state.mixer.clipAction(clip)
             this.state.action.play();
-            
+
             this.box = box;
 
             this.add(gltf.scene);
@@ -64,14 +64,14 @@ class Airplane extends Group {
         if (this.state.prevTimeStamp === null) {
             this.state.prevTimeStamp = timeStamp;
         }
-    
+
         let delta;
         if (this.state.hit) {
             console.log('HI')
             this.state.hit = false
             this.state.hitTime = timeStamp
             this.state.speed = 100
-        } 
+        }
 
         // wobble if hit previously
         if ((timeStamp - this.state.hitTime) < 5000) {
@@ -80,8 +80,8 @@ class Airplane extends Group {
             // calculate delta
             this.state.speed = 1000;
         }
-        delta = (timeStamp - this.state.prevTimeStamp)/this.state.speed;
-        
+        delta = (timeStamp - this.state.prevTimeStamp) / this.state.speed;
+
 
         // update previous time stamp
         this.state.prevTimeStamp = timeStamp;

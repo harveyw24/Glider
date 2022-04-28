@@ -1,4 +1,5 @@
 import { Group, Color, PlaneBufferGeometry, VertexColors, PlaneGeometry, MeshStandardMaterial, MeshLambertMaterial, Mesh, Vector2 } from 'three';
+import * as THREE from 'three';
 import SimplexNoise from 'simplex-noise';
 //import { Water } from 'three/examples/js/objects/Water.js';
 import { Tree } from '../Tree';
@@ -73,7 +74,7 @@ class Terrain extends Group {
         console.log(offset)
         for(let i = 0; i < this.geometry.vertices.length; i++) {
           console.log("z = " + this.geometry.vertices[i].z);
-          if(this.geometry.vertices[i] > this.CMState.waterLevel) {
+          if(this.geometry.vertices[i] > this.CMState.waterHeight) {
             this.geometry.vertices[i].z = this.geometry.vertices[i].z + offset;
           }
         } */
@@ -81,15 +82,28 @@ class Terrain extends Group {
         //console.log("TS = " + timeStamp + "(" + x + ", " + y + ", " + z + ")")
     }
 
+
+
+    getVertexAtCoords(i, j) {
+        const index = (j * (this.heightMap.length) + i);
+        return this.geometry.vertices[index];
+    }
+
+    // returns the position of the vertex corresponding to this.heightMap[i][j]
+    // relative to terrain.position
+    getPositionAtCoords(i, j) {
+        const v = this.getVertexAtCoords(i, j);
+        return new THREE.Vector3(v.x, v.z + this.CMState.groundY, -v.y)
+    }
+
     updateTerrainGeo() {
         //assign vert heights in geometry
         for (let j = 0; j < this.heightMap.length; j++) {
             for (let i = 0; i < this.heightMap[0].length; i++) {
-                const index = (j * (this.heightMap.length) + i)
-                const v1 = this.geometry.vertices[index]
+                const v1 = this.getVertexAtCoords(i, j);
                 v1.z = this.heightMap[j][i] * this.CMState.exaggeration * 10
                 // set to water level if below water
-                v1.z = Math.max(this.CMState.waterLevel, v1.z)
+                v1.z = Math.max(this.CMState.waterHeight, v1.z)
             }
         }
 
@@ -103,7 +117,7 @@ class Terrain extends Group {
             //assign colors based on the average point of the face
             var wiggle = this.CMState.colorWiggle * 25;
             const max = (a.z + b.z + c.z) / 3
-            if (max <= this.CMState.waterLevel) {
+            if (max <= this.CMState.waterHeight) {
                 return f.color.setRGB((this.CMState.waterColor.r + Math.random() * wiggle) / 255,
                     (this.CMState.waterColor.g + Math.random() * wiggle) / 255,
                     (this.CMState.waterColor.b + Math.random() * wiggle) / 255)
@@ -115,9 +129,9 @@ class Terrain extends Group {
                 // ]);
                 // geometry2.uvsNeedUpdate = true;
             }
-            if (max - this.CMState.waterLevel > this.CMState.exaggeration * 7) return f.color.setRGB((this.CMState.peakColor.r + Math.random() * wiggle) / 255, (this.CMState.peakColor.g + Math.random() * wiggle) / 255, (this.CMState.peakColor.b + Math.random() * wiggle) / 255)
+            if (max - this.CMState.waterHeight > this.CMState.exaggeration * 7) return f.color.setRGB((this.CMState.peakColor.r + Math.random() * wiggle) / 255, (this.CMState.peakColor.g + Math.random() * wiggle) / 255, (this.CMState.peakColor.b + Math.random() * wiggle) / 255)
 
-            var ratio = (max - this.CMState.waterLevel) / (this.CMState.exaggeration * 7);
+            var ratio = (max - this.CMState.waterHeight) / (this.CMState.exaggeration * 7);
 
             // upper half? blend middle with peak
             if (ratio >= this.CMState.middleGradient) {
@@ -146,13 +160,15 @@ class Terrain extends Group {
 
         for (let i = 0; i < this.heightMap.length; i++) {
             for (let j = 0; j < this.heightMap[0].length; j++) {
-                const index = (j * (this.heightMap.length) + i);
-                const v = this.geometry.vertices[index];
-                if (treeIndex < this.trees.length && this.CMState.treeHeightMin < v.z && v.z < this.CMState.treeHeightMax && Math.random() < .03) {
+                const v = this.getVertexAtCoords(i, j);
+                const pos = this.getPositionAtCoords(i, j);
+                const h = this.heightMap[i][j];
+                if (treeIndex < this.trees.length && this.CMState.treeHeightMin < v.z && v.z < this.CMState.treeHeightMax && Math.random() < .05 / (1 + Math.exp(h - .5))) {
                     this.trees[treeIndex].visible = true;
-                    this.trees[treeIndex].position.set(v.x, v.z + this.CMState.groundY, -v.y); // plane is rotated
+                    this.trees[treeIndex].position.set(pos.x, pos.y, pos.z); // plane is rotated
                     treeIndex++;
-                } else if (cloudIndex < this.clouds.length && Math.random() < .005) {
+                }
+                if (cloudIndex < this.clouds.length && Math.random() < .0025) {
                     this.clouds[cloudIndex].visible = true;
                     this.clouds[cloudIndex].position.set(v.x, random(this.CMState.cloudYMin, this.CMState.cloudYMax), -v.y);
                     cloudIndex++;
@@ -199,11 +215,11 @@ class Terrain extends Group {
 
         for (let i = 0; i < this.heightMap.length; i++) {
             for (let j = 0; j < this.heightMap[0].length; j++) {
-                let v = this.octave(
+                let h = this.octave(
                     j / this.CMState.chunkVertWidth,
                     (i + this.chunk.position.z / this.CMState.chunkWidth * (this.CMState.chunkVertWidth - 1)) / this.CMState.chunkVertWidth,
                     this.CMState.octaves, simplex);
-                this.heightMap[i][j] = v;
+                this.heightMap[i][j] = h;
             }
         }
 

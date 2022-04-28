@@ -44,7 +44,7 @@ export function start(document, canvas) {
         scoreCounter.id = 'score';
         document.body.appendChild(scoreCounter);
     }
-    
+
     let instructions = document.createElement('div');
     instructions.id = 'instructions';
     instructions.innerHTML = INSTRUCTIONS;

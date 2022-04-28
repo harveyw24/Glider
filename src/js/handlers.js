@@ -4,8 +4,8 @@ import * as utils from "./utils.js"
 
 let buffer = false;
 
-function clamp (val,min,max) {
-    return Math.max(min,Math.min(max,val));
+function clamp(val, min, max) {
+    return Math.max(min, Math.min(max, val));
 }
 
 export function handleKeyDown(event, keypress) {
@@ -24,35 +24,42 @@ export function handleKeyUp(event, keypress) {
 
 export function handleCharacterControls(scene, keypress, character, camera) {
     let obj = scene.getObjectByName(character);
-    if (keypress['up'] && obj.position.y < 5) {
+    if (keypress['up'] && obj.position.y < 20) {
         obj.position.y += 0.1;
         obj.box.min.y += 0.1;
         obj.box.max.y += 0.1;
+
+        camera.position.y += 0.1;
     }
-    if (keypress['down'] && obj.position.y > -5) {
+    if (keypress['down']) {
         obj.position.y -= 0.1;
         obj.box.min.y -= 0.1;
         obj.box.max.y -= 0.1;
+
+        camera.position.y -= 0.1;
     }
-    if (keypress['right'] && obj.position.x < 10) {
-        obj.position.x += 0.1;
-        obj.position.x += 0.1;
+    if (keypress['right']) {
+        obj.position.x += 0.2;
         obj.box.min.x += 0.1;
+        obj.box.max.x += 0.1;
         // obj.rotation.z += 0.015;
         // need to somehow rotate bounding box
+
+        camera.position.x += 0.2;
     }
-    if (keypress['left'] && obj.position.x > -10) {
-        obj.position.x -= 0.1;
-        obj.position.x -= 0.1;
+    if (keypress['left']) {
+        obj.position.x -= 0.2;
         obj.box.min.x -= 0.1;
+        obj.box.max.x -= 0.1;
         // obj.rotation.z -= 0.015;
         // need to somehow rotate bounding box
+        camera.position.x -= 0.2;
     }
 
     // clamp to viewport, not working
     // let h = visibleHeightAtZDepth(5, camera);
     // let w = visibleWidthAtZDepth(5, camera);
-    
+
     // obj.position.y = clamp(obj.position.y, -h,h);
     // obj.position.x = clamp(obj.position.x, -w,w);
 
@@ -82,25 +89,27 @@ export function handleScreens(event, screens, document, canvas, sound, score) {
         pages.start(document, canvas);
         sound.play()
     }
-     // unpause: pause -> game
+    // unpause: pause -> game
     else if (event.key == " " && screens["pause"]) {
         screens["pause"] = false;
         sound.setVolume(0.5);
     }
-   // unpause: pause -> game
+    // unpause: pause -> game
     else if (event.key == " " && !screens["ending"]) {
         screens["pause"] = true;
         sound.setVolume(0.2);
     }
 }
 
-    // let land = scene.getObjectByName('land');
-export function handleCollisions(scene, character, screens, sound, score){
+// let land = scene.getObjectByName('land');
+export function handleCollisions(scene, character, screens, sound, score) {
     if (buffer) return;
 
     let land = scene.getObjectByName('land');
     let chunkManager = scene.getObjectByName('chunkManager');
     let clouds = [];
+
+    const childPosition = new THREE.Vector3();
     scene.traverseVisible(function(child) {
         if (child.name === "cloud") {
             let matWorld = child.matrixWorld;
@@ -112,7 +121,7 @@ export function handleCollisions(scene, character, screens, sound, score){
             child.getWorldPosition(vector_pos);
 
             if (vector_pos.z > -100 && vector_pos.z < 100 && vector_pos.x > -50 && vector_pos.x < 50) {
-                clouds.push(child); 
+                clouds.push(child);
                 child.mesh.material.color.setHex(0xff0000)
                 // console.log(child.position.x)
                 // console.log(child.position.y)
@@ -126,14 +135,14 @@ export function handleCollisions(scene, character, screens, sound, score){
                 child.mesh.material.color.setHex(0xffffff)
 
             }
-          
+
         }
-      });
+    });
 
     let obj = scene.getObjectByName(character);
     let meshes = [];
     let plane = [];
-    // utils.findType(land, 'Mesh', meshes)
+    utils.findType(land, 'Mesh', meshes)
     clouds.forEach(cloud => {
         utils.findType(cloud, 'Mesh', meshes)
     })
@@ -145,26 +154,25 @@ export function handleCollisions(scene, character, screens, sound, score){
     const vector_pos = new THREE.Vector3();
     const vector_norm = new THREE.Vector3();
 
-    let raytip = new THREE.Raycaster(plane[0].tip, new THREE.Vector3(0,0,-1));
+    let raytip = new THREE.Raycaster(plane[0].tip, new THREE.Vector3(0, 0, -1));
     let raycollisions = raytip.intersectObjects(meshes, false);
-        if (raycollisions.length != 0 && raycollisions[0].distance < 0.5) {
-            buffer = true;
-            // chunkManager.position.y += 30;
-            let fillScreen = document.getElementById('fillScreen');
-            fillScreen.classList.add('red');
-            setTimeout(function() {
-                fillScreen.classList.remove('red');
-            }, 500);
-            // obj.position = obj.position.add(vector_norm.multiplyScalar(1))
-            // obj.position.x -= vector_norm.x * 0.1;
-            // obj.position.y -= vector_norm.y * 0.1;
+    if (raycollisions.length != 0 && raycollisions[0].distance < 0.5) {
+        buffer = true;
+        // chunkManager.position.y += 30;
+        let fillScreen = document.getElementById('fillScreen');
+        fillScreen.classList.add('red');
+        setTimeout(function() {
+            fillScreen.classList.remove('red');
+        }, 500);
+        // obj.position = obj.position.add(vector_norm.multiplyScalar(1))
+        // obj.position.x -= vector_norm.x * 0.1;
+        // obj.position.y -= vector_norm.y * 0.1;
 
-            // console.log('collision');
-            setTimeout (function(){ buffer = false}, 5000);
-            return;
-        }
+        // console.log('collision');
+        setTimeout(function() { buffer = false }, 5000);
+        return;
+    }
 
-    
     for (let i = 0; i < pos.count; i += 1) {
         vector_pos.fromBufferAttribute(pos, i);
         vector_pos.add(obj.position)
@@ -172,7 +180,8 @@ export function handleCollisions(scene, character, screens, sound, score){
         vector_pos.y -= 2.5;
         // vector_pos.applyMatrix4(matWorld);
         vector_norm.fromBufferAttribute(norm, i);
-        // vector_norm.applyMatrix4(matWorld);
+
+        vector_pos.add(obj.position);
         let ray = new THREE.Raycaster(vector_pos, vector_norm);
         // scene.add(new THREE.ArrowHelper(ray.ray.direction, ray.ray.origin, 0.5, 0xff0000) );
 
@@ -187,20 +196,20 @@ export function handleCollisions(scene, character, screens, sound, score){
             setTimeout(function() {
                 fillScreen.classList.remove('red');
             }, 500);
-            setTimeout (function(){ buffer = false}, 5000)
+            setTimeout(function() { buffer = false }, 5000)
             // obj.state.hit = false;
             break;
         }
-    
+
     }
 
     let chunkManagerPos = chunkManager.position;
     let chunkWidth = chunkManager.state.chunkWidth;
     let terrain = chunkManager.chunks[0].terrain;
     let heightMap = terrain.heightMap;
-    
+
     // let j = Math.floor((chunkManagerPos.x + chunkWidth/2 + obj.position.x + 2 * Math.sign(obj.position.x)) / chunkWidth * (heightMap.length));
-    let j = Math.floor((chunkManagerPos.x + chunkWidth/2) / chunkWidth * (heightMap.length));
+    let j = Math.floor((chunkManagerPos.x + chunkWidth / 2) / chunkWidth * (heightMap.length));
     let i = Math.round((chunkWidth - (chunkManagerPos.z % chunkWidth)) / chunkWidth * (heightMap.length - 1));
 
     const index = (i * (heightMap.length) + j);
@@ -224,6 +233,14 @@ export function handleCollisions(scene, character, screens, sound, score){
         screens['ending'] = true;
         pages.quit(document, score);
         sound.stop()
+    }
+
+
+    const dummy = new THREE.Vector3();
+    console.log("to current reward", obj.position.distanceTo(chunkManager.currentReward.getWorldPosition(dummy)));
+    if (obj.position.distanceTo(chunkManager.currentReward.getWorldPosition(dummy)) < 10) {
+        console.log("!!!")
+        chunkManager.position.y -= 50;
     }
 }
 

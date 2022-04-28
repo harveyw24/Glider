@@ -30,32 +30,32 @@ class Cloud extends Group {
         });
         const geo = new Geometry()
 
-        // const decay = .7;
-        // for (const sign of [-1, 1]) {
-        //     const max = randomRange(1, maxMainTufts);
-        //     let tuftScale = scale;
-        //     const center = [0, 0, 0];
-        //     for (let i = 0 + (sign - 1) / 2; i < max; i++, tuftScale *= decay) {
-        //         const radius = 1.5 * tuftScale;
-        //         const tuft = new SphereGeometry(radius, 7, 8);
-        //         if (i != 0) center[0] += sign * radius * (1 + 1 / decay) * .7;
-        //         tuft.translate(...center);
+        const decay = .7;
+        for (const sign of [-1, 1]) {
+            const max = randomRange(1, maxMainTufts);
+            let tuftScale = scale;
+            const center = [0, 0, 0];
+            for (let i = 0 + (sign - 1) / 2; i < max; i++, tuftScale *= decay) {
+                const radius = 1.5 * tuftScale;
+                const tuft = new SphereGeometry(radius, 7, 8);
+                if (i != 0) center[0] += sign * radius * (1 + 1 / decay) * .7;
+                tuft.translate(...center);
 
-        //         geo.merge(tuft);
-        //     }
-        // }
-        // //randomly displace the x,y,z coords by the `per` value
-        // const jitter = (geo, per) => geo.vertices.forEach(v => {
-        //     v.x += randomRange(-per, per);
-        //     v.y += randomRange(-per, per);
-        //     v.z += randomRange(-per, per);
-        // })
-        // jitter(geo, 0.15 * scale)
+                geo.merge(tuft);
+            }
+        }
+        //randomly displace the x,y,z coords by the `per` value
+        const jitter = (geo, per) => geo.vertices.forEach(v => {
+            v.x += randomRange(-per, per);
+            v.y += randomRange(-per, per);
+            v.z += randomRange(-per, per);
+        })
+        jitter(geo, 0.15 * scale)
 
 
 
-        const tuft = new SphereGeometry(2, 7, 8);
-        geo.merge(tuft);
+        // const tuft = new SphereGeometry(1.5 * scale, 7, 8);
+        // geo.merge(tuft);
 
         const cloud = new Mesh(geo, material);
         this.add(cloud);

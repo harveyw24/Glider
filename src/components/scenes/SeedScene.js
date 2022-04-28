@@ -1,6 +1,6 @@
 import * as Dat from 'dat.gui';
 import { Scene, Color } from 'three';
-import { Flower, Land, Kite, Falcon, Paper, Terrain, Airplane, ChunkManager} from 'objects';
+import { Flower, Land, Kite, Falcon, Paper, Terrain, Airplane, ChunkManager } from 'objects';
 import { BasicLights } from 'lights';
 import * as THREE from 'three'
 import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js'
@@ -22,7 +22,7 @@ class SeedScene extends Scene {
         this.background = new Color(0x7ec0ee);
 
         // Add fog
-        this.fog =  new THREE.FogExp2(0xADD8E6, 0.0015);
+        this.fog = new THREE.FogExp2(0xADD8E6, 0.0015);
         // this.fog =  new THREE.Fog(0xADD8E6, 10, 1500);
 
         // Add meshes to scene
@@ -33,7 +33,7 @@ class SeedScene extends Scene {
         const chunkManager = new ChunkManager(this);
         this.chunkManager = chunkManager;
         this.add(lights, airplane, chunkManager);
-        
+
 
 
         // Populate GUI

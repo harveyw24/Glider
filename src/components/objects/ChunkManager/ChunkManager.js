@@ -1,8 +1,14 @@
 import { Group, Color, PlaneBufferGeometry, PlaneGeometry } from 'three';
 import { Chunk } from '../Chunk';
+import { Tree } from '../Tree';
+
+function random(min, max) {
+    return Math.random() * (max - min) + min;
+}
 
 // SET THESE TO CHANGE CHUNK DIMENSIONS
 const groundY = -200;
+const waterHeight = 0;
 const chunkPxWidth = 1000;
 const chunkVertexWidth = 100;
 
@@ -27,7 +33,7 @@ class ChunkManager extends Group {
             octaves: 3,
             // amplitude: 1, // Does nothing
             exaggeration: 17,
-            waterLevel: 0,
+            waterHeight: waterHeight,
             waterColor: new Color(50, 90, 145),
             bankColor: new Color(26, 143, 26),
             middleColor: new Color(113, 105, 105),
@@ -37,14 +43,14 @@ class ChunkManager extends Group {
             randSeed: 3.8,
             freq: 4.4,
             currentOffset: 0,
+            // maxTreeNum: 100,
             maxTreeNum: 0,
-            maxCloudNum: 200,
-            treeHeightMin: 0,
-            treeHeightMax: 50,
-            cloudYMin: 0,
-            cloudYMax: 0,
-            // cloudYMin: -100,
-            // cloudYMax: -50,
+            maxCloudNum: 25,
+            treeHeightMin: 0 + waterHeight,
+            treeHeightMax: 50 + waterHeight,
+            cloudYMin: 100 + groundY,
+            cloudYMax: 150 + groundY,
+            firstChunk: true
         }
 
 
@@ -65,6 +71,16 @@ class ChunkManager extends Group {
             this.chunks.push(new_chunk);
         }
 
+        this.rewardIndex = 0;
+        this.maxRewardNum = 10;
+        this.maxRewardY = 100 + groundY;
+        this.rewards = Array.from(Array(this.maxRewardNum), () => new Tree());
+        this.currentReward = this.rewards[this.rewardIndex];
+        for (let k = 0; k < this.maxRewardNum; k++) {
+            this.updateReward();
+            this.add(this.currentReward);
+        }
+
         parent.addToUpdateList(this);
 
         // Populate GUI
@@ -82,7 +98,7 @@ class ChunkManager extends Group {
         // Related to the look of the terrain and don't need to recalculate height map again
         var folder = this.state.gui.addFolder('TERRAIN LOOK FACTORS');
         folder.add(this.state, 'exaggeration', 0, 70).onChange(() => this.updateTerrainGeo());
-        folder.add(this.state, 'waterLevel', -100, 100).name("Water Level").onChange(() => this.updateTerrainGeo());
+        folder.add(this.state, 'waterHeight', -100, 100).name("Water Level").onChange(() => this.updateTerrainGeo());
         folder.add(this.state, 'colorWiggle', -1, 1).name("Color Texturing").onChange(() => this.updateTerrainGeo());
         folder.add(this.state, 'middleGradient', 0, 1).name("Peak Height").onChange(() => this.updateTerrainGeo());
         folder.addColor(this.state, 'waterColor').name("Water Color").onChange(() => this.updateTerrainGeo());
@@ -92,6 +108,22 @@ class ChunkManager extends Group {
 
         folder.open();
 
+    }
+
+    getRewardJCoord(rewardIndex) {
+        return Math.floor(this.state.chunkVertWidth * (this.maxRewardNum - rewardIndex - 1) / this.maxRewardNum);
+    }
+
+    updateReward() {
+        const jCoord = this.getRewardJCoord(this.rewardIndex);
+        const pos = this.chunks[1].terrain.getPositionAtCoords(Math.floor(random(0, this.state.chunkVertWidth - 1)), jCoord);
+        pos.add(this.chunks[1].position);
+        this.currentReward.position.set(pos.x, random(pos.y, this.maxRewardY), pos.z);
+        // this.currentReward.position.set(0, 0, pos.z);
+
+        this.rewardIndex++;
+        if (this.rewardIndex == this.maxRewardNum) this.rewardIndex = 0;
+        this.currentReward = this.rewards[this.rewardIndex];
     }
 
 
@@ -122,6 +154,11 @@ class ChunkManager extends Group {
             this.chunks.push(this.chunks.shift());
 
             this.anchor.z = this.position.z;
+            console.log(this.anchor.z);
+        }
+
+        if (this.position.z + this.rewards[this.rewardIndex].position.z > 0) {
+            this.updateReward();
         }
     }
 }
