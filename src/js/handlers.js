@@ -26,7 +26,7 @@ export function handleKeyUp(event, keypress) {
 export function handleCharacterControls(scene, keypress, character, camera) {
     let plane = scene.getObjectByName(character);
     let chunkManager = scene.getObjectByName('chunkManager');
-    const maxRotation = 0.45;
+    const maxRotation = 0.5;
     const maxPitch = 0.2;
     const rotationRate = 0.02;
 
@@ -154,7 +154,7 @@ export function handleScreens(event, screens, document, canvas, menuCanvas, soun
     }
 }
 
-export function handleCollisions(document, scene, character, screens, sounds, score) {
+export function handleCollisions(document, scene, character, screens, sounds, score, camera) {
     let chunkManager = scene.getObjectByName('chunkManager');
     let clouds = [];
     scene.traverseVisible(function(child) {
@@ -182,18 +182,37 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
     let chunk = chunkManager.getCurrentChunk(); // TODO: change to current chunk
     let heightMap = chunk.heightMap;
 
-    let i = Math.floor((-((chunkManagerPos.x + chunkLine.position.x) % chunkWidth) + chunkWidth / 2) / chunkWidth * (heightMap.length));
+    console.log(chunkManagerPos);
+
+    let i = (-((chunkManagerPos.x + chunkLine.position.x) % chunkWidth) + chunkWidth / 2) / chunkWidth * (heightMap.length);
     let j = Math.round((chunkWidth - (chunkManagerPos.z % chunkWidth)) / chunkWidth * (heightMap.length - 1));
 
-    const v1 = chunk.getVertexAtCoords(i, j);
-    // TODO: should probably check a square around v1
+    const v1 = chunk.getVertexAtCoords(Math.floor(i), j);
+    const v2 = chunk.getVertexAtCoords(Math.ceil(i), j);
+
+    let vertexHeight = Math.min(v1.z, v2.z);
+    console.log("VERTEX HEIGHT: ", vertexHeight);
+
+    // console.log(v1.z);
 
 
     // Collide with terrain (chunk)
     // target is how much the ground has risen, -v1.z is chunk height at cur point
     let target = new THREE.Vector3();
     chunk.getWorldPosition(target);
-    if (target.y + chunkManager.state.groundY - obj.position.y > -v1.z) {
+    // if (target.y + chunkManager.state.groundY - obj.position.y > -v1.z) {
+    //     screens['menu'] = false;
+    //     screens['paused'] = false;
+    //     screens['ending'] = true;
+    //     pages.quit(document, score);
+    //     sounds['whirring'].stop()
+    //     document.getElementById('audio').pause()
+    //     // sounds['menu'].stop()
+    // }
+
+    console.log(target.y + chunkManager.state.groundY + vertexHeight);
+
+    if (target.y + chunkManager.state.groundY + vertexHeight > 2) {
         screens['menu'] = false;
         screens['paused'] = false;
         screens['ending'] = true;
@@ -336,13 +355,13 @@ export function updateScore(document, score) {
 
 export function updateAudioSpeed(document, sounds, scene) {
     let chunkManager = scene.getObjectByName('chunkManager');
-    let height = chunkManager.getWorldPosition(new THREE.Vector3()).y;
-    let newPlaybackSpeed = height / 400 + 1;
-    let newPitch = -(newPlaybackSpeed - 1) * 1200;
+    let target = new THREE.Vector3();
+    chunkManager.getWorldPosition(target);
+    let height = target.y;
+    let newPlaybackSpeed = height/400+1;
+    let newPitch = -(newPlaybackSpeed-1) * 1200;
     let audio = document.getElementById('audio');
     audio.playbackRate = newPlaybackSpeed;
-
-
 }
 
 
