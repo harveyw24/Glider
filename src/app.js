@@ -161,24 +161,24 @@ clock.start()
 const onAnimationFrameHandler = (timeStamp) => {
     if (screens['menu']) {
         menuRenderer.render(menuScene, menuCamera)
-         let plane = scene.getObjectByName(character);
-         let chunkManager = scene.getObjectByName('chunkManager');
-         plane.position.x = 0;
-         plane.position.y = 0;
-         plane.position.z = 0;
- 
-         chunkManager.position.y = 0;
- 
-         score_num = 0;
-     }
-     // controls.update();
-     window.requestAnimationFrame(onAnimationFrameHandler);
-     if (!screens["menu"] && !screens["ending"] && !screens["pause"]) {
-         renderer.render(scene, camera);
-         scene.update && scene.update(timeStamp);
-         handlers.handleCharacterControls(scene, keypress, character, camera);
-         handlers.handleCollisions(document, scene, character, screens, sounds, score, camera);
-         handlers.updateAudioSpeed(document, sounds, scene);
+        let plane = scene.getObjectByName(character);
+        let chunkManager = scene.getObjectByName('chunkManager');
+        plane.position.x = 0;
+        plane.position.y = 0;
+        plane.position.z = 0;
+
+        chunkManager.position.y = 0;
+
+        score_num = 0;
+    }
+    // controls.update();
+    window.requestAnimationFrame(onAnimationFrameHandler);
+    if (!screens["menu"] && !screens["ending"] && !screens["pause"]) {
+        renderer.render(scene, camera);
+        scene.update && scene.update(timeStamp);
+        handlers.handleCharacterControls(scene, keypress, character, camera);
+        handlers.handleCollisions(document, scene, character, screens, sounds, score, camera);
+        handlers.updateAudioSpeed(document, sounds, scene);
 
         //  let elapsed = clock.getElapsedTime();
         //  if (elapsed - oldTime > 5) { 

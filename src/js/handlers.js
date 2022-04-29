@@ -109,7 +109,7 @@ export function handleScreens(event, screens, document, canvas, menuCanvas, soun
     // quit: game -> ending
     if (event.key == 'q' && !screens['ending'] && !screens['menu']) {
         screens['menu'] = false;
-        screens['paused'] = false;
+        screens['pause'] = false;
         screens['ending'] = true;
         pages.quit(document, score);
         sounds['whirring'].stop()
@@ -146,7 +146,7 @@ export function handleScreens(event, screens, document, canvas, menuCanvas, soun
         screens["pause"] = true;
         sounds['whirring'].setVolume(0.1);
         document.getElementById('audio').volume = 0.5;
-        
+
         let pause = document.getElementById("pause");
         pause.classList.remove('invisible');
 
@@ -182,37 +182,42 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
     let chunk = chunkManager.getCurrentChunk(); // TODO: change to current chunk
     let heightMap = chunk.heightMap;
 
-    console.log(chunkManagerPos);
+    // console.log(chunkManagerPos);
 
-    let i = (-((chunkManagerPos.x + chunkLine.position.x) % chunkWidth) + chunkWidth / 2) / chunkWidth * (heightMap.length);
-    let j = Math.round((chunkWidth - (chunkManagerPos.z % chunkWidth)) / chunkWidth * (heightMap.length - 1));
+    // let i = (-((chunkManagerPos.x + chunkLine.position.x) % chunkWidth) + chunkWidth / 2) / chunkWidth * (heightMap.length);
+    // let j = Math.round((chunkWidth - (chunkManagerPos.z % chunkWidth)) / chunkWidth * (heightMap.length - 1));
 
-    const v1 = chunk.getVertexAtCoords(Math.floor(i), j);
-    const v2 = chunk.getVertexAtCoords(Math.ceil(i), j);
+    // const v1 = chunk.getVertexAtCoords(Math.floor(i), j);
+    // const v2 = chunk.getVertexAtCoords(Math.ceil(i), j);
 
-    let vertexHeight = Math.min(v1.z, v2.z);
-    console.log("VERTEX HEIGHT: ", vertexHeight);
+    // let vertexHeight = Math.min(v1.z, v2.z);
+    // console.log("VERTEX HEIGHT: ", vertexHeight);
 
     // console.log(v1.z);
+    let i = Math.floor((chunkWidth - (chunkManagerPos.z - chunkManager.anchor.z)) / chunkWidth * (heightMap.length - 1));
+    let j = Math.floor((-((chunkManagerPos.x + chunkLine.position.x) % chunkWidth) + chunkWidth / 2) / chunkWidth * heightMap.length);
+
+    const vPos = chunk.getPositionAtCoords(i, j);
+    // TODO: should probably check a square around vPos
+
 
 
     // Collide with terrain (chunk)
-    // target is how much the ground has risen, -v1.z is chunk height at cur point
+    // target is how much the ground has risen, vPos is chunk height at cur point
     let target = new THREE.Vector3();
     chunk.getWorldPosition(target);
-    // if (target.y + chunkManager.state.groundY - obj.position.y > -v1.z) {
-    //     screens['menu'] = false;
-    //     screens['paused'] = false;
-    //     screens['ending'] = true;
-    //     pages.quit(document, score);
-    //     sounds['whirring'].stop()
-    //     document.getElementById('audio').pause()
-    //     // sounds['menu'].stop()
+
+    // Debugging for terrain collisions
+    // const targetWorldXY = new THREE.Vector2(vPos.x + target.x, vPos.z + target.z);
+    // console.log("current (i,j): ", [i, j], "current targetWorldXY: ", targetWorldXY, "chunkManagerPos.z: ", chunkManagerPos.z, "chunk.position.z: ", chunk.position.z);
+    // if (targetWorldXY.length() > 20) {
+    //     console.log("TargetWorldXY is too far away!");
+    //     screens['pause'] = true;
     // }
 
-    console.log(target.y + chunkManager.state.groundY + vertexHeight);
 
-    if (target.y + chunkManager.state.groundY + vertexHeight > 2) {
+    // if (target.y + chunkManager.state.groundY - obj.position.y > -v1.z) {
+    if (target.y - obj.position.y > -vPos.y) {
         screens['menu'] = false;
         screens['paused'] = false;
         screens['ending'] = true;
@@ -221,6 +226,18 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
         document.getElementById('audio').pause()
         // sounds['menu'].stop()
     }
+
+    // console.log(target.y + chunkManager.state.groundY + vertexHeight);
+
+    // if (target.y + chunkManager.state.groundY + vertexHeight > 2) {
+    //     screens['menu'] = false;
+    //     screens['paused'] = false;
+    //     screens['ending'] = true;
+    //     pages.quit(document, score);
+    //     sounds['whirring'].stop()
+    //     document.getElementById('audio').pause()
+    //     // sounds['menu'].stop()
+    // }
 
 
     const dummy = new THREE.Vector3();
@@ -358,8 +375,8 @@ export function updateAudioSpeed(document, sounds, scene) {
     let target = new THREE.Vector3();
     chunkManager.getWorldPosition(target);
     let height = target.y;
-    let newPlaybackSpeed = height/400+1;
-    let newPitch = -(newPlaybackSpeed-1) * 1200;
+    let newPlaybackSpeed = height / 400 + 1;
+    let newPitch = -(newPlaybackSpeed - 1) * 1200;
     let audio = document.getElementById('audio');
     audio.playbackRate = newPlaybackSpeed;
 }

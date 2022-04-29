@@ -1,3 +1,4 @@
+import * as THREE from 'three'
 import { Group, Color, PlaneBufferGeometry, PlaneGeometry } from 'three';
 import { ChunkLine } from '../ChunkLine';
 import { Turbine } from '../Turbine';
@@ -42,7 +43,7 @@ class ChunkManager extends Group {
             freq: 4.4,
             currentOffset: 0,
             // maxTreeNum: 100,
-            maxTreeNum: 0,
+            maxTreeNum: 10,
             maxCloudNum: 25,
             treeHeightMin: 0 + waterHeight,
             treeHeightMax: 50 + waterHeight,
@@ -57,7 +58,7 @@ class ChunkManager extends Group {
         }
 
 
-        this.anchor = this.position.clone();
+        this.anchor = new THREE.Vector3();
         const coordinates = [
             [-this.state.chunkWidth / 2, 0, 0],
             [this.state.chunkWidth / 2, 0, 0],

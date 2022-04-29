@@ -92,8 +92,10 @@ class Chunk extends Group {
 
 
 
+    // i corresponds to z-axis
+    // j corresponds to x-axis
     getVertexAtCoords(i, j) {
-        const index = (j * (this.heightMap.length) + i);
+        const index = (i * (this.heightMap.length) + j);
         return this.geometry.vertices[index];
     }
 
@@ -109,7 +111,7 @@ class Chunk extends Group {
         for (let j = 0; j < this.heightMap.length; j++) {
             for (let i = 0; i < this.heightMap[0].length; i++) {
                 const v1 = this.getVertexAtCoords(i, j);
-                v1.z = this.heightMap[j][i] * this.CMState.exaggeration * 10
+                v1.z = this.heightMap[i][j] * this.CMState.exaggeration * 10
                 // set to water level if below water
                 v1.z = Math.max(this.CMState.waterHeight, v1.z)
             }

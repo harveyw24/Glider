@@ -54,14 +54,14 @@ class ChunkLine extends Group {
     }
 
 
-    getRewardJCoord(rewardIndex) {
+    getRewardICoord(rewardIndex) {
         return Math.floor(this.CMState.chunkVertWidth * (this.CMState.maxRewardNum - rewardIndex - 1) / this.CMState.maxRewardNum);
     }
 
     updateRewardAtIndex(rewardIndex) {
         const reward = this.rewards[rewardIndex];
-        const jCoord = this.getRewardJCoord(rewardIndex);
-        const pos = this.chunks[1].getPositionAtCoords(Math.floor(random(0, this.CMState.chunkVertWidth - 1)), jCoord);
+        const iCoord = this.getRewardICoord(rewardIndex);
+        const pos = this.chunks[1].getPositionAtCoords(iCoord, Math.floor(random(0, this.CMState.chunkVertWidth - 1)));
         pos.add(this.chunks[1].position);
         reward.position.set(pos.x, random(pos.y, this.CMState.maxRewardY), pos.z);
     }
