@@ -185,13 +185,14 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
     // console.log("VERTEX HEIGHT: ", vertexHeight);
 
     // console.log(v1.z);
-    let i = Math.floor((chunkWidth - (chunkManagerPos.z - chunkManager.anchor.z)) / chunkWidth * (heightMap.length - 1));
-    let j = Math.floor((-((chunkManagerPos.x + chunkLine.position.x) % chunkWidth) + chunkWidth / 2) / chunkWidth * heightMap.length);
+    let i = (chunkWidth - (chunkManagerPos.z - chunkManager.anchor.z)) / chunkWidth * (heightMap.length - 1);
+    let j = (-((chunkManagerPos.x + chunkLine.position.x) % chunkWidth) + chunkWidth / 2) / chunkWidth * (heightMap.length - 1);
 
-    const vPos = chunk.getPositionAtCoords(i, j);
-    // TODO: should probably check a square around vPos
-
-
+    // check square around current vPos
+    const vPos1 = chunk.getPositionAtCoords(Math.floor(i), Math.floor(j));
+    const vPos2 = chunk.getPositionAtCoords(Math.floor(i), Math.ceil(j));
+    const vPos3 = chunk.getPositionAtCoords(Math.ceil(i), Math.floor(j));
+    const vPos4 = chunk.getPositionAtCoords(Math.ceil(i), Math.ceil(j));
 
     // Collide with terrain (chunk)
     // target is how much the ground has risen, vPos is chunk height at cur point
@@ -199,13 +200,13 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
     chunk.getWorldPosition(target);
 
     // Debugging for terrain collisions
-    const targetWorldXY = new THREE.Vector2(vPos.x + target.x, vPos.z + target.z);
-    if (cumulNum == 100) {
-        console.log("Average targetWorldXY: ", cumulXYError / cumulNum);
-        cumulNum = cumulXYError = 0;
-    }
-    cumulXYError += targetWorldXY.length();
-    cumulNum++;
+    // const targetWorldXY = new THREE.Vector2(vPos.x + target.x, vPos.z + target.z);
+    // if (cumulNum == 100) {
+    //     console.log("Average targetWorldXY: ", cumulXYError / cumulNum);
+    //     cumulNum = cumulXYError = 0;
+    // }
+    // cumulXYError += targetWorldXY.length();
+    // cumulNum++;
     // if (targetWorldXY.length() > 40) {
     //     console.log("current (i,j): ", [i, j], "current targetWorldXY: ", targetWorldXY, "chunkManagerPos.z: ", chunkManagerPos.z, "chunk.position.z: ", chunk.position.z);
     //     console.log("current chunkline:", chunkLine);
@@ -213,9 +214,8 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
     //     screens['pause'] = true;
     // }
 
-
     // if (target.y + chunkManager.state.groundY - obj.position.y > -v1.z) {
-    if (target.y - obj.position.y > -vPos.y) {
+    if (target.y - obj.position.y > - Math.min(vPos1.y, vPos2.y, vPos3.y, vPos4.y)) {
         // screens['menu'] = false;
         screens['pause'] = true;
         // screens['ending'] = true;
