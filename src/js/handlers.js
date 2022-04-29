@@ -164,7 +164,6 @@ let cumulNum = 0;
 let cumulXYError = 0;
 export function handleCollisions(document, scene, character, screens, sounds, score, camera) {
     let chunkManager = scene.getObjectByName('chunkManager');
-    let clouds = [];
 
     let obj = scene.getObjectByName(character);
     let chunkManagerPos = chunkManager.position;
@@ -173,51 +172,54 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
     let chunk = chunkManager.getCurrentChunk(); // TODO: change to current chunk
     let heightMap = chunk.heightMap;
 
-    // console.log(chunkManagerPos);
 
-    // let i = (-((chunkManagerPos.x + chunkLine.position.x) % chunkWidth) + chunkWidth / 2) / chunkWidth * (heightMap.length);
-    // let j = Math.round((chunkWidth - (chunkManagerPos.z % chunkWidth)) / chunkWidth * (heightMap.length - 1));
-
-    // const v1 = chunk.getVertexAtCoords(Math.floor(i), j);
-    // const v2 = chunk.getVertexAtCoords(Math.ceil(i), j);
-
-    // let vertexHeight = Math.min(v1.z, v2.z);
-    // console.log("VERTEX HEIGHT: ", vertexHeight);
-
-    // console.log(v1.z);
-    let i = (chunkWidth - (chunkManagerPos.z - chunkManager.anchor.z)) / chunkWidth * (heightMap.length - 1);
-    let j = (-((chunkManagerPos.x + chunkLine.position.x) % chunkWidth) + chunkWidth / 2) / chunkWidth * (heightMap.length - 1);
-
-    // check square around current vPos
-    const vPos1 = chunk.getPositionAtCoords(Math.floor(i), Math.floor(j));
-    const vPos2 = chunk.getPositionAtCoords(Math.floor(i), Math.ceil(j));
-    const vPos3 = chunk.getPositionAtCoords(Math.ceil(i), Math.floor(j));
-    const vPos4 = chunk.getPositionAtCoords(Math.ceil(i), Math.ceil(j));
+    let i = Math.floor((chunkWidth - (chunkManagerPos.z - chunkManager.anchor.z)) / chunkWidth * (heightMap.length - 1));
+    let j = Math.floor((-(chunkManagerPos.x + chunkLine.position.x) + chunkWidth / 2) / chunkWidth * (heightMap.length - 1));
+    // ensure that both (i,j) and (i+1,j+1) are valid coordinates
+    if (i == heightMap.length - 1) { i--; console.log("!!!!!!!!!!!!! i at edge"); }
+    if (j == heightMap.length - 1) { j--; console.log("!!!!!!!!!!!!! j at edge"); }
 
     // Collide with terrain (chunk)
-    // target is how much the ground has risen, vPos is chunk height at cur point
-    let target = new THREE.Vector3();
-    chunk.getWorldPosition(target);
+    // chunkWorldPos is how much the ground has risen, vWorldPos is chunk height at cur point
+    let chunkWorldPos = new THREE.Vector3();
+    chunk.getWorldPosition(chunkWorldPos);
 
-    // Debugging for terrain collisions
-    // const targetWorldXY = new THREE.Vector2(vPos.x + target.x, vPos.z + target.z);
-    // if (cumulNum == 100) {
-    //     console.log("Average targetWorldXY: ", cumulXYError / cumulNum);
-    //     cumulNum = cumulXYError = 0;
-    // }
-    // cumulXYError += targetWorldXY.length();
-    // cumulNum++;
-    // if (targetWorldXY.length() > 40) {
-    //     console.log("current (i,j): ", [i, j], "current targetWorldXY: ", targetWorldXY, "chunkManagerPos.z: ", chunkManagerPos.z, "chunk.position.z: ", chunk.position.z);
-    //     console.log("current chunkline:", chunkLine);
-    //     console.log("TargetWorldXY is too far away!");
-    //     screens['pause'] = true;
-    // }
+    // check square around current vWorldPos
+    // vWorldPos1, vWorldPos2, vWorldPos3 form a triangle; vWorldPos2, vWorldPos3, vWorldPos4 form the other triangle
+    const vWorldPos1 = chunk.getPositionAtCoords(i, j).add(chunkWorldPos);
+    const vWorldPos2 = chunk.getPositionAtCoords(i, j + 1).add(chunkWorldPos);
+    const vWorldPos3 = chunk.getPositionAtCoords(i + 1, j).add(chunkWorldPos);
+    const vWorldPos4 = chunk.getPositionAtCoords(i + 1, j + 1).add(chunkWorldPos);
 
-    // if (target.y + chunkManager.state.groundY - obj.position.y > -v1.z) {
-    if (target.y - obj.position.y > -(vPos1.y + vPos2.y + vPos3.y + vPos4.y)/4) {
-        // screens['menu'] = false;
+
+
+    let interp = new THREE.Vector3();
+    const area2 = chunkManager.state.segmentWidth * chunkManager.state.segmentWidth;
+    if (!(vWorldPos1.x <= 0 && vWorldPos4.x >= 0 && vWorldPos1.z <= 0 && vWorldPos4.z >= 0)) {
+        console.log("Player not in square!");
+        screens["pause"] = true;
+    } else {
+        if (-vWorldPos2.z * (vWorldPos3.x - vWorldPos2.x) >= -vWorldPos2.x * (vWorldPos3.z - vWorldPos2.z)) {
+            const baryCoord1 = (vWorldPos2.x * vWorldPos3.z - vWorldPos2.z * vWorldPos3.x) / area2;
+            const baryCoord2 = (vWorldPos3.x * vWorldPos1.z - vWorldPos3.z * vWorldPos1.x) / area2;
+            const baryCoord3 = (vWorldPos1.x * vWorldPos2.z - vWorldPos1.z * vWorldPos2.x) / area2;
+            interp = vWorldPos1.multiplyScalar(baryCoord1).add(vWorldPos2.multiplyScalar(baryCoord2)).add(vWorldPos3.multiplyScalar(baryCoord3));
+        } else {
+            const baryCoord3 = (vWorldPos2.x * vWorldPos4.z - vWorldPos2.z * vWorldPos4.x) / area2;
+            const baryCoord4 = (vWorldPos3.x * vWorldPos2.z - vWorldPos3.z * vWorldPos2.x) / area2;
+            const baryCoord2 = (vWorldPos4.x * vWorldPos3.z - vWorldPos4.z * vWorldPos3.x) / area2;
+            interp = vWorldPos2.multiplyScalar(baryCoord2).add(vWorldPos3.multiplyScalar(baryCoord3)).add(vWorldPos4.multiplyScalar(baryCoord4));
+        }
+    }
+
+
+
+    if (interp.y > obj.position.y) {
         screens['pause'] = true;
+        console.log("Crash!");
+
+        // screens['menu'] = false;
+        // screens['pause'] = false;
         // screens['ending'] = true;
         // pages.quit(document, score);
         // sounds['whirring'].stop()
@@ -225,17 +227,6 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
         // sounds['menu'].stop()
     }
 
-    // console.log(target.y + chunkManager.state.groundY + vertexHeight);
-
-    // if (target.y + chunkManager.state.groundY + vertexHeight > 2) {
-    //     screens['menu'] = false;
-    //     screens['paused'] = false;
-    //     screens['ending'] = true;
-    //     pages.quit(document, score);
-    //     sounds['whirring'].stop()
-    //     document.getElementById('audio').pause()
-    //     // sounds['menu'].stop()
-    // }
 
 
     const rewardWorldPos = new THREE.Vector3();

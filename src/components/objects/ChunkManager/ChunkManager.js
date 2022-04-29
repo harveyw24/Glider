@@ -23,7 +23,7 @@ class ChunkManager extends Group {
             parent: parent,
             chunkWidth: chunkPxWidth,
             chunkVertWidth: chunkVertexWidth,
-            totalVertWidth: chunkVertexWidth * 3, // chunkVertWidth * 3
+            segmentWidth: chunkPxWidth / (chunkVertexWidth - 1),
             groundY: groundY,
             currentXOffset: 0,
             currentZOffset: 0,
@@ -143,8 +143,8 @@ class ChunkManager extends Group {
         }
 
         // to keep the chunks in the vicinity of the player:
-        // z-position is changed chunk-wise     (z-position of chunkLine = 0)
-        // x-position is changed chunkLine-wise (x-position of chunk     = 0)
+        // z-position is changed chunk-wise     (chunkLine.position.z = 0)
+        // x-position is changed chunkLine-wise     (chunk.position.x = 0)
 
         // Move first chunk forward when player passes the chunk
         if (this.position.z - this.anchor.z >= this.state.chunkWidth) {
@@ -159,7 +159,7 @@ class ChunkManager extends Group {
                 chunkLine.chunks.push(chunkLine.chunks.shift());
             }
 
-            // invariant: at z-chunk change, anchor.z + currentChunk.position.z + chunkwidth/2 = 0
+            // invariant: at z-chunk change, (anchor.z + chunkwidth/2) + currentChunk.position.z = 0
             this.anchor.z = -this.chunkLines[0].chunks[0].position.z - this.state.chunkWidth / 2;
             console.log("NEW ANCHOR: ", this.anchor.x, this.anchor.y, this.anchor.z);
         }
