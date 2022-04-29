@@ -64,6 +64,7 @@ class ChunkLine extends Group {
         const pos = this.chunks[1].getPositionAtCoords(iCoord, Math.floor(random(0, this.CMState.chunkVertWidth - 1)));
         pos.add(this.chunks[1].position);
         reward.position.set(pos.x, random(pos.y, this.CMState.maxRewardY), pos.z);
+        // reward.position.set(-this.position.x * .95, -50, pos.z);
     }
 
 

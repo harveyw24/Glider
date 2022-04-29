@@ -142,9 +142,13 @@ class ChunkManager extends Group {
             }
         }
 
+        // to keep the chunks in the vicinity of the player:
+        // z-position is changed chunk-wise     (z-position of chunkLine = 0)
+        // x-position is changed chunkLine-wise (x-position of chunk     = 0)
 
         // Move first chunk forward when player passes the chunk
         if (this.position.z - this.anchor.z >= this.state.chunkWidth) {
+            while (this.state.rewardIndex != 0) this.updateReward();
             for (const chunkLine of this.chunkLines) {
                 chunkLine.chunks[0].setChunkPosition(
                     chunkLine.chunks[0].position.x,
@@ -155,12 +159,13 @@ class ChunkManager extends Group {
                 chunkLine.chunks.push(chunkLine.chunks.shift());
             }
 
-            this.anchor.z = this.position.z;
-            console.log("NEW ANCHOR: ", this.anchor.z);
+            // invariant: at z-chunk change, anchor.z + currentChunk.position.z + chunkwidth/2 = 0
+            this.anchor.z = -this.chunkLines[0].chunks[0].position.z - this.state.chunkWidth / 2;
+            console.log("NEW ANCHOR: ", this.anchor.x, this.anchor.y, this.anchor.z);
         }
 
         // Move chunklines left/right if player crosses loadThreshold
-        if (this.position.x + this.chunkLines[0].position.x + (.5 - this.state.loadThreshold) * this.state.chunkWidth > 0) {
+        if (this.position.x - this.anchor.x > this.state.loadThreshold * this.state.chunkWidth) {
             this.chunkLines[1].setChunkLinePosition(
                 this.chunkLines[0].position.x - this.state.chunkWidth,
                 this.chunkLines[1].position.y,
@@ -168,7 +173,12 @@ class ChunkManager extends Group {
             )
             this.chunkLines[1].updateNoise();
             this.chunkLines.unshift(this.chunkLines.pop());
-        } else if (this.position.x + this.chunkLines[0].position.x + (.5 + this.state.loadThreshold) * this.state.chunkWidth < 0) {
+
+            // invariant: at x-chunk change, anchor.x + currentChunk.position.x + chunkwidth/2 = 0
+            this.anchor.x = -this.chunkLines[0].position.x - this.state.chunkWidth / 2;
+            console.log("NEW ANCHOR: ", this.anchor.x, this.anchor.y, this.anchor.z);
+
+        } else if (this.position.x - this.anchor.x < -this.state.loadThreshold * this.state.chunkWidth) {
             this.chunkLines[0].setChunkLinePosition(
                 this.chunkLines[1].position.x + this.state.chunkWidth,
                 this.chunkLines[0].position.y,
@@ -176,13 +186,16 @@ class ChunkManager extends Group {
             )
             this.chunkLines[0].updateNoise();
             this.chunkLines.push(this.chunkLines.shift());
+
+            this.anchor.x = -this.chunkLines[0].position.x - this.state.chunkWidth / 2;
+            console.log("NEW ANCHOR: ", this.anchor.x, this.anchor.y, this.anchor.z);
         }
 
         if (this.position.z + this.chunkLines[0].rewards[this.state.rewardIndex].position.z > 0) {
+            console.log("updating reward!");
             this.updateReward();
         }
 
-        this.getCurrentChunkLine();
     }
 
     updateReward() {
@@ -196,7 +209,7 @@ class ChunkManager extends Group {
     }
 
     getCurrentChunkLine() {
-        if (this.position.x + this.chunkLines[0].position.x + 0.5 * this.state.chunkWidth > 0) {
+        if (this.position.x > this.anchor.x) {
             return this.chunkLines[0];
         } else {
             return this.chunkLines[1];

@@ -186,10 +186,10 @@ class Chunk extends Group {
             }
         }
         // want a hit rate that is close to 1.0 but not always 1.0
-        console.log(
-            "tree hit rate:", this.CMState.maxTreeNum != 0 ? treeIndex / this.CMState.maxTreeNum : "(maxTreeNum is 0); ",
-            "cloud hit rate:", this.CMState.maxCloudNum != 0 ? cloudIndex / this.CMState.maxCloudNum : "(maxCloudNum is 0)"
-        );
+        // console.log(
+        //     "tree hit rate:", this.CMState.maxTreeNum != 0 ? treeIndex / this.CMState.maxTreeNum : "(maxTreeNum is 0); ",
+        //     "cloud hit rate:", this.CMState.maxCloudNum != 0 ? cloudIndex / this.CMState.maxCloudNum : "(maxCloudNum is 0)"
+        // );
         for (let i = treeIndex; i < this.trees.length; i++) this.trees[i].visible = false;
         for (let i = cloudIndex; i < this.clouds.length; i++) this.clouds[i].visible = false;
     }

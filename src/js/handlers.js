@@ -130,7 +130,7 @@ export function handleScreens(event, screens, document, canvas, menuCanvas, soun
         pages.start(document, canvas);
         buffer = true;
         setTimeout(function() {
-           buffer = false;
+            buffer = false;
         }, 3000);
         clearTimeout(timer);
 
@@ -160,12 +160,13 @@ export function handleScreens(event, screens, document, canvas, menuCanvas, soun
     }
 }
 
+let cumulNum = 0;
+let cumulXYError = 0;
 export function handleCollisions(document, scene, character, screens, sounds, score, camera) {
     let chunkManager = scene.getObjectByName('chunkManager');
     let clouds = [];
     scene.traverseVisible(function(child) {
         if (child.name === "cloud") {
-            let matWorld = child.matrixWorld;
             let vector_pos = new THREE.Vector3();
             child.getWorldPosition(vector_pos);
 
@@ -214,9 +215,16 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
     chunk.getWorldPosition(target);
 
     // Debugging for terrain collisions
-    // const targetWorldXY = new THREE.Vector2(vPos.x + target.x, vPos.z + target.z);
-    // console.log("current (i,j): ", [i, j], "current targetWorldXY: ", targetWorldXY, "chunkManagerPos.z: ", chunkManagerPos.z, "chunk.position.z: ", chunk.position.z);
-    // if (targetWorldXY.length() > 20) {
+    const targetWorldXY = new THREE.Vector2(vPos.x + target.x, vPos.z + target.z);
+    if (cumulNum == 100) {
+        console.log("Average targetWorldXY: ", cumulXYError / cumulNum);
+        cumulNum = cumulXYError = 0;
+    }
+    cumulXYError += targetWorldXY.length();
+    cumulNum++;
+    // if (targetWorldXY.length() > 40) {
+    //     console.log("current (i,j): ", [i, j], "current targetWorldXY: ", targetWorldXY, "chunkManagerPos.z: ", chunkManagerPos.z, "chunk.position.z: ", chunk.position.z);
+    //     console.log("current chunkline:", chunkLine);
     //     console.log("TargetWorldXY is too far away!");
     //     screens['pause'] = true;
     // }
@@ -246,9 +254,18 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
     // }
 
 
-    const dummy = new THREE.Vector3();
-    // console.log("to current reward", obj.position.distanceTo(chunkManager.getCurrentReward().getWorldPosition(dummy)));
-    if (obj.position.distanceTo(chunkManager.getCurrentReward().getWorldPosition(dummy)) < 15) {
+    const rewardWorldPos = new THREE.Vector3();
+    chunkManager.getCurrentReward().getWorldPosition(rewardWorldPos)
+    // console.log(chunkManager.getCurrentReward().position.clone());
+    // console.log("to current reward", obj.position.distanceTo(rewardWorldPos));
+
+    // const geo = new THREE.SphereGeometry(5, 7, 8);
+    // const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    // const mesh = new THREE.Mesh(geo, material);
+    // mesh.position.set(rewardWorldPos.x - chunkManagerPos.x, rewardWorldPos.y - chunkManagerPos.y, rewardWorldPos.z - chunkManagerPos.z);
+    // chunkManager.add(mesh);
+
+    if (obj.position.distanceTo(rewardWorldPos) < 15) {
         if (!mute) sounds['powerup'].play();
         sounds['whirring'].setVolume(1)
 
