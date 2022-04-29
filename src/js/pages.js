@@ -2,6 +2,7 @@ import START from "../start.html"
 import FOOTER from "../footer.html"
 import END from "../ending.html"
 import INSTRUCTIONS from "../instructions.html";
+import PAUSE from "../pause.html"
 
 
 // idea from https://github.com/efyang/portal-0.5/blob/main/src/app.js
@@ -65,4 +66,12 @@ export function start(document, canvas) {
     fillScreen.id = 'fillScreen';
     fillScreen.style.pointerEvents = "none";
     document.body.appendChild(fillScreen);
+    let pause = document.createElement('div');
+    pause.id = 'pause';
+    pause.style.pointerEvents = 'none';
+    pause.innerHTML = PAUSE;
+    pause.classList.add('invisible')
+    document.body.appendChild(pause)
+    
+
 }

@@ -3,6 +3,7 @@ import * as pages from "./pages.js"
 import * as utils from "./utils.js"
 
 let buffer = false;
+let mute = false;
 
 function clamp(val, min, max) {
     return Math.max(min, Math.min(max, val));
@@ -53,7 +54,7 @@ export function handleCharacterControls(scene, keypress, character, camera) {
         }
     }
     if (keypress['right']) {
-        const delta = 0.8;
+        const delta = 2;
         chunkManager.position.x -= delta;
         // plane.state.rotation = "right";
         if (plane.rotation.z > -maxRotation) {
@@ -66,7 +67,7 @@ export function handleCharacterControls(scene, keypress, character, camera) {
         // need to somehow rotate bounding box
     }
     if (keypress['left']) {
-        const delta = 0.8;
+        const delta = 2;
         chunkManager.position.x += delta;
         // plane.state.rotation = "left";
         if (plane.rotation.z < maxRotation) {
@@ -94,6 +95,17 @@ export function handleCharacterControls(scene, keypress, character, camera) {
 }
 // Handle screens
 export function handleScreens(event, screens, document, canvas, menuCanvas, sounds, score) {
+    if (event.key == 'm') {
+        mute = !mute;
+        if (!mute && !screens['ending'] && !screens['menu']) {
+            document.getElementById('audio').play();
+            sounds['whirring'].play();
+        }
+        else {
+            document.getElementById('audio').pause();
+            sounds['whirring'].stop();
+        }
+    }
     // quit: game -> ending
     if (event.key == 'q' && !screens['ending'] && !screens['menu']) {
         screens['menu'] = false;
@@ -115,20 +127,29 @@ export function handleScreens(event, screens, document, canvas, menuCanvas, soun
     else if (event.key == " " && screens["menu"]) {
         screens["menu"] = false;
         pages.start(document, canvas);
-        sounds['whirring'].play()
-        document.getElementById('audio').play()
+
+        if (!mute) {
+            sounds['whirring'].play()
+            document.getElementById('audio').play()
+        }
     }
     // unpause: pause -> game
     else if (event.key == " " && screens["pause"]) {
         screens["pause"] = false;
         sounds['whirring'].setVolume(0.4);
         document.getElementById('audio').volume = 1;
+        let pause = document.getElementById("pause");
+        pause.classList.add('invisible');
     }
     // pause: game -> pause
     else if (event.key == " " && !screens["ending"]) {
         screens["pause"] = true;
         sounds['whirring'].setVolume(0.1);
         document.getElementById('audio').volume = 0.5;
+        
+        let pause = document.getElementById("pause");
+        pause.classList.remove('invisible');
+
 
     }
 }
@@ -186,7 +207,7 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
     const dummy = new THREE.Vector3();
     // console.log("to current reward", obj.position.distanceTo(chunkManager.getCurrentReward().getWorldPosition(dummy)));
     if (obj.position.distanceTo(chunkManager.getCurrentReward().getWorldPosition(dummy)) < 15) {
-        sounds['powerup'].play();
+        if (!mute) sounds['powerup'].play();
         sounds['whirring'].setVolume(1)
 
         setTimeout(function() {
@@ -258,7 +279,7 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
             setTimeout(function() {
                 fillScreen.classList.remove('red');
             }, 500);
-            sounds['damage'].play();
+            if (!mute) sounds['damage'].play();
             // obj.position = obj.position.add(vector_norm.multiplyScalar(1))
             // obj.position.x -= vector_norm.x * 0.1;
             // obj.position.y -= vector_norm.y * 0.1;
@@ -295,7 +316,7 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
                 setTimeout(function() {
                     fillScreen.classList.remove('red');
                 }, 500);
-                sounds['damage'].play();
+                if (!mute) sounds['damage'].play();
 
                 setTimeout(function() { buffer = false; console.log("UNBUFFERED!"); }, 3000)
                 // obj.state.hit = false;
