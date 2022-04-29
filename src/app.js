@@ -209,12 +209,13 @@ const onAnimationFrameHandler = (timeStamp) => {
     // controls.update();
     window.requestAnimationFrame(onAnimationFrameHandler);
     if (!screens["menu"] && !screens["ending"] && !screens["pause"]) {
+        scene.getObjectByName('chunkManager').update(timeStamp, speedLevel)
         renderer.render(scene, camera);
         scene.update && scene.update(timeStamp);
         let chunkManager = scene.getObjectByName('chunkManager');
         chunkManager.update(timeStamp, speedLevel)
+        handlers.handleCollisions(document, scene, character, screens, sounds, score, camera); // needs to happen immediately after update for accuracy
         handlers.handleCharacterControls(scene, keypress, character, camera, speedLevel);
-        handlers.handleCollisions(document, scene, character, screens, sounds, score, camera);
         handlers.updateAudioSpeed(document, sounds, scene);
 
          let elapsed = clock.getElapsedTime();

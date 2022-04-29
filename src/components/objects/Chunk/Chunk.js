@@ -92,8 +92,8 @@ class Chunk extends Group {
 
 
 
-    // i corresponds to z-axis
-    // j corresponds to x-axis
+    // i corresponds to +z-axis
+    // j corresponds to +x-axis
     getVertexAtCoords(i, j) {
         const index = (i * (this.heightMap.length) + j);
         return this.geometry.vertices[index];

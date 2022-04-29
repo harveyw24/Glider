@@ -1,6 +1,6 @@
 import * as Dat from 'dat.gui';
 import { Scene, Color } from 'three';
-import { Flower, Land, Kite, Falcon, Paper, Terrain, Airplane, ChunkManager, Turbine} from '../../objects';
+import { Flower, Land, Kite, Falcon, Paper, Terrain, Airplane, ChunkManager, Turbine } from '../../objects';
 import { BasicLights } from 'lights';
 import * as THREE from 'three'
 import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js'
@@ -37,19 +37,25 @@ class SeedScene extends Scene {
         const hemiLight = new THREE.HemisphereLight(0xFF8F00, 0xffffff, 0.9)
         hemiLight.castShadow = true;
 
-        const dirLight = new THREE.DirectionalLight( 0xffffff, 0.9 );
-        dirLight.position.set( -1, 10, 5 );
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
+        dirLight.position.set(-1, 10, 5);
 
         const chunkManager = new ChunkManager(this);
         this.chunkManager = chunkManager;
 
         this.sky = new Sky();
         this.sky.scale.setScalar(1000);
-        
+
         this.sun = new THREE.Vector3();
 
         // this.add(lights, this.sky, airplane, chunkManager);
         this.add(hemiLight, dirLight, this.sky, airplane, chunkManager);
+
+        // player hitbox visualization
+        // let geo = new THREE.SphereGeometry(1, 7, 8);
+        // let material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+        // let mesh = new THREE.Mesh(geo, material);
+        // this.add(mesh);
 
         // Populate GUI
         this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
