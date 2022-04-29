@@ -84,6 +84,7 @@ sounds['powerup'] = powerup;
 
 
 const clock = new THREE.Clock();
+let speedLevel = 1;
 
 initSky(scene.sky, scene.sun, renderer, scene.state.gui);
 initSky(menuScene.sky, scene.sun, menuRenderer, menuScene.state.gui)
@@ -166,7 +167,7 @@ const onAnimationFrameHandler = (timeStamp) => {
         plane.position.x = 0;
         plane.position.y = 0;
         plane.position.z = 0;
-
+        speedLevel = 1;
         chunkManager.position.y = 0;
 
         score_num = 0;
@@ -176,15 +177,16 @@ const onAnimationFrameHandler = (timeStamp) => {
     if (!screens["menu"] && !screens["ending"] && !screens["pause"]) {
         renderer.render(scene, camera);
         scene.update && scene.update(timeStamp);
-        handlers.handleCharacterControls(scene, keypress, character, camera);
+        scene.getObjectByName('chunkManager').update(timeStamp, speedLevel)
+        handlers.handleCharacterControls(scene, keypress, character, camera, speedLevel);
         handlers.handleCollisions(document, scene, character, screens, sounds, score, camera);
         handlers.updateAudioSpeed(document, sounds, scene);
 
-        //  let elapsed = clock.getElapsedTime();
-        //  if (elapsed - oldTime > 5) { 
-        //     handlers.updateAudioSpeed(sounds, scene);
-        //      oldTime = elapsed;
-        //  }
+         let elapsed = clock.getElapsedTime();
+         if (elapsed - oldTime > 30 && speedLevel < 2) { 
+            speedLevel *= 1.1;
+             oldTime = elapsed;
+         }
         if (!screens["menu"] && !screens["ending"] && !screens["pause"]) {
             score_num += 0.01;
             score = score_num.toFixed(2);

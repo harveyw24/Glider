@@ -74,7 +74,7 @@ class ChunkManager extends Group {
 
 
 
-        parent.addToUpdateList(this);
+        // parent.addToUpdateList(this);
 
         // Populate GUI
         var folder1 = this.state.gui.addFolder('BREATH');
@@ -115,10 +115,10 @@ class ChunkManager extends Group {
 
     // the key invariant to maintain here is that the plane is within the first chunk (i.e. this.chunkLines[0]);
     // if the plane leaves the first chunk, then the first chunk needs to be popped and moved to the back
-    update(timeStamp) {
+    update(timeStamp, speedLevel) {
         // Chunk positions are relative to terrain, so updating terrain position is sufficient
-        this.position.z += 3;
-        this.position.y += 0.25;
+        this.position.z += 3 * speedLevel;
+        this.position.y += 0.25 * speedLevel;
 
         // Gradual collision falling collision
         if (this.state.falling > 0) {

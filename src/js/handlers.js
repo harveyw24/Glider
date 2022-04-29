@@ -23,7 +23,7 @@ export function handleKeyUp(event, keypress) {
     if (event.key == "ArrowRight") keypress['right'] = false;
 }
 
-export function handleCharacterControls(scene, keypress, character, camera) {
+export function handleCharacterControls(scene, keypress, character, camera, speedLevel) {
     let plane = scene.getObjectByName(character);
     let chunkManager = scene.getObjectByName('chunkManager');
     const maxRotation = 0.5;
@@ -31,7 +31,7 @@ export function handleCharacterControls(scene, keypress, character, camera) {
     const rotationRate = 0.02;
 
     if (keypress['up'] && plane.position.y < 20) {
-        const delta = 0.2;
+        const delta = 0.2 * speedLevel;
         chunkManager.position.y -= delta;
         if (plane.rotation.x < maxPitch) {
             if (plane.rotation.x > maxPitch - 0.02) {
@@ -42,7 +42,7 @@ export function handleCharacterControls(scene, keypress, character, camera) {
         }
     }
     if (keypress['down']) {
-        const delta = 0.4;
+        const delta = 0.4 * speedLevel;
         chunkManager.position.y += delta;
 
         if (plane.rotation.x > -maxPitch) {
@@ -54,7 +54,7 @@ export function handleCharacterControls(scene, keypress, character, camera) {
         }
     }
     if (keypress['right']) {
-        const delta = 2;
+        const delta = 2 * speedLevel;
         chunkManager.position.x -= delta;
         // plane.state.rotation = "right";
         if (plane.rotation.z > -maxRotation) {
@@ -67,7 +67,7 @@ export function handleCharacterControls(scene, keypress, character, camera) {
         // need to somehow rotate bounding box
     }
     if (keypress['left']) {
-        const delta = 2;
+        const delta = 2 * speedLevel;
         chunkManager.position.x += delta;
         // plane.state.rotation = "left";
         if (plane.rotation.z < maxRotation) {
@@ -218,12 +218,12 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
 
     // if (target.y + chunkManager.state.groundY - obj.position.y > -v1.z) {
     if (target.y - obj.position.y > -vPos.y) {
-        screens['menu'] = false;
-        screens['paused'] = false;
-        screens['ending'] = true;
-        pages.quit(document, score);
-        sounds['whirring'].stop()
-        document.getElementById('audio').pause()
+        // screens['menu'] = false;
+        screens['pause'] = true;
+        // screens['ending'] = true;
+        // pages.quit(document, score);
+        // sounds['whirring'].stop()
+        // document.getElementById('audio').pause()
         // sounds['menu'].stop()
     }
 
