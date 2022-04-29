@@ -127,6 +127,10 @@ export function handleScreens(event, screens, document, canvas, menuCanvas, soun
     else if (event.key == " " && screens["menu"]) {
         screens["menu"] = false;
         pages.start(document, canvas);
+        buffer = true;
+        setTimeout(function() {
+           buffer = false;
+        }, 3000);
 
         if (!mute) {
             sounds['whirring'].play()

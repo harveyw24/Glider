@@ -47,6 +47,7 @@ export function quit(document, score) {
     document.getElementById('score').remove();
     document.getElementById("canvas").remove();
     document.getElementById('instructions').remove();
+    document.getElementById('pause').remove();
 }
 
 export function start(document, canvas) {
