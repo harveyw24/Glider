@@ -76,9 +76,9 @@ const desert_biome = {
 }
 
 const volcano_biome = {
-    waterColor: new THREE.Color(0,0,0),
-    bankColor: new THREE.Color(0,0,0),
-    middleColor: new THREE.Color(0,0,0),
+    waterColor: new THREE.Color(0, 0, 0),
+    bankColor: new THREE.Color(0, 0, 0),
+    middleColor: new THREE.Color(0, 0, 0),
     peakColor: new THREE.Color(242, 64, 24),
     exaggeration: 30
 }
@@ -209,31 +209,32 @@ const onAnimationFrameHandler = (timeStamp) => {
     // controls.update();
     window.requestAnimationFrame(onAnimationFrameHandler);
     if (!screens["menu"] && !screens["ending"] && !screens["pause"]) {
-        scene.getObjectByName('chunkManager').update(timeStamp, speedLevel)
+        let chunkManager = scene.getObjectByName('chunkManager');
+        chunkManager.update(timeStamp, speedLevel);
+
         renderer.render(scene, camera);
         scene.update && scene.update(timeStamp);
-        let chunkManager = scene.getObjectByName('chunkManager');
-        chunkManager.update(timeStamp, speedLevel)
+
         handlers.handleCollisions(document, scene, character, screens, sounds, score, camera); // needs to happen immediately after update for accuracy
         handlers.handleCharacterControls(scene, keypress, character, camera, speedLevel);
         handlers.updateAudioSpeed(document, sounds, scene);
 
-         let elapsed = clock.getElapsedTime();
-         if (elapsed - oldTime > 5 && speedLevel < 2) { 
+        let elapsed = clock.getElapsedTime();
+        if (elapsed - oldTime > 5 && speedLevel < 2) {
             speedLevel *= 1.1;
-             oldTime = elapsed;
-         }
+            oldTime = elapsed;
+        }
 
-         let terrainElapsed = terrainClock.getElapsedTime();
-         if (terrainElapsed - terrainOldTime > 10) {
-            let biome = biomes[Math.floor(Math.random()*biomes.length)]
+        let terrainElapsed = terrainClock.getElapsedTime();
+        if (terrainElapsed - terrainOldTime > 10) {
+            let biome = biomes[Math.floor(Math.random() * biomes.length)]
             chunkManager.state.bankColor = biome.bankColor;
             chunkManager.state.waterColor = biome.waterColor;
             chunkManager.state.middleColor = biome.middleColor;
             chunkManager.state.peakColor = biome.peakColor;
             chunkManager.state.exaggeration = biome.exaggeration;
             terrainOldTime = terrainElapsed;
-         }
+        }
 
 
         if (!screens["menu"] && !screens["ending"] && !screens["pause"]) {
