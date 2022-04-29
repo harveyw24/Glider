@@ -73,6 +73,4 @@ export function start(document, canvas) {
     pause.innerHTML = PAUSE;
     pause.classList.add('invisible')
     document.body.appendChild(pause)
-    
-
 }

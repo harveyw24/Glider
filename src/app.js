@@ -167,8 +167,13 @@ const onAnimationFrameHandler = (timeStamp) => {
         plane.position.x = 0;
         plane.position.y = 0;
         plane.position.z = 0;
+        plane.rotation.z = 0;
+        plane.rotation.x = 0;
+        plane.state.hit = false;
         speedLevel = 1;
         chunkManager.position.y = 0;
+        chunkManager.state.falling = 0;
+        chunkManager.state.climbing = 0;
 
         score_num = 0;
     }

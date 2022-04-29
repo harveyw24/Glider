@@ -35,7 +35,7 @@ class Chunk extends Group {
         this.geometry.colorsNeedUpdate = true;
 
 
-        this.trees = Array.from(Array(this.CMState.maxTreeNum), () => new Tree());
+        this.trees = Array.from(Array(this.CMState.maxTreeNum), () => new Cloud());
         this.clouds = Array.from(Array(this.CMState.maxCloudNum), () => new Cloud());
         for (const tree of this.trees) {
             this.add(tree);

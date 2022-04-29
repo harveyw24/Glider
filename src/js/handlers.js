@@ -4,6 +4,7 @@ import * as utils from "./utils.js"
 
 let buffer = false;
 let mute = false;
+let timer;
 
 function clamp(val, min, max) {
     return Math.max(min, Math.min(max, val));
@@ -54,7 +55,7 @@ export function handleCharacterControls(scene, keypress, character, camera, spee
         }
     }
     if (keypress['right']) {
-        const delta = 2 * speedLevel;
+        const delta = 2 * Math.sqrt(speedLevel) * (Math.abs(plane.rotation.z) + 0.5);
         chunkManager.position.x -= delta;
         // plane.state.rotation = "right";
         if (plane.rotation.z > -maxRotation) {
@@ -67,7 +68,7 @@ export function handleCharacterControls(scene, keypress, character, camera, spee
         // need to somehow rotate bounding box
     }
     if (keypress['left']) {
-        const delta = 2 * speedLevel;
+        const delta = 2 * Math.sqrt(speedLevel) * (Math.abs(plane.rotation.z) + 0.5);
         chunkManager.position.x += delta;
         // plane.state.rotation = "left";
         if (plane.rotation.z < maxRotation) {
@@ -131,6 +132,7 @@ export function handleScreens(event, screens, document, canvas, menuCanvas, soun
         setTimeout(function() {
            buffer = false;
         }, 3000);
+        clearTimeout(timer);
 
         if (!mute) {
             sounds['whirring'].play()
@@ -260,7 +262,6 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
         }
     }
 
-
     if (!buffer) {
         let clouds = [];
 
@@ -304,9 +305,7 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
         const vector_pos = new THREE.Vector3();
         const vector_norm = new THREE.Vector3();
 
-        let raytip = new THREE.Raycaster(plane[0].tip, new THREE.Vector3(0, 0, -1));
-        let raycollisions = raytip.intersectObjects(meshes, false);
-        if (raycollisions.length != 0 && raycollisions[0].distance < 0.5) {
+        function collideCloud() {
             obj.state.hit = true;
             buffer = true;
             // console.log(obj.state)
@@ -325,7 +324,13 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
             // obj.position.y -= vector_norm.y * 0.1;
 
             // console.log('collision');
-            setTimeout(function() { buffer = false; console.log("UNBUFFERED!"); }, 3000)
+            timer = setTimeout(function() { buffer = false; console.log("UNBUFFERED!"); }, 3000);
+        }
+
+        let raytip = new THREE.Raycaster(plane[0].tip, new THREE.Vector3(0, 0, -1));
+        let raycollisions = raytip.intersectObjects(meshes, false);
+        if (raycollisions.length != 0 && raycollisions[0].distance < 0.5) {
+            collideCloud();
             console.log("collision! (v0");
             return;
         }
@@ -344,22 +349,7 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
 
             let collisions = ray.intersectObjects(meshes, false);
             if (collisions.length != 0 && collisions[0].distance < 0.5) {
-                obj.state.hit = true;
-                buffer = true;
-                // console.log(obj.state)
-                if (chunkManager.state.falling == 0) {
-                    chunkManager.state.falling = 1;
-                }
-                // chunkManager.position.y += 30;
-                let fillScreen = document.getElementById('fillScreen');
-                fillScreen.classList.add('red');
-                setTimeout(function() {
-                    fillScreen.classList.remove('red');
-                }, 500);
-                if (!mute) sounds['damage'].play();
-
-                setTimeout(function() { buffer = false; console.log("UNBUFFERED!"); }, 3000)
-                // obj.state.hit = false;
+                collideCloud();
                 console.log("collision! (v1)");
                 break;
             }

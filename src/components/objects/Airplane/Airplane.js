@@ -17,8 +17,7 @@ class Airplane extends Group {
             action: null,
             hit: null,
             hitTime: null,
-            speed: 1000,
-            rotation: "none"
+            speed: 1000
         };
 
         this.name = 'plane';
