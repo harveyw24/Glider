@@ -250,6 +250,7 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
     // chunkManager.add(mesh);
 
     if (obj.position.distanceTo(rewardWorldPos) < 15) {
+        obj.state.reward = true
         if (!mute) sounds['powerup'].play();
         sounds['whirring'].setVolume(1)
 

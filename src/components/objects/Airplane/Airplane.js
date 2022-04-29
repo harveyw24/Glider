@@ -17,12 +17,17 @@ class Airplane extends Group {
             action: null,
             hit: null,
             hitTime: null,
+            reward: null,
+            rewardTime: null,
+            barrel: null,
             speed: 1000
         };
 
         this.name = 'plane';
         this.tip = new THREE.Vector3(0, 0, 0);
         this.state.hit = false;
+        this.state.reward = false;
+        this.state.barrel = false;
         this.addPlane()
 
         // Add update list
@@ -59,7 +64,6 @@ class Airplane extends Group {
     }
 
     update(timeStamp) {
-        // console.log(this.state.hit)
         if (this.state.prevTimeStamp === null) {
             this.state.prevTimeStamp = timeStamp;
         }
@@ -83,11 +87,26 @@ class Airplane extends Group {
 
         let delta;
         if (this.state.hit) {
-            console.log('HI')
             this.state.hit = false
             this.state.hitTime = timeStamp
             this.state.speed = 100
         }
+
+        if (this.state.reward) {
+            this.state.rewardTime = timeStamp;
+            this.state.reward = false
+            this.state.barrel = true;
+        }
+
+        if (this.state.barrel) {
+            let temp = Math.PI * 3 - this.rotation.z
+            this.rotation.x += Math.random() * 0.025 
+            this.rotation.z += (-Math.pow(temp,2) + Math.pow((Math.PI * 3.4),2))/200;
+            if (Math.abs(this.rotation.z) > 6 * Math.PI + 0.2) {
+                this.rotation.z -= Math.sign(this.rotation.z) * 6 * Math.PI;
+                this.state.barrel = false
+            }
+        }   
 
         // wobble if hit previously
         if ((timeStamp - this.state.hitTime) < 5000) {
