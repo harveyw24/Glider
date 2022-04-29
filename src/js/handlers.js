@@ -163,23 +163,6 @@ export function handleScreens(event, screens, document, canvas, menuCanvas, soun
 export function handleCollisions(document, scene, character, screens, sounds, score, camera) {
     let chunkManager = scene.getObjectByName('chunkManager');
     let clouds = [];
-    scene.traverseVisible(function(child) {
-        if (child.name === "cloud") {
-            let matWorld = child.matrixWorld;
-            let vector_pos = new THREE.Vector3();
-            child.getWorldPosition(vector_pos);
-
-            if (vector_pos.z > -100 && vector_pos.z < 100 && vector_pos.x > -50 && vector_pos.x < 50) {
-                clouds.push(child);
-                child.mesh.material.color.setHex(0xff0000)
-            }
-            else {
-                child.mesh.material.color.setHex(0xffffff)
-
-            }
-
-        }
-    });
 
     let obj = scene.getObjectByName(character);
     let chunkManagerPos = chunkManager.position;
@@ -276,18 +259,6 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
 
                 if (vector_pos.z > -100 && vector_pos.z < 100 && vector_pos.x > -50 && vector_pos.x < 50) {
                     clouds.push(child);
-                    child.mesh.material.color.setHex(0xff0000)
-                    // console.log(child.position.x)
-                    // console.log(child.position.y)
-                    // console.log(child.position.z)
-
-                    // console.log(vector_pos.x);
-                    // console.log(vector_pos.y);
-                    // console.log(vector_pos.z);
-                }
-                else {
-                    child.mesh.material.color.setHex(0xffffff)
-
                 }
 
             }
