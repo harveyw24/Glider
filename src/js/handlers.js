@@ -55,7 +55,7 @@ export function handleCharacterControls(scene, keypress, character, camera, spee
         }
     }
     if (keypress['right']) {
-        const delta = 2 * Math.sqrt(speedLevel) * (Math.abs(plane.rotation.z) + 0.5);
+        const delta = 2 * Math.sqrt(speedLevel) * (Math.min(0.5, Math.abs(plane.rotation.z)) + 0.5);
         chunkManager.position.x -= delta;
         // plane.state.rotation = "right";
         if (plane.rotation.z > -maxRotation) {
@@ -68,7 +68,7 @@ export function handleCharacterControls(scene, keypress, character, camera, spee
         // need to somehow rotate bounding box
     }
     if (keypress['left']) {
-        const delta = 2 * Math.sqrt(speedLevel) * (Math.abs(plane.rotation.z) + 0.5);
+        const delta = 2 * Math.sqrt(speedLevel) * (Math.min(0.5, Math.abs(plane.rotation.z)) + 0.5);
         chunkManager.position.x += delta;
         // plane.state.rotation = "left";
         if (plane.rotation.z < maxRotation) {
@@ -215,7 +215,7 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
     // }
 
     // if (target.y + chunkManager.state.groundY - obj.position.y > -v1.z) {
-    if (target.y - obj.position.y > - Math.min(vPos1.y, vPos2.y, vPos3.y, vPos4.y)) {
+    if (target.y - obj.position.y > -(vPos1.y + vPos2.y + vPos3.y + vPos4.y)/4) {
         // screens['menu'] = false;
         screens['pause'] = true;
         // screens['ending'] = true;
