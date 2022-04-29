@@ -59,6 +59,32 @@ function initSky(sky, sun, renderer, gui) {
 
     guiChanged();
 }
+//
+const default_biome = {
+    waterColor: new THREE.Color(50, 90, 145),
+    bankColor: new THREE.Color(26, 143, 26),
+    middleColor: new THREE.Color(113, 105, 105),
+    peakColor: new THREE.Color(255, 255, 255),
+    exaggeration: 17
+}
+const desert_biome = {
+    waterColor: new THREE.Color(97, 32, 13),
+    bankColor: new THREE.Color(97, 32, 13),
+    middleColor: new THREE.Color(232, 161, 90),
+    peakColor: new THREE.Color(252, 203, 78),
+    exaggeration: 10
+}
+
+const volcano_biome = {
+    waterColor: new THREE.Color(0,0,0),
+    bankColor: new THREE.Color(0,0,0),
+    middleColor: new THREE.Color(0,0,0),
+    peakColor: new THREE.Color(242, 64, 24),
+    exaggeration: 30
+}
+
+const biomes = [default_biome, desert_biome, volcano_biome];
+
 
 // Initialize core ThreeJS components
 let scene = new SeedScene();
@@ -84,6 +110,7 @@ sounds['powerup'] = powerup;
 
 
 const clock = new THREE.Clock();
+const terrainClock = new THREE.Clock();
 let speedLevel = 1;
 
 initSky(scene.sky, scene.sun, renderer, scene.state.gui);
@@ -125,6 +152,7 @@ const character = 'plane';
 let score;
 let score_num = 0;
 let oldTime = 0;
+let terrainOldTime = 0;
 
 // Set up camera
 camera.position.set(0, 2, 20);
@@ -157,6 +185,7 @@ controls.maxDistance = 16;
 controls.update();
 
 clock.start()
+terrainClock.start()
 
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {
@@ -182,16 +211,30 @@ const onAnimationFrameHandler = (timeStamp) => {
     if (!screens["menu"] && !screens["ending"] && !screens["pause"]) {
         renderer.render(scene, camera);
         scene.update && scene.update(timeStamp);
-        scene.getObjectByName('chunkManager').update(timeStamp, speedLevel)
+        let chunkManager = scene.getObjectByName('chunkManager');
+        chunkManager.update(timeStamp, speedLevel)
         handlers.handleCharacterControls(scene, keypress, character, camera, speedLevel);
         handlers.handleCollisions(document, scene, character, screens, sounds, score, camera);
         handlers.updateAudioSpeed(document, sounds, scene);
 
          let elapsed = clock.getElapsedTime();
-         if (elapsed - oldTime > 30 && speedLevel < 2) { 
+         if (elapsed - oldTime > 5 && speedLevel < 2) { 
             speedLevel *= 1.1;
              oldTime = elapsed;
          }
+
+         let terrainElapsed = terrainClock.getElapsedTime();
+         if (terrainElapsed - terrainOldTime > 10) {
+            let biome = biomes[Math.floor(Math.random()*biomes.length)]
+            chunkManager.state.bankColor = biome.bankColor;
+            chunkManager.state.waterColor = biome.waterColor;
+            chunkManager.state.middleColor = biome.middleColor;
+            chunkManager.state.peakColor = biome.peakColor;
+            chunkManager.state.exaggeration = biome.exaggeration;
+            terrainOldTime = terrainElapsed;
+         }
+
+
         if (!screens["menu"] && !screens["ending"] && !screens["pause"]) {
             score_num += 0.01;
             score = score_num.toFixed(2);
