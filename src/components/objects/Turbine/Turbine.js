@@ -23,7 +23,7 @@ class Turbine extends Group {
         // parent.state.parent.state.parent.addToUpdateList(this);
 
         loader.load(MODEL, (gltf) => {
-            const scale = 12;
+            const scale = 15;
             gltf.scene.position.x = 0;
             gltf.scene.position.y = 0;
             gltf.scene.position.z = 0;
@@ -51,7 +51,7 @@ class Turbine extends Group {
     }
 
     update(timeStamp) {
-        // this.rotation.y += 0.01
+        this.rotation.y += 0.01
 
 
     }

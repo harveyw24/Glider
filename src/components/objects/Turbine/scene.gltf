@@ -160,19 +160,19 @@
     {
       "doubleSided": true,
       "emissiveFactor": [
+        0.45,
         1.0,
-        0.0,
-        1.0
+        0.07
       ],
       "name": "lambert1",
       "pbrMetallicRoughness": {
         "baseColorFactor": [
-          0.5,
-          0.5,
-          0.5,
+          0.7,
+          0.7,
+          0.7,
           1.0
         ],
-        "metallicFactor": 0.0,
+        "metallicFactor": 0.6,
         "roughnessFactor": 0.6
       }
     }
