@@ -98,10 +98,10 @@ const arctic_biome = {
     middleColor: new THREE.Color(152,212,255),
     peakColor: new THREE.Color(209,225,255),
     exaggeration: 50,
-    freq: 2
+    freq: 0.4
 }
 
-const biomes = [default_biome, grassland_biome, desert_biome, volcano_biome, arctic_biome];
+const biomes = [default_biome,arctic_biome];
 
 
 // Initialize core ThreeJS components
