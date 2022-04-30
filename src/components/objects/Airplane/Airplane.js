@@ -28,7 +28,7 @@ class Airplane extends Group {
         this.tip = new THREE.Vector3(0, 0, 0);
         this.state.hit = true;
         this.state.reward = false;
-        this.state.barrel = false;
+        this.state.barrel = 0;
         this.state.barrelEnd = false;
         this.addPlane()
 
@@ -97,20 +97,16 @@ class Airplane extends Group {
         if (this.state.reward) {
             this.state.rewardTime = timeStamp;
             this.state.reward = false
-            this.state.barrel = true;
+            this.state.barrel = this.rotation.z;
             this.state.barrelEnd = true;
         }
 
         if (this.state.barrel) {
             let temp = Math.PI - this.rotation.z
             this.rotation.z += (-Math.pow(temp,2) + Math.pow((Math.PI * 1.15),2))/35;
-            if (this.rotation.z > 2 * Math.PI - 0.1) {
-                this.rotation.z = 0;
-                this.state.barrelEnd = false;
-            }
-            if (!this.state.barrelEnd && this.rotation.z < 0.2) {
-                this.rotation.z -= Math.sign(this.rotation.z) * 2 * Math.PI;
-                this.state.barrel = false
+            if (this.rotation.z > this.state.barrel + 2 * Math.PI - 0.2) {
+                this.rotation.z = this.state.barrel;
+                this.state.barrel = 0;
             }
         }   
 
