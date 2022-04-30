@@ -81,10 +81,12 @@ export function handleCharacterControls(scene, keypress, character, camera, spee
 
         // need to somehow rotate bounding box
     }
-    if (!plane.state.barrel) {
+    console.log(plane.rotation.x)
+    console.log(plane.rotation.z)
+    if (!plane.state.barrelEnd) {
         camera.rotation.z = plane.rotation.z / 3;
-        camera.position.y = 2 + plane.rotation.x * 2;
     } 
+    camera.position.y = 2 + plane.rotation.x * 2;
     
 
     // clamp to viewport, not working
