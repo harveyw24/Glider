@@ -160,14 +160,6 @@ class ChunkManager extends Group {
 
         // Move first chunk forward when player passes the chunk
         if (this.position.z - this.anchor.z >= this.state.chunkWidth) {
-            if (this.state.newBiome !== null) {
-                for (const [name, value] of Object.entries(this.state.newBiome)) {
-                    if (modifiableFields.includes(name)) this.state[name] = value;
-                }
-                this.state.newBiome = null;
-            }
-
-            // TODO: updateRemaining
             for (const chunkLine of this.chunkLines) chunkLine.skipRemainingTrees();
             if (this.state.rewardIndex != 0) console.log("Some rewards were not moved forward! this probably shouldn't happen unless you're going very fast");
             this.updateRemainingRewards();
@@ -212,7 +204,10 @@ class ChunkManager extends Group {
     }
 
     updateBiome(newBiome) {
-        this.state.newBiome = { ...default_biome, ...newBiome };
+        for (const [name, value] of Object.entries(newBiome)) {
+            if (modifiableFields.includes(name)) this.state[name] = value;
+            else console.log("Attempting to change field " + name + ", which is unmodifiable/not a field.");
+        }
     }
 
     getCurrentTree() {
