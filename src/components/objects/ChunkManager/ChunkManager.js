@@ -11,6 +11,26 @@ const waterHeight = 0;
 const chunkPxWidth = 1000;
 const chunkVertexWidth = 100;
 
+const default_biome = {
+    breathOffset: 5,
+    breathLength: 5,
+    octaves: 3,
+    // amplitude: 1, // Does nothing
+    exaggeration: 17,
+    waterHeight: waterHeight,
+    waterColor: new Color(50, 90, 145),
+    bankColor: new Color(26, 143, 26),
+    middleColor: new Color(113, 105, 105),
+    peakColor: new Color(255, 255, 255),
+    colorWiggle: 0.1,
+    middleGradient: 0.5,
+    randSeed: 3.8,
+    freq: 4.4,
+    gamma: undefined,
+    smoothPeaks: false
+};
+const modifiableFields = Object.keys(default_biome);
+
 class ChunkManager extends Group {
     constructor(parent) {
 
@@ -25,23 +45,6 @@ class ChunkManager extends Group {
             chunkVertWidth: chunkVertexWidth,
             segmentWidth: chunkPxWidth / (chunkVertexWidth - 1),
             groundY: groundY,
-            currentXOffset: 0,
-            currentZOffset: 0,
-            breathOffset: 5,
-            breathLength: 5,
-            octaves: 3,
-            // amplitude: 1, // Does nothing
-            exaggeration: 17,
-            waterHeight: waterHeight,
-            waterColor: new Color(50, 90, 145),
-            bankColor: new Color(26, 143, 26),
-            middleColor: new Color(113, 105, 105),
-            peakColor: new Color(255, 255, 255),
-            colorWiggle: 0.1,
-            middleGradient: 0.5,
-            randSeed: 3.8,
-            freq: 4.4,
-            currentOffset: 0,
             // maxTreeNum: 100,
             maxTreeNum: 10,
             maxCloudNum: 25,
@@ -55,7 +58,8 @@ class ChunkManager extends Group {
             loadThreshold: 0.55,
             falling: 0,
             climbing: 0,
-            prevBiome: null
+            newBiome: null,
+            ...default_biome,
         }
 
 
@@ -104,11 +108,6 @@ class ChunkManager extends Group {
 
     }
 
-    updateBiome(biome) {
-        for (let [param, value] of Object.entries(biome)) this.state[param] = value;
-        this.state.prevBiome = biome;
-    }
-
     updateNoise() {
         for (const chunkLine of this.chunkLines) chunkLine.updateNoise();
     }
@@ -152,6 +151,15 @@ class ChunkManager extends Group {
 
         // Move first chunk forward when player passes the chunk
         if (this.position.z - this.anchor.z >= this.state.chunkWidth) {
+            if (this.state.newBiome !== null) {
+                const newState = { ... this.state };
+                for (const [name, value] of Object.entries(this.state.newBiome)) {
+                    if (modifiableFields.includes(name)) newState[name] = value;
+                }
+                this.state = newState;
+                this.state.newBiome = null;
+            }
+
             while (this.state.rewardIndex != 0) this.updateReward();
             for (const chunkLine of this.chunkLines) {
                 chunkLine.chunks[0].setChunkPosition(
@@ -159,7 +167,8 @@ class ChunkManager extends Group {
                     chunkLine.chunks[0].position.y,
                     chunkLine.chunks[chunkLine.chunks.length - 1].position.z - this.state.chunkWidth
                 );
-                chunkLine.chunks[0].updateNoise();
+                if (this.state !== chunkLine.chunks[0].CMState) chunkLine.chunks[0].updateNoise(this.state);
+                else chunkLine.chunks[0].updateNoise();
                 chunkLine.chunks.push(chunkLine.chunks.shift());
             }
 
@@ -195,12 +204,18 @@ class ChunkManager extends Group {
             console.log("NEW ANCHOR: ", this.anchor.x, this.anchor.y, this.anchor.z);
         }
 
+
         if (this.position.z + this.chunkLines[0].rewards[this.state.rewardIndex].position.z > 0) {
             console.log("updating reward!");
             this.updateReward();
         }
 
     }
+
+    updateBiome(newBiome) {
+        this.state.newBiome = { ...default_biome, ...newBiome };
+    }
+
 
     updateReward() {
         for (const chunkLine of this.chunkLines) chunkLine.updateRewardAtIndex(this.state.rewardIndex);

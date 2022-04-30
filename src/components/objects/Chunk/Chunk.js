@@ -2,14 +2,44 @@ import { Group, Color, PlaneBufferGeometry, VertexColors, PlaneGeometry, MeshSta
 import * as THREE from 'three';
 import SimplexNoise from 'simplex-noise';
 //import { Water } from 'three/examples/js/objects/Water.js';
-import { Turbine } from '../Turbine';
 import { Tree } from '../Tree';
 import { Cloud } from '../Cloud';
 
 
-function random(min, max) {
-    return Math.random() * (max - min) + min;
+function random(min, max) { return Math.random() * (max - min) + min; }
+
+
+// smoothly transition from 0 to 1.0 as x goes from -infty to +infty
+function transition(x, rate) {
+    return 1 / (1 + Math.exp(-x * rate));
 }
+
+
+function sinStep(x, transitionRange, width) {
+    if (x < transitionRange) {
+        return (Math.sin((x - transitionRange / 2) / transitionRange * Math.PI) + 1) / 2;
+    } else if (x > width - transitionRange) {
+        return (-Math.sin((width - x + transitionRange / 2) / transitionRange * Math.PI) + 1) / 2;
+    } else {
+        return 1;
+    }
+}
+
+function zeroBoxStep(x, y, transitionRange, width) {
+    let result = 1;
+    if (x < transitionRange) {
+        result *= (Math.sin((x - transitionRange / 2) / transitionRange * Math.PI) + 1) / 2;
+    } else if (x > width - transitionRange) {
+        result *= (-Math.sin((width - x + transitionRange / 2) / transitionRange * Math.PI) + 1) / 2;
+    }
+    if (y < transitionRange) {
+        result *= (Math.sin((y - transitionRange / 2) / transitionRange * Math.PI) + 1) / 2;
+    } else if (y > width - transitionRange) {
+        result *= (-Math.sin((width - y + transitionRange / 2) / transitionRange * Math.PI) + 1) / 2;
+    }
+    return result;
+}
+
 
 class Chunk extends Group {
 
@@ -25,7 +55,7 @@ class Chunk extends Group {
         };
 
         // take state from parent.parent = chunkManager
-        this.CMState = this.state.chunkManager.state; // abbreviation for chunkManager state
+        this.CMState = this.state.chunkManager.state; // snapshots chunkManager.state
         this.chunk = parent; // abbreviation for this.state.parent
 
         // create the plane; -1 on vertWidth since argument is the number of segments
@@ -95,7 +125,7 @@ class Chunk extends Group {
     // i corresponds to +z-axis
     // j corresponds to +x-axis
     getVertexAtCoords(i, j) {
-        const index = (i * (this.heightMap.length) + j);
+        const index = (i * (this.CMState.chunkVertWidth) + j);
         return this.geometry.vertices[index];
     }
 
@@ -194,7 +224,8 @@ class Chunk extends Group {
         for (let i = cloudIndex; i < this.clouds.length; i++) this.clouds[i].visible = false;
     }
 
-    updateNoise() {
+    updateNoise(CMState) {
+        if (CMState !== undefined) this.CMState = CMState;
         this.updateHeightMap();
         this.updateTerrainGeo();
         this.updateObstacles();
@@ -233,7 +264,34 @@ class Chunk extends Group {
                     (i + (this.position.z + this.chunk.position.z) / this.CMState.chunkWidth * (this.CMState.chunkVertWidth - 1)) / this.CMState.chunkVertWidth,
                     (j + (this.position.x + this.chunk.position.x) / this.CMState.chunkWidth * (this.CMState.chunkVertWidth - 1)) / this.CMState.chunkVertWidth,
                     this.CMState.octaves, simplex);
+                h *= sinStep(i, 5, this.CMState.chunkVertWidth - 1);
+                if (this.CMState.gamma !== undefined) h *= transition(h - this.CMState.middleGradient, this.CMState.gamma);
                 this.heightMap[i][j] = h;
+            }
+        }
+
+        if (this.CMState.smoothPeaks) {
+            for (let i = 2; i < this.heightMap.length - 2; i++) {
+                for (let j = 2; j < this.heightMap[0].length - 2; j++) {
+                    const neighborhoodMax = Math.max(
+                        this.heightMap[i - 1][j - 1], this.heightMap[i][j - 1], this.heightMap[i + 1][j - 1],
+                        this.heightMap[i - 1][j], this.heightMap[i][j], this.heightMap[i + 1][j],
+                        this.heightMap[i - 1][j + 1], this.heightMap[i][j + 1], this.heightMap[i + 1][j + 1],
+                    );
+                    if (this.heightMap[i][j] == neighborhoodMax) {
+                        const average = (
+                            this.heightMap[i - 1][j - 1] + this.heightMap[i][j - 1] + this.heightMap[i + 1][j - 1] +
+                            this.heightMap[i - 1][j] + this.heightMap[i][j] + this.heightMap[i + 1][j] +
+                            this.heightMap[i - 1][j + 1] + this.heightMap[i][j + 1] + this.heightMap[i + 1][j + 1]
+                        ) / 8;
+                        for (const di of [-1, 0, 1]) {
+                            for (const dj of [-1, 0, 1]) {
+                                this.heightMap[i + di][j + dj] = (this.heightMap[i + di][j + dj] + average) / 2;
+                            }
+                        }
+                        this.heightMap[i][j] = (this.heightMap[i][j] + average) / 2;
+                    }
+                }
             }
         }
 
