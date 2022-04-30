@@ -81,8 +81,8 @@ export function handleCharacterControls(scene, keypress, character, camera, spee
 
         // need to somehow rotate bounding box
     }
-    console.log(plane.rotation.x)
-    console.log(plane.rotation.z)
+    // console.log(plane.rotation.x)
+    // console.log(plane.rotation.z)
     // if (!plane.state.barrel) {
     //     camera.rotation.z = plane.rotation.z / 3;
     // } 
@@ -319,7 +319,7 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
         let raycollisions = raytip.intersectObjects(meshes, false);
         if (raycollisions.length != 0 && raycollisions[0].distance < 0.5) {
             collideCloud();
-            console.log("collision! (v0");
+            console.log("collision! (v0)");
             return;
         }
 
