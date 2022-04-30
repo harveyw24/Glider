@@ -55,7 +55,7 @@ class Chunk extends Group {
         };
 
         // take state from parent.parent = chunkManager
-        this.CMState = this.state.chunkManager.state; // snapshots chunkManager.state
+        this.CMState = { ...this.state.chunkManager.state }; // snapshots chunkManager.state
         this.chunk = parent; // abbreviation for this.state.parent
 
         // create the plane; -1 on vertWidth since argument is the number of segments
@@ -65,12 +65,8 @@ class Chunk extends Group {
         this.geometry.colorsNeedUpdate = true;
 
 
-        this.trees = Array.from(Array(this.CMState.maxTreeNum), () => new Cloud());
+        this.treePositions = Array.from(Array(this.CMState.maxTreeNum), () => new THREE.Vector3());
         this.clouds = Array.from(Array(this.CMState.maxCloudNum), () => new Cloud());
-        for (const tree of this.trees) {
-            this.add(tree);
-            tree.visible = false;
-        }
         for (const cloud of this.clouds) {
             this.add(cloud);
             cloud.visible = false;
@@ -198,19 +194,29 @@ class Chunk extends Group {
         let treeIndex = 0;
         let cloudIndex = 0;
 
+        let totalProb = 0;
         for (let i = 0; i < this.heightMap.length; i++) {
             for (let j = 0; j < this.heightMap[0].length; j++) {
                 const v = this.getVertexAtCoords(i, j);
-                const pos = this.getPositionAtCoords(i, j);
                 const h = this.heightMap[i][j];
-                if (treeIndex < this.trees.length && this.CMState.treeHeightMin < v.z && v.z < this.CMState.treeHeightMax && Math.random() < .05 / (1 + Math.exp(h - .5))) {
-                    this.trees[treeIndex].visible = true;
-                    this.trees[treeIndex].position.set(pos.x, pos.y, pos.z); // plane is rotated
+                if (this.CMState.treeHeightMin < v.z && v.z < this.CMState.treeHeightMax) totalProb += 1 / (1 + Math.exp(h - .5));
+            }
+        }
+
+        for (let i = this.heightMap.length - 1; i >= 0; i--) { // iterate along -z axis (i.e. into the screen)
+            for (let j = 0; j < this.heightMap[0].length; j++) {
+                const v = this.getVertexAtCoords(i, j);
+                const h = this.heightMap[i][j];
+                if (treeIndex < this.treePositions.length
+                    && this.CMState.treeHeightMin < v.z && v.z < this.CMState.treeHeightMax
+                    && Math.random() < (this.CMState.maxTreeNum / totalProb) * 1 / (1 + Math.exp(h - .5))
+                ) {
+                    this.treePositions[treeIndex] = this.getPositionAtCoords(i, j); // plane is rotated
                     treeIndex++;
                 }
                 if (cloudIndex < this.clouds.length && Math.random() < 25 / this.geometry.vertices.length) {
                     this.clouds[cloudIndex].visible = true;
-                    this.clouds[cloudIndex].position.set(v.x, random(this.CMState.cloudYMin, this.CMState.cloudYMax), -v.y);
+                    this.clouds[cloudIndex].position.set(v.x, random(this.CMState.cloudHeightMin, this.CMState.cloudHeightMax) + this.CMState.groundY, -v.y);
                     cloudIndex++;
                 }
             }
@@ -220,12 +226,12 @@ class Chunk extends Group {
         //     "tree hit rate:", this.CMState.maxTreeNum != 0 ? treeIndex / this.CMState.maxTreeNum : "(maxTreeNum is 0); ",
         //     "cloud hit rate:", this.CMState.maxCloudNum != 0 ? cloudIndex / this.CMState.maxCloudNum : "(maxCloudNum is 0)"
         // );
-        for (let i = treeIndex; i < this.trees.length; i++) this.trees[i].visible = false;
+        for (let i = treeIndex; i < this.treePositions.length; i++) this.treePositions[i] = null;
         for (let i = cloudIndex; i < this.clouds.length; i++) this.clouds[i].visible = false;
     }
 
     updateNoise(CMState) {
-        if (CMState !== undefined) this.CMState = CMState;
+        if (CMState !== undefined) this.CMState = { ...CMState };
         this.updateHeightMap();
         this.updateTerrainGeo();
         this.updateObstacles();

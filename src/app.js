@@ -105,10 +105,11 @@ const stone_biome = {
     colorWiggle: -1,
     middleGradient: .8,
     gamma: 5,
-    smoothPeaks: true
+    smoothPeaks: true,
+    rewardHeightMax: 40,
 }
 
-const biomes = [default_biome, volcano_biome, grassland_biome, stone_biome, desert_biome, arctic_biome];
+const biomes = [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
 
 
 // Initialize core ThreeJS components
