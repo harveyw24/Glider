@@ -97,8 +97,8 @@ const arctic_biome = {
     bankColor: new THREE.Color(39,168,247),
     middleColor: new THREE.Color(152,212,255),
     peakColor: new THREE.Color(209,225,255),
-    exaggeration: 50,
-    freq: 0.4
+    exaggeration: 40,
+    freq: 2
 }
 
 const biomes = [default_biome,arctic_biome];
