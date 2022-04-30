@@ -55,7 +55,6 @@ class ChunkManager extends Group {
             loadThreshold: 0.55,
             falling: 0,
             climbing: 0,
-            newBiome: null,
             ...default_biome,
         }
 
@@ -204,6 +203,7 @@ class ChunkManager extends Group {
     }
 
     updateBiome(newBiome) {
+        newBiome = { ...default_biome, ...newBiome };
         for (const [name, value] of Object.entries(newBiome)) {
             if (modifiableFields.includes(name)) this.state[name] = value;
             else console.log("Attempting to change field " + name + ", which is unmodifiable/not a field.");
