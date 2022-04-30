@@ -26,7 +26,7 @@ const default_biome = {
     middleGradient: 0.5,
     randSeed: 3.8,
     freq: 4.4,
-    gamma: undefined,
+    gamma: 0, // if gamma is zero, then no gamma is applied
     smoothPeaks: false
 };
 const modifiableFields = Object.keys(default_biome);
@@ -103,6 +103,8 @@ class ChunkManager extends Group {
         folder.addColor(this.state, 'bankColor').name("Bank Color").onChange(() => this.updateTerrainGeo());
         folder.addColor(this.state, 'middleColor').name("Middle Color").onChange(() => this.updateTerrainGeo());
         folder.addColor(this.state, 'peakColor').name("Peak Color").onChange(() => this.updateTerrainGeo());
+        folder.add(this.state, 'gamma').name("Terrain Gamma").onChange(() => this.updateTerrainGeo());
+        folder.add(this.state, 'smoothPeaks').name("Smooth Peaks").onChange(() => this.updateTerrainGeo());
 
         folder.open();
 

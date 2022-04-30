@@ -51,8 +51,12 @@ class SeedScene extends Scene {
         // this.add(lights, this.sky, airplane, chunkManager);
         this.add(hemiLight, dirLight, this.sky, airplane, chunkManager);
 
+        // object hitbox testing
+        // const turbine = new Turbine(this);
+        // this.add(turbine);
+
         // player hitbox visualization
-        // let geo = new THREE.SphereGeometry(1, 7, 8);
+        // let geo = new THREE.SphereGeometry(.1, 7, 8);
         // let material = new THREE.MeshBasicMaterial({ color: 0x000000 });
         // let mesh = new THREE.Mesh(geo, material);
         // this.add(mesh);

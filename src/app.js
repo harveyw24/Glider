@@ -99,7 +99,7 @@ const stone_biome = {
     bankColor: new THREE.Color(54, 82, 54),
     middleColor: new THREE.Color(223, 175, 115),
     peakColor: new THREE.Color(55, 46, 29),
-    exaggeration: 25,
+    exaggeration: 30,
     freq: 8,
     octaves: 1,
     colorWiggle: -1,
@@ -108,7 +108,7 @@ const stone_biome = {
     smoothPeaks: true
 }
 
-const biomes = [default_biome, stone_biome];
+const biomes = [default_biome, volcano_biome, grassland_biome, stone_biome, desert_biome, arctic_biome];
 
 
 // Initialize core ThreeJS components
@@ -214,8 +214,16 @@ terrainClock.start()
 
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {
+
+
+    // ***DEBUGGING***
+    // let plane = scene.getObjectByName(character);
+    // plane.visible = false;
     // let chunkManager = scene.getObjectByName('chunkManager');
     // chunkManager.position.set(0, 0, 0);
+
+
+
     if (screens['menu']) {
         menuRenderer.render(menuScene, menuCamera)
         let plane = scene.getObjectByName(character);

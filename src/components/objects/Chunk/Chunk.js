@@ -265,7 +265,7 @@ class Chunk extends Group {
                     (j + (this.position.x + this.chunk.position.x) / this.CMState.chunkWidth * (this.CMState.chunkVertWidth - 1)) / this.CMState.chunkVertWidth,
                     this.CMState.octaves, simplex);
                 h *= sinStep(i, 5, this.CMState.chunkVertWidth - 1);
-                if (this.CMState.gamma !== undefined) h *= transition(h - this.CMState.middleGradient, this.CMState.gamma);
+                if (this.CMState.gamma !== 0) h *= transition(h - this.CMState.middleGradient, this.CMState.gamma);
                 this.heightMap[i][j] = h;
             }
         }
