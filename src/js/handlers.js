@@ -305,7 +305,7 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
             // obj.position.y -= vector_norm.y * 0.1;
 
             // console.log('collision');
-            timer = setTimeout(function() { buffer = false; console.log("UNBUFFERED!"); }, 3000);
+            timer = setTimeout(function() { buffer = false; console.log("UNBUFFERED!"); }, 2500);
         }
 
         let raytip = new THREE.Raycaster(plane[0].tip, new THREE.Vector3(0, 0, -1));

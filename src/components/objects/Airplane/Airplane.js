@@ -25,7 +25,7 @@ class Airplane extends Group {
 
         this.name = 'plane';
         this.tip = new THREE.Vector3(0, 0, 0);
-        this.state.hit = false;
+        this.state.hit = true;
         this.state.reward = false;
         this.state.barrel = false;
         this.addPlane()
@@ -110,6 +110,14 @@ class Airplane extends Group {
 
         // wobble if hit previously
         if ((timeStamp - this.state.hitTime) < 5000) {
+            if ((timeStamp - this.state.hitTime) < 2500) {
+                if (Math.round((timeStamp - this.state.hitTime)) % 4 == 0) {
+                    this.visible = !this.visible;
+                }
+            } else {
+                this.visible = true;
+            }
+            
             this.state.speed += (timeStamp - this.state.hitTime) / 1000;
         } else {
             // calculate delta
