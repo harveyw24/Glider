@@ -95,7 +95,7 @@ export function handleCharacterControls(scene, keypress, character, camera, spee
 
 }
 // Handle screens
-export function handleScreens(event, screens, document, canvas, menuCanvas, sounds, score) {
+export function handleScreens(event, screens, document, canvas, character, scene, menuCanvas, sounds, score) {
     if (event.key == 'm') {
         mute = !mute;
         if (!mute && !screens['ending'] && !screens['menu']) {
@@ -119,6 +119,8 @@ export function handleScreens(event, screens, document, canvas, menuCanvas, soun
     }
     // restart: ending -> menu
     else if (event.key == " " && screens["ending"]) {
+        let plane = scene.getObjectByName(character);
+        plane.null()
         screens["ending"] = false;
         screens['pause'] = false;
         screens['menu'] = true;

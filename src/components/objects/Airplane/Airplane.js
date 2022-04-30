@@ -133,6 +133,14 @@ class Airplane extends Group {
         this.state.mixer.update(delta);
     }
 
+    null() {
+        console.log("null");
+        this.state.prevTimeStamp = null;
+        this.state.hit = false;
+        this.state.reward = false;
+        this.state.barrel = false;
+    }
+
 }
 
 export default Airplane;

@@ -275,7 +275,7 @@ window.addEventListener('resize', windowResizeHandler, false);
 /**************************EVENT LISTENERS*****************************/
 window.addEventListener('keydown', event => handlers.handleKeyDown(event, keypress), false);
 window.addEventListener('keyup', event => handlers.handleKeyUp(event, keypress), false);
-window.addEventListener('keydown', event => handlers.handleScreens(event, screens, document, canvas, menuCanvas, sounds, score));
+window.addEventListener('keydown', event => handlers.handleScreens(event, screens, document, canvas, character, scene, menuCanvas, sounds, score));
 
 /**********************************************************************/
 let titleFont = document.createElement('link');
