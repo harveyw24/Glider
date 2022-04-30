@@ -223,16 +223,15 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
 
 
     if (interp.y > obj.position.y) {
-        screens['pause'] = true;
+        // screens['pause'] = true;
         console.log("Crash!");
 
-        // screens['menu'] = false;
-        // screens['pause'] = false;
-        // screens['ending'] = true;
-        // pages.quit(document, score);
-        // sounds['whirring'].stop()
-        // document.getElementById('audio').pause()
-        // sounds['menu'].stop()
+        screens['menu'] = false;
+        screens['pause'] = false;
+        screens['ending'] = true;
+        pages.quit(document, score);
+        sounds['whirring'].stop()
+        document.getElementById('audio').pause()
     }
 
 
