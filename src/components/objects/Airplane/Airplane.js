@@ -99,11 +99,10 @@ class Airplane extends Group {
         }
 
         if (this.state.barrel) {
-            let temp = Math.PI * 3 - this.rotation.z
-            this.rotation.x += Math.random() * 0.025 
-            this.rotation.z += (-Math.pow(temp,2) + Math.pow((Math.PI * 3.4),2))/200;
-            if (Math.abs(this.rotation.z) > 6 * Math.PI + 0.2) {
-                this.rotation.z -= Math.sign(this.rotation.z) * 6 * Math.PI;
+            let temp = Math.PI - this.rotation.z
+            this.rotation.z += (-Math.pow(temp,2) + Math.pow((Math.PI * 1.15),2))/35;
+            if (Math.abs(this.rotation.z) > 2 * Math.PI + 0.2) {
+                this.rotation.z -= Math.sign(this.rotation.z) * 2 * Math.PI;
                 this.state.barrel = false
             }
         }   
@@ -135,10 +134,15 @@ class Airplane extends Group {
 
     null() {
         console.log("null");
+        this.rotation.z = 0;
+        this.rotation.x = 0;
         this.state.prevTimeStamp = null;
+        this.state.hitTime = null;
         this.state.hit = false;
         this.state.reward = false;
         this.state.barrel = false;
+        this.visible = true;
+        this.speed = 1000;
     }
 
 }
