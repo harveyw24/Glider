@@ -85,12 +85,12 @@ const volcano_biome = {
     freq: 3
 }
 const grassland_biome = {
-    waterColor: new THREE.Color(34, 139, 34),
+    waterColor: new THREE.Color(0, 127, 255),
     bankColor: new THREE.Color(34, 139, 34),
     middleColor: new THREE.Color(154, 205, 50),
     peakColor: new THREE.Color(223, 255, 0),
-    exaggeration: 12,
-    freq: 1.5
+    exaggeration: 15,
+    freq: 1
 }
 const arctic_biome = {
     waterColor: new THREE.Color(1, 12, 48),
