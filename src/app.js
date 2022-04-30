@@ -65,25 +65,35 @@ const default_biome = {
     bankColor: new THREE.Color(26, 143, 26),
     middleColor: new THREE.Color(113, 105, 105),
     peakColor: new THREE.Color(255, 255, 255),
-    exaggeration: 17
+    exaggeration: 17,
+    freq: 4.4
 }
 const desert_biome = {
     waterColor: new THREE.Color(97, 32, 13),
     bankColor: new THREE.Color(97, 32, 13),
     middleColor: new THREE.Color(232, 161, 90),
     peakColor: new THREE.Color(252, 203, 78),
-    exaggeration: 10
+    exaggeration: 10,
+    freq: 4
 }
-
 const volcano_biome = {
-    waterColor: new THREE.Color(0, 0, 0),
+    waterColor: new THREE.Color(100, 0, 0),
     bankColor: new THREE.Color(0, 0, 0),
     middleColor: new THREE.Color(0, 0, 0),
     peakColor: new THREE.Color(242, 64, 24),
-    exaggeration: 30
+    exaggeration: 27,
+    freq: 3
+}
+const grassland_biome = {
+    waterColor: new THREE.Color(34, 139, 34),
+    bankColor: new THREE.Color(34, 139, 34),
+    middleColor: new THREE.Color(154, 205, 50),
+    peakColor: new THREE.Color(223, 255, 0),
+    exaggeration: 12,
+    freq: 1.5
 }
 
-const biomes = [default_biome, desert_biome, volcano_biome];
+const biomes = [default_biome, grassland_biome, desert_biome, volcano_biome];
 
 
 // Initialize core ThreeJS components
@@ -228,11 +238,13 @@ const onAnimationFrameHandler = (timeStamp) => {
         let terrainElapsed = terrainClock.getElapsedTime();
         if (terrainElapsed - terrainOldTime > 10) {
             let biome = biomes[Math.floor(Math.random() * biomes.length)]
-            chunkManager.state.bankColor = biome.bankColor;
-            chunkManager.state.waterColor = biome.waterColor;
-            chunkManager.state.middleColor = biome.middleColor;
-            chunkManager.state.peakColor = biome.peakColor;
-            chunkManager.state.exaggeration = biome.exaggeration;
+            // chunkManager.state.bankColor = biome.bankColor;
+            // chunkManager.state.waterColor = biome.waterColor;
+            // chunkManager.state.middleColor = biome.middleColor;
+            // chunkManager.state.peakColor = biome.peakColor;
+            // chunkManager.state.exaggeration = biome.exaggeration;
+            // chunkManager.state.freq = biome.freq;
+            chunkManager.updateBiome(biome);
             terrainOldTime = terrainElapsed;
         }
 

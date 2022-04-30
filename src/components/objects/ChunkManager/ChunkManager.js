@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import { Group, Color, PlaneBufferGeometry, PlaneGeometry } from 'three';
+import { Group, Color, PlaneBufferGeometry, PlaneGeometry, NoToneMapping } from 'three';
 import { ChunkLine } from '../ChunkLine';
 import { Turbine } from '../Turbine';
 import { Tree } from '../Tree';
@@ -55,6 +55,7 @@ class ChunkManager extends Group {
             loadThreshold: 0.55,
             falling: 0,
             climbing: 0,
+            prevBiome: null
         }
 
 
@@ -103,7 +104,10 @@ class ChunkManager extends Group {
 
     }
 
-
+    updateBiome(biome) {
+        for (let [param, value] of Object.entries(biome)) this.state[param] = value;
+        this.state.prevBiome = biome;
+    }
 
     updateNoise() {
         for (const chunkLine of this.chunkLines) chunkLine.updateNoise();
@@ -133,8 +137,8 @@ class ChunkManager extends Group {
 
         // Gradual climbing
         if (this.state.climbing > 0) {
-            if (this.state.climbing < 60) {
-                let offset = Math.pow(100 - this.state.climbing, 0.3) / 3;
+            if (this.state.climbing < 80) {
+                let offset = Math.pow(120 - this.state.climbing, 0.3) / 2;
                 this.state.climbing += offset;
                 this.position.y -= offset;
             } else {
