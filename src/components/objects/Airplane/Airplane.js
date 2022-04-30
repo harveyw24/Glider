@@ -70,21 +70,21 @@ class Airplane extends Group {
 
         // Angle correction
         if (Math.abs(this.rotation.z) < 0.005) {
-                this.rotation.z = 0;
+            this.rotation.z = 0;
         } else {
-                this.rotation.z -= Math.sign(this.rotation.z) * 0.005;
+            this.rotation.z -= Math.sign(this.rotation.z) * 0.005;
         }
         if (Math.abs(this.rotation.x) < 0.005) {
             this.rotation.x = 0;
         } else {
-                this.rotation.x -= Math.sign(this.rotation.x) * 0.005;
+            this.rotation.x -= Math.sign(this.rotation.x) * 0.005;
         }
-        
+
         if (this.parent.chunkManager.state.climbing > 0) {
             this.rotation.x += 0.01;
         }
         // this.rotation.z -= Math.sign(this.rotation.z) * 0.005;
-        console.log(this.state)
+        // console.log(this.state)
 
         let delta;
         if (this.state.hit) {
@@ -117,7 +117,7 @@ class Airplane extends Group {
             } else {
                 this.visible = true;
             }
-            
+
             this.state.speed += (timeStamp - this.state.hitTime) / 1000;
         } else {
             // calculate delta

@@ -88,7 +88,7 @@ export function handleCharacterControls(scene, keypress, character, camera, spee
     // } 
     camera.rotation.z = plane.rotation.z / 3;
     camera.position.y = 2 + plane.rotation.x * 2;
-    
+
 
     // clamp to viewport, not working
     // let h = visibleHeightAtZDepth(5, camera);
@@ -168,8 +168,8 @@ export function handleScreens(event, screens, document, canvas, character, scene
     }
 }
 
-let cumulNum = 0;
-let cumulXYError = 0;
+// let cumulNum = 0;
+// let cumulXYError = 0;
 export function handleCollisions(document, scene, character, screens, sounds, score, camera) {
     let chunkManager = scene.getObjectByName('chunkManager');
 
@@ -223,15 +223,15 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
 
 
     if (interp.y > obj.position.y) {
-        // screens['pause'] = true;
+        screens['pause'] = true;
         console.log("Crash!");
 
-        screens['menu'] = false;
-        screens['pause'] = false;
-        screens['ending'] = true;
-        pages.quit(document, score);
-        sounds['whirring'].stop()
-        document.getElementById('audio').pause()
+        // screens['menu'] = false;
+        // screens['pause'] = false;
+        // screens['ending'] = true;
+        // pages.quit(document, score);
+        // sounds['whirring'].stop()
+        // document.getElementById('audio').pause()
     }
 
 

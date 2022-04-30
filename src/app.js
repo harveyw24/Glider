@@ -9,6 +9,7 @@
 import { WebGLRenderer, PerspectiveCamera, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SeedScene, MenuScene } from 'scenes';
+import { ChunkManager } from "objects"
 import *  as handlers from './js/handlers.js';
 import * as pages from "./js/pages.js";
 import './styles.css';
@@ -60,21 +61,14 @@ function initSky(sky, sun, renderer, gui) {
     guiChanged();
 }
 //
-const default_biome = {
-    waterColor: new THREE.Color(50, 90, 145),
-    bankColor: new THREE.Color(26, 143, 26),
-    middleColor: new THREE.Color(113, 105, 105),
-    peakColor: new THREE.Color(255, 255, 255),
-    exaggeration: 17,
-    freq: 4.4
-}
+const default_biome = {}
 const desert_biome = {
     waterColor: new THREE.Color(97, 32, 13),
     bankColor: new THREE.Color(97, 32, 13),
     middleColor: new THREE.Color(232, 161, 90),
     peakColor: new THREE.Color(252, 203, 78),
     exaggeration: 10,
-    freq: 4
+    freq: 4,
 }
 const volcano_biome = {
     waterColor: new THREE.Color(100, 0, 0),
@@ -82,7 +76,7 @@ const volcano_biome = {
     middleColor: new THREE.Color(0, 0, 0),
     peakColor: new THREE.Color(242, 64, 24),
     exaggeration: 27,
-    freq: 3
+    freq: 3,
 }
 const grassland_biome = {
     waterColor: new THREE.Color(0, 127, 255),
@@ -90,18 +84,31 @@ const grassland_biome = {
     middleColor: new THREE.Color(154, 205, 50),
     peakColor: new THREE.Color(223, 255, 0),
     exaggeration: 15,
-    freq: 1
+    freq: 1,
 }
 const arctic_biome = {
     waterColor: new THREE.Color(1, 12, 48),
-    bankColor: new THREE.Color(39,168,247),
-    middleColor: new THREE.Color(152,212,255),
-    peakColor: new THREE.Color(209,225,255),
+    bankColor: new THREE.Color(39, 168, 247),
+    middleColor: new THREE.Color(152, 212, 255),
+    peakColor: new THREE.Color(209, 225, 255),
     exaggeration: 40,
-    freq: 2
+    freq: 2,
+}
+const stone_biome = {
+    waterColor: new THREE.Color(5, 78, 5),
+    bankColor: new THREE.Color(54, 82, 54),
+    middleColor: new THREE.Color(223, 175, 115),
+    peakColor: new THREE.Color(55, 46, 29),
+    exaggeration: 25,
+    freq: 8,
+    octaves: 1,
+    colorWiggle: -1,
+    middleGradient: .8,
+    gamma: 5,
+    smoothPeaks: true
 }
 
-const biomes = [default_biome,arctic_biome];
+const biomes = [default_biome, stone_biome];
 
 
 // Initialize core ThreeJS components
@@ -207,6 +214,8 @@ terrainClock.start()
 
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {
+    // let chunkManager = scene.getObjectByName('chunkManager');
+    // chunkManager.position.set(0, 0, 0);
     if (screens['menu']) {
         menuRenderer.render(menuScene, menuCamera)
         let plane = scene.getObjectByName(character);
@@ -245,14 +254,7 @@ const onAnimationFrameHandler = (timeStamp) => {
 
         let terrainElapsed = terrainClock.getElapsedTime();
         if (terrainElapsed - terrainOldTime > 10) {
-            let biome = biomes[Math.floor(Math.random() * biomes.length)]
-            // chunkManager.state.bankColor = biome.bankColor;
-            // chunkManager.state.waterColor = biome.waterColor;
-            // chunkManager.state.middleColor = biome.middleColor;
-            // chunkManager.state.peakColor = biome.peakColor;
-            // chunkManager.state.exaggeration = biome.exaggeration;
-            // chunkManager.state.freq = biome.freq;
-            chunkManager.updateBiome(biome);
+            chunkManager.updateBiome(biomes[Math.floor(Math.random() * biomes.length)])
             terrainOldTime = terrainElapsed;
         }
 
@@ -311,7 +313,5 @@ font.href = "https://fonts.googleapis.com/css?family=Radio+Canada";
 document.head.appendChild(font)
 
 
+// document.body.appendChild(canvas);
 pages.init_page(document, menuCanvas);
-
-
-
