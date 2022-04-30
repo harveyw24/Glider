@@ -104,20 +104,15 @@ class Airplane extends Group {
         if (this.state.barrel) {
             let temp = Math.PI - this.rotation.z
             this.rotation.z += (-Math.pow(temp,2) + Math.pow((Math.PI * 1.15),2))/35;
-            if (Math.abs(this.rotation.z) > 2 * Math.PI + 0.2) {
+            if (this.rotation.z > 2 * Math.PI - 0.1) {
+                this.rotation.z = 0;
+                this.state.barrelEnd = false;
+            }
+            if (!this.state.barrelEnd && this.rotation.z < 0.2) {
                 this.rotation.z -= Math.sign(this.rotation.z) * 2 * Math.PI;
                 this.state.barrel = false
             }
         }   
-
-        if (this.state.barrelEnd) {
-            if (Math.abs(this.rotation.z) < 0.002 && Math.abs(this.rotation.x) < 0.002) {
-                // this.rotation.z = 0;
-                // this.rotation.x = 0;
-                this.state.barrelEnd = false;
-            }
-                
-        }
 
 
         // wobble if hit previously
