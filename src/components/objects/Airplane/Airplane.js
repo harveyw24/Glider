@@ -20,7 +20,6 @@ class Airplane extends Group {
             reward: null,
             rewardTime: null,
             barrel: null,
-            barrelEnd: null,
             speed: 1000
         };
 
@@ -29,7 +28,6 @@ class Airplane extends Group {
         this.state.hit = true;
         this.state.reward = false;
         this.state.barrel = 0;
-        this.state.barrelEnd = false;
         this.addPlane()
 
         // Add update list
@@ -86,6 +84,7 @@ class Airplane extends Group {
             this.rotation.x += 0.01;
         }
         // this.rotation.z -= Math.sign(this.rotation.z) * 0.005;
+        console.log(this.state)
 
         let delta;
         if (this.state.hit) {
@@ -98,18 +97,16 @@ class Airplane extends Group {
             this.state.rewardTime = timeStamp;
             this.state.reward = false
             this.state.barrel = this.rotation.z;
-            this.state.barrelEnd = true;
         }
 
         if (this.state.barrel) {
             let temp = Math.PI - this.rotation.z
-            this.rotation.z += (-Math.pow(temp,2) + Math.pow((Math.PI * 1.15),2))/35;
+            this.rotation.z += (-Math.pow(temp,2) + Math.pow((Math.PI * 1.15),2))/35 + 0.002;
             if (this.rotation.z > this.state.barrel + 2 * Math.PI - 0.2) {
                 this.rotation.z = this.state.barrel;
                 this.state.barrel = 0;
             }
         }   
-
 
         // wobble if hit previously
         if ((timeStamp - this.state.hitTime) < 5000) {

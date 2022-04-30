@@ -83,7 +83,7 @@ export function handleCharacterControls(scene, keypress, character, camera, spee
     }
     console.log(plane.rotation.x)
     console.log(plane.rotation.z)
-    if (!plane.state.barrelEnd) {
+    if (!plane.state.barrel) {
         camera.rotation.z = plane.rotation.z / 3;
     } 
     camera.position.y = 2 + plane.rotation.x * 2;
