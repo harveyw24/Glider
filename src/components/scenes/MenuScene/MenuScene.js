@@ -45,6 +45,54 @@ class MenuScene extends Scene {
         this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
     }
 
+    initSky(renderer, camera) {
+        // GUI
+
+        const effectController = {
+            turbidity: 10,
+            rayleigh: 3,
+            mieCoefficient: 0.005,
+            mieDirectionalG: 0.7,
+            elevation: 2,
+            azimuth: 180,
+            exposure: renderer.toneMappingExposure
+        };
+
+        let sky = this.sky
+        let sun = this.sun
+        let scene = this
+
+        function guiChanged() {
+
+            const uniforms = sky.material.uniforms;
+            uniforms['turbidity'].value = effectController.turbidity;
+            uniforms['rayleigh'].value = effectController.rayleigh;
+            uniforms['mieCoefficient'].value = effectController.mieCoefficient;
+            uniforms['mieDirectionalG'].value = effectController.mieDirectionalG;
+
+            const phi = THREE.MathUtils.degToRad(90 - effectController.elevation);
+            const theta = THREE.MathUtils.degToRad(effectController.azimuth);
+
+            sun.setFromSphericalCoords(1, phi, theta);
+
+            uniforms['sunPosition'].value.copy(sun);
+
+            renderer.toneMappingExposure = effectController.exposure;
+            renderer.render(scene, camera);
+
+        }
+
+        this.state.gui.add(effectController, 'turbidity', 0.0, 20.0, 0.1).onChange(guiChanged);
+        this.state.gui.add(effectController, 'rayleigh', 0.0, 4, 0.001).onChange(guiChanged);
+        this.state.gui.add(effectController, 'mieCoefficient', 0.0, 0.1, 0.001).onChange(guiChanged);
+        this.state.gui.add(effectController, 'mieDirectionalG', 0.0, 1, 0.001).onChange(guiChanged);
+        this.state.gui.add(effectController, 'elevation', 0, 90, 0.1).onChange(guiChanged);
+        this.state.gui.add(effectController, 'azimuth', - 180, 180, 0.1).onChange(guiChanged);
+        this.state.gui.add(effectController, 'exposure', 0, 1, 0.0001).onChange(guiChanged);
+
+        guiChanged();
+    }
+
     addToUpdateList(object) {
         this.state.updateList.push(object);
     }

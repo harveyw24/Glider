@@ -1,4 +1,5 @@
 const THREE = require('three');
+const { updateAudioSpeed } = require('../../../js/handlers');
 
 /**
  * @author zz85 / https://github.com/zz85
@@ -40,8 +41,9 @@ Sky.SkyShader = {
     turbidity: {value: 2},
     rayleigh: {value: 1},
     mieCoefficient: {value: 0.005},
-    mieDirectionalG: {value: 0.8},
+    mieDirectionalG: {value: 0.6},
     sunPosition: {value: new THREE.Vector3()},
+    skyColor: {value: new THREE.Vector3(0.0, 0.0003, 0.00075)}
   },
 
   vertexShader: [
@@ -127,6 +129,7 @@ Sky.SkyShader = {
 
     'uniform float luminance;',
     'uniform float mieDirectionalG;',
+    'uniform vec3 skyColor;',
 
     'const vec3 cameraPos = vec3( 0.0, 0.0, 0.0 );',
 
@@ -207,7 +210,7 @@ Sky.SkyShader = {
     '	float sundisk = smoothstep( sunAngularDiameterCos, sunAngularDiameterCos + 0.00002, cosTheta );',
     '	L0 += ( vSunE * 19000.0 * Fex ) * sundisk;',
 
-    '	vec3 texColor = ( Lin + L0 ) * 0.04 + vec3( 0.0, 0.0003, 0.00075 );',
+    '	vec3 texColor = ( Lin + L0 ) * 0.04 + skyColor;',
 
     '	vec3 curr = Uncharted2Tonemap( ( log2( 2.0 / pow( luminance, 4.0 ) ) ) * texColor );',
     '	vec3 color = curr * whiteScale;',
