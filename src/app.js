@@ -76,7 +76,7 @@ const biomes = [default_biome, desert_biome];
 // Initialize core ThreeJS components
 let scene = new SeedScene();
 const camera = new PerspectiveCamera();
-const renderer = new WebGLRenderer({ antialias: true });
+const renderer = new WebGLRenderer({ powerPreference: "high-performance", antialias: true });
 const listener = new THREE.AudioListener();
 
 let menuScene = new MenuScene();
