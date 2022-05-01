@@ -155,16 +155,16 @@ class SeedScene extends Scene {
         this.state.elevation = Math.min(6, Math.max(0, this.state.elevation + Math.sign(delta)*Math.pow(Math.abs(delta), 0.2) / 180));
 
         if (curAzimuth < 100 || curAzimuth > 260 ) {
-            console.log("NIGHT");
+            // console.log("NIGHT");
             this.state.azimuth += 3;
             this.state.elevation = 0;
         }
         else if (curAzimuth < 150 || curAzimuth > 210) {
-            console.log("SUN SETTING/RISING");
+            // console.log("SUN SETTING/RISING");
             let weight = Math.abs(180 - curAzimuth) / 30;
             this.state.azimuth += 0.06 * Math.pow(weight, 4);
         } else {
-            console.log("DAY");
+            // console.log("DAY");
             this.state.azimuth += 0.06;
         }
         const phi = THREE.MathUtils.degToRad(90 - this.state.elevation);

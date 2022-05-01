@@ -280,5 +280,5 @@ font.href = "https://fonts.googleapis.com/css?family=Radio+Canada";
 document.head.appendChild(font)
 
 
-document.body.appendChild(canvas);
-// pages.init_page(document, menuCanvas);
+// document.body.appendChild(canvas);
+pages.init_page(document, menuCanvas);
