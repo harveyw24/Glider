@@ -217,7 +217,7 @@ terrainClock.start()
 const onAnimationFrameHandler = (timeStamp) => {
 
 
-    // ***DEBUGGING***
+    // // ***DEBUGGING***
     // let plane = scene.getObjectByName(character);
     // plane.visible = false;
     // let chunkManager = scene.getObjectByName('chunkManager');

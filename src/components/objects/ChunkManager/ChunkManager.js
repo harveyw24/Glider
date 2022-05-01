@@ -123,6 +123,17 @@ class ChunkManager extends Group {
         this.position.z += 3 * speedLevel;
         this.position.y += 0.25 * speedLevel;
 
+        for (let chunkLine of this.chunkLines) {
+            for (let reward of chunkLine.rewards) {
+                reward.update(timeStamp);
+            }
+            for (let chunk of chunkLine.chunks) {
+                for (let cloud of chunk.clouds) {
+                    cloud.update(timeStamp);
+                }
+            }
+        }
+
         // Gradual collision falling collision
         if (this.state.falling > 0) {
             if (this.state.falling < 40) {

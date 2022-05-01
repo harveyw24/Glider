@@ -29,6 +29,7 @@ class Cloud extends Group {
             flatShading: true, //required for flat shading
         });
         const geo = new Geometry()
+        this.speed = Math.random() * 0.6
 
         const decay = .7;
         for (const sign of [-1, 1]) {
@@ -52,8 +53,6 @@ class Cloud extends Group {
         })
         jitter(geo, 0.15 * scale)
 
-
-
         // const tuft = new SphereGeometry(1.5 * scale, 7, 8);
         // geo.merge(tuft);
 
@@ -63,6 +62,7 @@ class Cloud extends Group {
     }
 
     update(timeStamp) {
+        this.position.x += this.speed;
     }
 }
 
