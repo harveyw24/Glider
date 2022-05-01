@@ -65,14 +65,14 @@ const stone_biome = {
     maxTreeNum: 50,
 }
 
-const biomes = [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
+const biomes = [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome];
 // const biomes = [default_biome, stone_biome];
 
 
 // Initialize core ThreeJS components
 let scene = new SeedScene();
 const camera = new PerspectiveCamera();
-const renderer = new WebGLRenderer({ antialias: true });
+const renderer = new WebGLRenderer({ powerPreference: "high-performance", antialias: true });
 const listener = new THREE.AudioListener();
 
 let menuScene = new MenuScene();
