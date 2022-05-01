@@ -5,6 +5,7 @@ import SimplexNoise from 'simplex-noise';
 import { Tree } from '../Tree';
 import { Turbine } from '../Turbine';
 import { Cloud } from '../Cloud';
+import { Obstacle } from '../Obstacle';
 
 
 function random(min, max) { return Math.random() * (max - min) + min; }
@@ -74,14 +75,18 @@ class Chunk extends Group {
 
 
         this.trees = Array.from(Array(treesLength));
-        const tree0 = new Tree();
+        const tree0 = new Obstacle(true);
         for (let i = 0; i < treesLength; i++) {
             const tree = i == 0 ? tree0 : tree0.clone();
+            tree.setObstacle(this.CMState.obstacle);
             tree.visible = false;
             tree.matrixAutoUpdate = false;
             this.add(tree);
             this.trees[i] = tree;
         }
+
+        console.log(Object.is(tree0.material, tree0.clone().material));
+        console.log(this.trees);
 
         this.clouds = Array.from(Array(this.CMState.maxCloudNum), () => new Cloud());
         for (const cloud of this.clouds) {
@@ -242,10 +247,10 @@ class Chunk extends Group {
             }
         }
         // want a hit rate that is close to 1.0 but not always 1.0
-        console.log(
-            "tree hit rate:", this.CMState.maxTreeNum != 0 ? treeIndex / this.CMState.maxTreeNum : "(maxTreeNum is 0); ",
-            "cloud hit rate:", this.CMState.maxCloudNum != 0 ? cloudIndex / this.CMState.maxCloudNum : "(maxCloudNum is 0)"
-        );
+        // console.log(
+        //     "tree hit rate:", this.CMState.maxTreeNum != 0 ? treeIndex / this.CMState.maxTreeNum : "(maxTreeNum is 0); ",
+        //     "cloud hit rate:", this.CMState.maxCloudNum != 0 ? cloudIndex / this.CMState.maxCloudNum : "(maxCloudNum is 0)"
+        // );
         this.activeTreeNum = treeIndex;
         this.activeCloudNum = cloudIndex;
         for (let i = cloudIndex; i < this.clouds.length; i++) this.clouds[i].visible = false;
@@ -294,7 +299,13 @@ class Chunk extends Group {
     }
 
     updateNoise(CMState) {
-        if (CMState !== undefined) this.CMState = { ...CMState };
+        if (CMState !== undefined) {
+            console.log("using obstacle: ", CMState.obstacle);
+            if (this.CMState.obstacle !== CMState.obstacle) {
+                for (const tree of this.trees) tree.setObstacle(CMState.obstacle);
+            }
+            this.CMState = { ...CMState };
+        }
         if (this.CMState.maxTreeNum > treesLength) {
             console.log("Provided maxTreeNum (" + this.CMState.maxTreeNum + ") is too large! Max is " + treesLength);
             this.CMState.maxTreeNum = treesLength;

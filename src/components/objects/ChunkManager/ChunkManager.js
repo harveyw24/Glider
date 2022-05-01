@@ -34,6 +34,7 @@ const default_biome = {
     cloudHeightMax: 150,
     maxRewardNum: 10,
     rewardHeightMax: 100,
+    obstacle: "tree",
 };
 const modifiableFields = Object.keys(default_biome);
 
@@ -184,7 +185,7 @@ class ChunkManager extends Group {
                 }
             }
         }
-        console.log("visible trees: ", visibleTrees);
+        // console.log("visible trees: ", visibleTrees);
 
         // to keep the chunks in the vicinity of the player:
         // z-position is changed chunk-wise     (chunkLine.position.z = 0)

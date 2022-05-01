@@ -11,3 +11,4 @@ export * from './ChunkManager';
 export * from './Airplane';
 export * from './Turbine';
 export * from './Sky';
+export * from './Obstacle';

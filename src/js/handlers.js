@@ -82,7 +82,7 @@ export function handleCharacterControls(scene, keypress, character, camera, spee
         // need to somehow rotate bounding box
     }
     // console.log(plane.rotation.x)
-    console.log(camera.rotation.z)
+    // console.log(camera.rotation.z)
     if (!plane.state.barrel) {
         camera.rotation.z = plane.rotation.z / 3;
     } else {

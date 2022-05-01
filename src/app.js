@@ -24,7 +24,8 @@ const desert_biome = {
     peakColor: new THREE.Color(252, 203, 78),
     exaggeration: 10,
     freq: 4,
-    maxTreeNum: 0,
+    maxTreeNum: 25,
+    obstacle: "cloud"
 }
 const volcano_biome = {
     waterColor: new THREE.Color(100, 0, 0),
@@ -67,10 +68,11 @@ const stone_biome = {
     smoothPeaks: true,
     rewardHeightMax: 40,
     maxTreeNum: 50,
+    obstacle: "tree",
 }
 
-// const biomes = [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
-const biomes = [default_biome, desert_biome];
+const biomes = [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
+// const biomes = [default_biome, desert_biome];
 
 
 // Initialize core ThreeJS components
