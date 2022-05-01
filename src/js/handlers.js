@@ -238,29 +238,24 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
 
 
 
-    const rewardWorldPos = new THREE.Vector3();
-    chunkManager.getCurrentReward().getWorldPosition(rewardWorldPos)
-    // console.log(chunkManager.getCurrentReward().position.clone());
-    // console.log("to current reward", obj.position.distanceTo(rewardWorldPos));
+    for (const reward of chunkManager.getCurrentRewards()) {
+        const rewardWorldPos = new THREE.Vector3();
+        reward.getWorldPosition(rewardWorldPos)
 
-    // const geo = new THREE.SphereGeometry(5, 7, 8);
-    // const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-    // const mesh = new THREE.Mesh(geo, material);
-    // mesh.position.set(rewardWorldPos.x - chunkManagerPos.x, rewardWorldPos.y - chunkManagerPos.y, rewardWorldPos.z - chunkManagerPos.z);
-    // chunkManager.add(mesh);
+        if (obj.position.distanceTo(rewardWorldPos) < 15) {
+            obj.state.reward = true
+            if (!mute) sounds['powerup'].play();
+            sounds['whirring'].setVolume(1)
 
-    if (obj.position.distanceTo(rewardWorldPos) < 15) {
-        obj.state.reward = true
-        if (!mute) sounds['powerup'].play();
-        sounds['whirring'].setVolume(1)
+            setTimeout(function() {
+                sounds['whirring'].setVolume(0.4)
+            }, 2000);
 
-        setTimeout(function() {
-            sounds['whirring'].setVolume(0.4)
-        }, 2000);
-
-        // chunkManager.position.y -= 50;
-        if (chunkManager.state.climbing == 0) {
-            chunkManager.state.climbing = 1;
+            // chunkManager.position.y -= 50;
+            if (chunkManager.state.climbing == 0) {
+                chunkManager.state.climbing = 1;
+            }
+            break;
         }
     }
 

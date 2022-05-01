@@ -87,7 +87,7 @@ class ChunkLine extends Group {
 
         pos.add(this.chunks[1].position);
         reward.position.set(pos.x, random(pos.y, this.CMState.rewardHeightMax + this.CMState.groundY), pos.z);
-        // reward.position.set(-this.position.x * .9, -50, pos.z);
+        // if (this.position.x > 0) reward.position.set(-this.position.x, -50, pos.z);
     }
 
 
