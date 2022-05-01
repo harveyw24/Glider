@@ -96,17 +96,19 @@ class Airplane extends Group {
         if (this.state.reward) {
             this.state.rewardTime = timeStamp;
             this.state.reward = false
-            // this.state.barrel = this.rotation.z;
+            if (Math.abs(this.rotation.z) > 0.07) {
+                this.state.barrel = this.rotation.z;
+            }
         }
 
-        // if (this.state.barrel) {
-        //     let temp = Math.PI - this.rotation.z
-        //     this.rotation.z += (-Math.pow(temp,2) + Math.pow((Math.PI * 1.15),2))/35 + 0.002;
-        //     if (this.rotation.z > this.state.barrel + 2 * Math.PI - 0.2) {
-        //         this.rotation.z = this.state.barrel;
-        //         this.state.barrel = 0;
-        //     }
-        // }   
+        if (this.state.barrel) {
+            let sign = Math.sign(this.state.barrel)
+            this.rotation.z += 0.1 * sign
+            if (Math.abs(this.rotation.z) > Math.abs(this.state.barrel) + 2 * Math.PI - 0.1) {
+                this.rotation.z = this.state.barrel;
+                this.state.barrel = 0;
+            }
+        }   
 
         // wobble if hit previously
         if ((timeStamp - this.state.hitTime) < 5000) {
