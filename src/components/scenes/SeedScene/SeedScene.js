@@ -1,6 +1,6 @@
 import * as Dat from 'dat.gui';
 import { Scene, Color } from 'three';
-import { Flower, Land, Kite, Falcon, Paper, Terrain, Airplane, ChunkManager, Turbine } from '../../objects';
+import { Flower, Land, Kite, Falcon, Paper, Terrain, Airplane, ChunkManager, Turbine, Tree } from '../../objects';
 import { BasicLights } from 'lights';
 import * as THREE from 'three'
 import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js'
@@ -52,8 +52,24 @@ class SeedScene extends Scene {
         this.add(hemiLight, dirLight, this.sky, airplane, chunkManager);
 
         // object hitbox testing
+        // const obj1 = new THREE.Object3D();
+        // const obj2 = new THREE.Object3D();
         // const turbine = new Turbine(this);
-        // this.add(turbine);
+        // obj1.add(turbine);
+        // obj2.add(turbine);
+        // obj1.position.set(-10, 0, -20);
+        // obj2.position.set(10, 0, -20);
+        // this.add(obj1);
+        // this.add(obj2);
+
+        // for (let i = 0; i < 100; i++) {
+        //     const tree1 = new Tree(this);
+        //     this.add(tree1);
+        //     tree1.position.set(5 * (i - 50), 0, -50);
+        //     tree1.visible = false;
+        // }
+
+
 
         // player hitbox visualization
         // let geo = new THREE.SphereGeometry(.1, 7, 8);

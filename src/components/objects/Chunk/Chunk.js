@@ -56,7 +56,7 @@ class Chunk extends Group {
 
         // take state from parent.parent = chunkManager
         this.CMState = { ...this.state.chunkManager.state }; // snapshots chunkManager.state
-        this.chunk = parent; // abbreviation for this.state.parent
+        this.chunkLine = parent; // abbreviation for this.state.parent
 
         // create the plane; -1 on vertWidth since argument is the number of segments
         this.geometry = new PlaneGeometry(this.CMState.chunkWidth, this.CMState.chunkWidth,
@@ -65,11 +65,18 @@ class Chunk extends Group {
         this.geometry.colorsNeedUpdate = true;
 
 
-        this.treePositions = Array.from(Array(this.CMState.maxTreeNum), () => new THREE.Vector3());
+        this.activeTreeNum = 0;
+        this.currentTreeIndex = 0;
+        this.nextTreeIndex = 0;
+        this.trees = Array.from(Array(this.CMState.maxTreeNum), () => new Tree());
+        for (const tree of this.trees) {
+            tree.visible = false;
+            this.add(tree);
+        }
         this.clouds = Array.from(Array(this.CMState.maxCloudNum), () => new Cloud());
         for (const cloud of this.clouds) {
-            this.add(cloud);
             cloud.visible = false;
+            this.add(cloud);
         }
 
         const terrain = new Mesh(this.geometry, new MeshLambertMaterial({
@@ -206,12 +213,14 @@ class Chunk extends Group {
         for (let i = this.heightMap.length - 1; i >= 0; i--) { // iterate along -z axis (i.e. into the screen)
             for (let j = 0; j < this.heightMap[0].length; j++) {
                 const v = this.getVertexAtCoords(i, j);
+                const pos = this.getPositionAtCoords(i, j);
                 const h = this.heightMap[i][j];
-                if (treeIndex < this.treePositions.length
+                if (treeIndex < this.trees.length
                     && this.CMState.treeHeightMin < v.z && v.z < this.CMState.treeHeightMax
                     && Math.random() < (this.CMState.maxTreeNum / totalProb) * 1 / (1 + Math.exp(h - .5))
                 ) {
-                    this.treePositions[treeIndex] = this.getPositionAtCoords(i, j); // plane is rotated
+                    this.trees[treeIndex].position.set(pos.x, pos.y, pos.z); // plane is rotated
+                    // this.trees[treeIndex].position.set(-this.state.parent.position.x * .9, -50, pos.z); // plane is rotated
                     treeIndex++;
                 }
                 if (cloudIndex < this.clouds.length && Math.random() < 25 / this.geometry.vertices.length) {
@@ -222,16 +231,61 @@ class Chunk extends Group {
             }
         }
         // want a hit rate that is close to 1.0 but not always 1.0
-        // console.log(
-        //     "tree hit rate:", this.CMState.maxTreeNum != 0 ? treeIndex / this.CMState.maxTreeNum : "(maxTreeNum is 0); ",
-        //     "cloud hit rate:", this.CMState.maxCloudNum != 0 ? cloudIndex / this.CMState.maxCloudNum : "(maxCloudNum is 0)"
-        // );
-        for (let i = treeIndex; i < this.treePositions.length; i++) this.treePositions[i] = null;
+        console.log(
+            "tree hit rate:", this.CMState.maxTreeNum != 0 ? treeIndex / this.CMState.maxTreeNum : "(maxTreeNum is 0); ",
+            "cloud hit rate:", this.CMState.maxCloudNum != 0 ? cloudIndex / this.CMState.maxCloudNum : "(maxCloudNum is 0)"
+        );
+        this.activeTreeNum = treeIndex;
+        this.activeCloudNum = cloudIndex;
         for (let i = cloudIndex; i < this.clouds.length; i++) this.clouds[i].visible = false;
     }
 
+    hideTrees() {
+        for (const tree of this.trees) tree.visible = false;
+        this.currentTreeIndex = 0;
+        this.nextTreeIndex = 0;
+    }
+
+    // get first visible tree
+    getCurrentTree() {
+        if (0 <= this.currentTreeIndex && this.currentTreeIndex < this.activeTreeNum) {
+            return this.trees[this.currentTreeIndex];
+        } else return null;
+    }
+
+    // get next invisible tree
+    getNextTree() {
+        if (0 <= this.nextTreeIndex && this.nextTreeIndex < this.activeTreeNum) {
+            return this.trees[this.nextTreeIndex];
+        } else return null;
+    }
+
+    hideCurrentTree() {
+        const currentTree = this.getCurrentTree();
+        if (currentTree !== null) {
+            currentTree.visible = false;
+            this.currentTreeIndex++;
+        }
+    }
+
+    showNextTree() {
+        const nextTree = this.getNextTree();
+        if (nextTree !== null) {
+            nextTree.visible = true;
+            this.nextTreeIndex++;
+        }
+    }
+
     updateNoise(CMState) {
-        if (CMState !== undefined) this.CMState = { ...CMState };
+        if (CMState !== undefined) {
+            this.CMState = { ...CMState };
+            while (this.CMState.maxTreeNum > this.trees.length) {
+                const tree = new Tree();
+                tree.visible = false;
+                this.add(tree);
+                this.trees.push(tree);
+            }
+        }
         this.updateHeightMap();
         this.updateTerrainGeo();
         this.updateObstacles();
@@ -267,8 +321,8 @@ class Chunk extends Group {
         for (let i = 0; i < this.heightMap.length; i++) {
             for (let j = 0; j < this.heightMap[0].length; j++) {
                 let h = this.octave(
-                    (i + (this.position.z + this.chunk.position.z) / this.CMState.chunkWidth * (this.CMState.chunkVertWidth - 1)) / this.CMState.chunkVertWidth,
-                    (j + (this.position.x + this.chunk.position.x) / this.CMState.chunkWidth * (this.CMState.chunkVertWidth - 1)) / this.CMState.chunkVertWidth,
+                    (i + (this.position.z + this.chunkLine.position.z) / this.CMState.chunkWidth * (this.CMState.chunkVertWidth - 1)) / this.CMState.chunkVertWidth,
+                    (j + (this.position.x + this.chunkLine.position.x) / this.CMState.chunkWidth * (this.CMState.chunkVertWidth - 1)) / this.CMState.chunkVertWidth,
                     this.CMState.octaves, simplex);
                 h *= sinStep(i, 5, this.CMState.chunkVertWidth - 1);
                 if (this.CMState.gamma !== 0) h *= transition(h - this.CMState.middleGradient, this.CMState.gamma);

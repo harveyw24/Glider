@@ -1,6 +1,5 @@
 import { Group } from 'three';
 import { Chunk } from '../Chunk';
-import { Tree } from '../Tree';
 import { Cloud } from '../Cloud';
 import { Turbine } from '../Turbine';
 
@@ -36,14 +35,6 @@ class ChunkLine extends Group {
             this.chunks.push(new_chunk);
         }
 
-        this.treeIndex = 0;
-        this.trees = Array.from(Array(this.CMState.maxTreeNum));
-        for (let k = 0; k < this.CMState.maxTreeNum; k++) {
-            const tree = new Cloud(this);
-            this.trees[k] = tree;
-            this.updateTreeAtIndex(k);
-            this.add(tree);
-        }
 
         // setup "rewards"; i.e. objectives
         this.rewards = Array(this.CMState.maxRewardNum);
@@ -73,37 +64,10 @@ class ChunkLine extends Group {
         );
         if (this.state.chunkManager.state !== this.chunks[0].CMState) this.chunks[0].updateNoise(this.state.chunkManager.state);
         else this.chunks[0].updateNoise();
+        this.chunks[0].hideTrees();
         this.chunks.push(this.chunks.shift());
     }
 
-    getCurrentTree() {
-        return this.trees[this.treeIndex];
-    }
-
-    skipRemainingTrees() {
-        this.treeIndex = 0;
-    }
-
-    updateTree() {
-        if (this.updateTreeAtIndex(this.treeIndex)) {
-            this.treeIndex++;
-            if (this.treeIndex == this.CMState.maxTreeNum) this.treeIndex = 0;
-        } else {
-            this.skipRemainingTrees();
-        }
-    }
-
-    // returns true if successful; false if no available tree to use
-    updateTreeAtIndex(treeIndex) {
-        const pos = this.chunks[1].treePositions[treeIndex];
-        if (pos === null) return false;
-        pos.add(this.chunks[1].position);
-
-        const tree = this.trees[treeIndex];
-        tree.position.set(pos.x, pos.y, pos.z);
-        // tree.position.set(-this.position.x * .95, -50, pos.z);
-        return true;
-    }
 
     getRewardICoord(rewardIndex) {
         return Math.floor(this.CMState.chunkVertWidth * (this.CMState.maxRewardNum - rewardIndex - 1) / this.CMState.maxRewardNum);
@@ -136,11 +100,6 @@ class ChunkLine extends Group {
         for (const chunk of this.chunks) chunk.updateTerrainGeo();
     }
 
-
-    disposeOf() {
-        this.chunk.disposeOf()
-        this.remove(this.chunk)
-    }
 
 }
 

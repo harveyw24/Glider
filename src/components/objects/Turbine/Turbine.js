@@ -3,8 +3,8 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import * as THREE from 'three'
 import MODEL from './scene.gltf';
 
-const scale = 10;
-export const radius = 1 * scale;
+const scale = 15;
+export const radius = .75 * scale;
 
 class Turbine extends Group {
     constructor(parent) {
@@ -23,7 +23,6 @@ class Turbine extends Group {
         // parent.state.parent.state.parent.addToUpdateList(this);
 
         loader.load(MODEL, (gltf) => {
-            const scale = 15;
             gltf.scene.position.x = 0;
             gltf.scene.position.y = 0;
             gltf.scene.position.z = 0;

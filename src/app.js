@@ -107,9 +107,11 @@ const stone_biome = {
     gamma: 5,
     smoothPeaks: true,
     rewardHeightMax: 40,
+    maxTreeNum: 50,
 }
 
 const biomes = [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
+// const biomes = [default_biome, stone_biome];
 
 
 // Initialize core ThreeJS components

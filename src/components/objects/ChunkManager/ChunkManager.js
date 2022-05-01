@@ -26,7 +26,7 @@ const default_biome = {
     freq: 4.4,
     gamma: 0, // if gamma is zero, then no gamma is applied
     smoothPeaks: false,
-    maxTreeNum: 10,
+    maxTreeNum: 20,
     treeHeightMin: 0,
     treeHeightMax: 50,
     maxCloudNum: 25,
@@ -160,9 +160,30 @@ class ChunkManager extends Group {
         // reward/obstacle updates should happen before moving chunks, so that no trees/obstacles are missed
         if (this.position.z + this.getCurrentReward().position.z > 0) this.updateReward();
 
+        let visibleTrees = 0;
         for (const chunkLine of this.chunkLines) {
-            while (this.position.z + chunkLine.getCurrentTree().position.z > 0) chunkLine.updateTree();
+            while (true) {
+                const chunk = chunkLine.chunks[0];
+                const currentTree = chunk.getCurrentTree();
+
+                if (currentTree !== null && this.position.z + currentTree.position.z + chunk.position.z > 0) chunk.hideCurrentTree();
+                else break;
+            }
+            while (true) {
+                const chunk = chunkLine.chunks[1];
+                const nextTree = chunk.getNextTree();
+
+                if (nextTree !== null && this.position.z + nextTree.position.z + chunk.position.z > -this.state.chunkWidth) chunk.showNextTree();
+                else break;
+            }
+
+            for (const chunk of chunkLine.chunks) {
+                for (const tree of chunk.trees) {
+                    if (tree.visible) visibleTrees++;
+                }
+            }
         }
+        console.log("visible trees: ", visibleTrees);
 
         // to keep the chunks in the vicinity of the player:
         // z-position is changed chunk-wise     (chunkLine.position.z = 0)
@@ -170,10 +191,8 @@ class ChunkManager extends Group {
 
         // Move first chunk forward when player passes the chunk
         if (this.position.z - this.anchor.z >= this.state.chunkWidth) {
-            for (const chunkLine of this.chunkLines) chunkLine.skipRemainingTrees();
             if (this.state.rewardIndex != 0) console.log("Some rewards were not moved forward! this probably shouldn't happen unless you're going very fast");
             this.updateRemainingRewards();
-
 
             for (const chunkLine of this.chunkLines) chunkLine.cycleChunks();
 
@@ -221,9 +240,6 @@ class ChunkManager extends Group {
         }
     }
 
-    getCurrentTree() {
-        return this.getCurrentChunkLine().trees[this.state.treeIndex];
-    }
 
     updateRemainingRewards() {
         while (this.state.rewardIndex != 0) this.updateReward();
