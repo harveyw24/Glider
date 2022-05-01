@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import SimplexNoise from 'simplex-noise';
 //import { Water } from 'three/examples/js/objects/Water.js';
 import { Tree } from '../Tree';
+import { Turbine } from '../Turbine';
 import { Cloud } from '../Cloud';
 
 
@@ -13,6 +14,8 @@ function random(min, max) { return Math.random() * (max - min) + min; }
 function transition(x, rate) {
     return 1 / (1 + Math.exp(-x * rate));
 }
+
+const treesLength = 50; // maximum number of trees supported per chunk
 
 
 function sinStep(x, transitionRange, width) {
@@ -68,11 +71,18 @@ class Chunk extends Group {
         this.activeTreeNum = 0;
         this.currentTreeIndex = 0;
         this.nextTreeIndex = 0;
-        this.trees = Array.from(Array(this.CMState.maxTreeNum), () => new Tree());
-        for (const tree of this.trees) {
+
+
+        this.trees = Array.from(Array(treesLength));
+        const tree0 = new Tree();
+        for (let i = 0; i < treesLength; i++) {
+            const tree = i == 0 ? tree0 : tree0.clone();
             tree.visible = false;
+            tree.matrixAutoUpdate = false;
             this.add(tree);
+            this.trees[i] = tree;
         }
+
         this.clouds = Array.from(Array(this.CMState.maxCloudNum), () => new Cloud());
         for (const cloud of this.clouds) {
             cloud.visible = false;
@@ -215,11 +225,12 @@ class Chunk extends Group {
                 const v = this.getVertexAtCoords(i, j);
                 const pos = this.getPositionAtCoords(i, j);
                 const h = this.heightMap[i][j];
-                if (treeIndex < this.trees.length
+                if (treeIndex < this.CMState.maxTreeNum
                     && this.CMState.treeHeightMin < v.z && v.z < this.CMState.treeHeightMax
                     && Math.random() < (this.CMState.maxTreeNum / totalProb) * 1 / (1 + Math.exp(h - .5))
                 ) {
                     this.trees[treeIndex].position.set(pos.x, pos.y, pos.z); // plane is rotated
+                    this.trees[treeIndex].updateMatrix();
                     // this.trees[treeIndex].position.set(-this.state.parent.position.x * .9, -50, pos.z); // plane is rotated
                     treeIndex++;
                 }
@@ -238,6 +249,12 @@ class Chunk extends Group {
         this.activeTreeNum = treeIndex;
         this.activeCloudNum = cloudIndex;
         for (let i = cloudIndex; i < this.clouds.length; i++) this.clouds[i].visible = false;
+    }
+
+    showTrees() {
+        for (let i = 0; i < this.activeTreeNum; i++) this.trees[i].visible = true;
+        this.currentTreeIndex = 0;
+        this.nextTreeIndex = this.activeTreeNum;
     }
 
     hideTrees() {
@@ -277,14 +294,10 @@ class Chunk extends Group {
     }
 
     updateNoise(CMState) {
-        if (CMState !== undefined) {
-            this.CMState = { ...CMState };
-            while (this.CMState.maxTreeNum > this.trees.length) {
-                const tree = new Tree();
-                tree.visible = false;
-                this.add(tree);
-                this.trees.push(tree);
-            }
+        if (CMState !== undefined) this.CMState = { ...CMState };
+        if (this.CMState.maxTreeNum > treesLength) {
+            console.log("Provided maxTreeNum (" + this.CMState.maxTreeNum + ") is too large! Max is " + treesLength);
+            this.CMState.maxTreeNum = treesLength;
         }
         this.updateHeightMap();
         this.updateTerrainGeo();

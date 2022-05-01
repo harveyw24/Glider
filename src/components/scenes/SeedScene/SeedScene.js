@@ -61,12 +61,11 @@ class SeedScene extends Scene {
         // this.add(obj1);
         // this.add(obj2);
 
-        // for (let i = 0; i < 100; i++) {
-        //     const tree1 = new Tree(this);
-        //     this.add(tree1);
-        //     tree1.position.set(5 * (i - 50), 0, -50);
-        //     tree1.visible = false;
-        // }
+        const tree = new Tree();
+        const turbine = new Turbine();
+        console.log(tree, turbine);
+        // this.add(tree);
+
 
 
 
@@ -152,9 +151,9 @@ class SeedScene extends Scene {
         let curAzimuth = this.state.azimuth % 360;
 
         let delta = 180 - curAzimuth
-        this.state.elevation = Math.min(6, Math.max(0, this.state.elevation + Math.sign(delta)*Math.pow(Math.abs(delta), 0.2) / 180));
+        this.state.elevation = Math.min(6, Math.max(0, this.state.elevation + Math.sign(delta) * Math.pow(Math.abs(delta), 0.2) / 180));
 
-        if (curAzimuth < 100 || curAzimuth > 260 ) {
+        if (curAzimuth < 100 || curAzimuth > 260) {
             // console.log("NIGHT");
             this.state.azimuth += 3;
             this.state.elevation = 0;

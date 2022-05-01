@@ -24,6 +24,7 @@ const desert_biome = {
     peakColor: new THREE.Color(252, 203, 78),
     exaggeration: 10,
     freq: 4,
+    maxTreeNum: 0,
 }
 const volcano_biome = {
     waterColor: new THREE.Color(100, 0, 0),
@@ -32,6 +33,7 @@ const volcano_biome = {
     peakColor: new THREE.Color(242, 64, 24),
     exaggeration: 27,
     freq: 3,
+    maxTreeNum: 0,
 }
 const grassland_biome = {
     waterColor: new THREE.Color(0, 127, 255),
@@ -40,6 +42,7 @@ const grassland_biome = {
     peakColor: new THREE.Color(223, 255, 0),
     exaggeration: 15,
     freq: 1,
+    maxTreeNum: 50,
 }
 const arctic_biome = {
     waterColor: new THREE.Color(1, 12, 48),
@@ -48,6 +51,7 @@ const arctic_biome = {
     peakColor: new THREE.Color(209, 225, 255),
     exaggeration: 40,
     freq: 2,
+    maxTreeNum: 0,
 }
 const stone_biome = {
     waterColor: new THREE.Color(5, 78, 5),
@@ -65,8 +69,8 @@ const stone_biome = {
     maxTreeNum: 50,
 }
 
-const biomes = [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
-// const biomes = [default_biome, stone_biome];
+// const biomes = [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
+const biomes = [default_biome, desert_biome];
 
 
 // Initialize core ThreeJS components
@@ -175,7 +179,7 @@ terrainClock.start()
 const onAnimationFrameHandler = (timeStamp) => {
 
 
-    // // ***DEBUGGING***
+    // ***DEBUGGING***
     // let plane = scene.getObjectByName(character);
     // plane.visible = false;
     // let chunkManager = scene.getObjectByName('chunkManager');

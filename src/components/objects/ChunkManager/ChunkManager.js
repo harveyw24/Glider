@@ -26,7 +26,7 @@ const default_biome = {
     freq: 4.4,
     gamma: 0, // if gamma is zero, then no gamma is applied
     smoothPeaks: false,
-    maxTreeNum: 20,
+    maxTreeNum: 50,
     treeHeightMin: 0,
     treeHeightMax: 50,
     maxCloudNum: 25,
@@ -74,6 +74,7 @@ class ChunkManager extends Group {
             this.add(chunk);
             this.chunkLines.push(chunk);
         }
+        for (const chunkLine of this.chunkLines) chunkLine.chunks[0].showTrees();
 
 
 
