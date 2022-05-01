@@ -160,7 +160,7 @@ class ChunkManager extends Group {
 
 
         // reward/obstacle updates should happen before moving chunks, so that no trees/obstacles are missed
-        if (this.position.z + this.getCurrentReward().position.z > 0) this.updateReward();
+        if (this.position.z + this.getCurrentRewards()[0].position.z > 0) this.updateReward();
 
         let visibleTrees = 0;
         for (const chunkLine of this.chunkLines) {
@@ -253,8 +253,8 @@ class ChunkManager extends Group {
         if (this.state.rewardIndex == this.state.maxRewardNum) this.state.rewardIndex = 0;
     }
 
-    getCurrentReward() {
-        return this.getCurrentChunkLine().rewards[this.state.rewardIndex];
+    getCurrentRewards() {
+        return this.chunkLines.map(chunkLine => chunkLine.rewards[this.state.rewardIndex]);
     }
 
     getCurrentChunkLine() {
