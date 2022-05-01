@@ -25,7 +25,7 @@ const desert_biome = {
     exaggeration: 10,
     freq: 4,
     maxTreeNum: 25,
-    obstacle: "cloud"
+    obstacle: "cactus",
 }
 const volcano_biome = {
     waterColor: new THREE.Color(100, 0, 0),
@@ -43,7 +43,8 @@ const grassland_biome = {
     peakColor: new THREE.Color(223, 255, 0),
     exaggeration: 15,
     freq: 1,
-    maxTreeNum: 50,
+    maxTreeNum: 20,
+    obstacle: "sheep",
 }
 const arctic_biome = {
     waterColor: new THREE.Color(1, 12, 48),
@@ -53,6 +54,7 @@ const arctic_biome = {
     exaggeration: 40,
     freq: 2,
     maxTreeNum: 0,
+    rewardHeightMax: 120
 }
 const stone_biome = {
     waterColor: new THREE.Color(5, 78, 5),
@@ -71,8 +73,8 @@ const stone_biome = {
     obstacle: "tree",
 }
 
-const biomes = [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
-// const biomes = [default_biome, desert_biome];
+// const biomes = [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
+const biomes = [default_biome, grassland_biome];
 
 
 // Initialize core ThreeJS components

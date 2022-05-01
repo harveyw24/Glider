@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Group } from 'three';
-import { Tree, Cloud } from '..'
+import { Tree, Cloud, Cactus, Sheep } from '..';
 
 
 
@@ -19,6 +19,8 @@ class Obstacle extends Group {
         this.objDictionary = {
             "tree": new Tree(),
             "cloud": new Cloud(),
+            "cactus": new Cactus(),
+            "sheep": new Sheep(),
         };
         for (const obj of Object.values(this.objDictionary)) {
             obj.visible = false;

@@ -12,3 +12,5 @@ export * from './Airplane';
 export * from './Turbine';
 export * from './Sky';
 export * from './Obstacle';
+export * from './Cactus';
+export * from './Sheep';

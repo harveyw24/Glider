@@ -132,7 +132,10 @@ class Airplane extends Group {
         this.state.prevTimeStamp = timeStamp;
 
         // update animation
-        this.state.mixer.update(delta);
+        if (this.state.mixer) {
+            this.state.mixer.update(delta);
+        }
+        
     }
 
     null() {

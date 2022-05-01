@@ -47,6 +47,7 @@ class SeedScene extends Scene {
 
         this.sun = new THREE.Vector3();
 
+        // let sheep = new Sheep(this);
         this.add(this.lights, this.sky, airplane, chunkManager);
         // this.add(this.hemiLight, this.dirLight, this.sky, airplane, chunkManager);
 

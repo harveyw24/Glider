@@ -235,6 +235,9 @@ class Chunk extends Group {
                     && Math.random() < (this.CMState.maxTreeNum / totalProb) * 1 / (1 + Math.exp(h - .5))
                 ) {
                     this.trees[treeIndex].position.set(pos.x, pos.y, pos.z); // plane is rotated
+                    if (this.CMState.obstacle == "sheep") {
+                        this.trees[treeIndex].rotation.y = Math.random() * Math.PI * 2;
+                    }
                     this.trees[treeIndex].updateMatrix();
                     // this.trees[treeIndex].position.set(-this.state.parent.position.x * .9, -50, pos.z); // plane is rotated
                     treeIndex++;
