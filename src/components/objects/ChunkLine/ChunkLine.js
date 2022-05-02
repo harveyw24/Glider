@@ -36,17 +36,6 @@ class ChunkLine extends Group {
         }
 
 
-        // setup "rewards"; i.e. objectives
-        this.rewards = Array(this.CMState.maxRewardNum);
-        for (let k = 0; k < this.CMState.maxRewardNum; k++) {
-            const reward = new Turbine(this);
-            this.rewards[k] = reward;
-            this.updateRewardAtIndex(k);
-            this.add(reward);
-        }
-
-
-
 
     }
 
@@ -64,35 +53,16 @@ class ChunkLine extends Group {
         );
         if (this.state.chunkManager.state !== this.chunks[0].CMState) this.chunks[0].updateNoise(this.state.chunkManager.state);
         else this.chunks[0].updateNoise();
-        this.chunks[0].hideTrees();
+        this.chunks[0].hideObstacles();
+        this.chunks[0].hideRewards();
         this.chunks.push(this.chunks.shift());
     }
 
 
-    getRewardICoord(rewardIndex) {
-        return Math.floor(this.CMState.chunkVertWidth * (this.CMState.maxRewardNum - rewardIndex - 1) / this.CMState.maxRewardNum);
-    }
 
-    updateRewardAtIndex(rewardIndex) {
-        const reward = this.rewards[rewardIndex];
-        const iCoord = this.getRewardICoord(rewardIndex);
-
-        // try to find a pos which is below the rewardHeightMax
-        let pos;
-        for (let i = 0; i < 10; i++) {
-            pos = this.chunks[1].getPositionAtCoords(iCoord, Math.floor(random(0, this.CMState.chunkVertWidth - 1)));
-            if (pos.y <= this.CMState.rewardHeightMax + this.CMState.groundY) break;
-            if (i == 9) console.log("couldn't find a good spot!");
-        }
-
-        pos.add(this.chunks[1].position);
-        reward.position.set(pos.x, random(pos.y, this.CMState.rewardHeightMax + this.CMState.groundY), pos.z);
-        // if (this.position.x > 0) reward.position.set(-this.position.x, -50, pos.z);
-    }
-
-
-    updateNoise(CMState) {
-        if (CMState !== undefined) this.CMState = CMState;
+    updateNoise() {
+        // CMState is not snapshotted in chunkLine!
+        // if (CMState !== undefined) this.CMState = CMState;
         for (const chunk of this.chunks) chunk.updateNoise(); // CMState update should NOT propagate to chunks
     }
 

@@ -15,7 +15,6 @@ class Obstacle extends Group {
     newObjects() {
         this.objDictionary = {
             "tree": new Tree(),
-            "cloud": new Cloud(),
             "cactus": new Cactus(),
             "sheep": new Sheep(),
             "penguin": new Penguin(),

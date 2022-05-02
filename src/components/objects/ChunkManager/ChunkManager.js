@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { Group, Color, PlaneBufferGeometry, PlaneGeometry, NoToneMapping } from 'three';
 import { ChunkLine } from '../ChunkLine';
 import { Turbine } from '../Turbine';
-import { Tree } from '../Tree';
+import { Obstacle } from '../Obstacle';
 
 
 // SET THESE TO CHANGE CHUNK DIMENSIONS
@@ -26,15 +26,16 @@ const default_biome = {
     freq: 4.4,
     gamma: 0, // if gamma is zero, then no gamma is applied
     smoothPeaks: false,
-    maxTreeNum: 50,
-    treeHeightMin: 1,
-    treeHeightMax: 50,
+    maxObstacleNum: 50,
+    obstacleHeightMin: 1,
+    obstacleHeightMax: 50,
     maxCloudNum: 25,
     cloudHeightMin: 100,
     cloudHeightMax: 150,
     maxRewardNum: 10,
     rewardHeightMax: 100,
     obstacle: "tree",
+    toSpace: false,
 };
 const modifiableFields = Object.keys(default_biome);
 
@@ -52,10 +53,10 @@ class ChunkManager extends Group {
             chunkVertWidth: chunkVertexWidth,
             segmentWidth: chunkPxWidth / (chunkVertexWidth - 1),
             groundY: groundY,
-            rewardIndex: 0,
             loadThreshold: 0.55,
             falling: 0,
             climbing: 0,
+            spaceRewardHeight: 0,
             ...default_biome,
         }
 
@@ -75,8 +76,7 @@ class ChunkManager extends Group {
             this.add(chunk);
             this.chunkLines.push(chunk);
         }
-        for (const chunkLine of this.chunkLines) chunkLine.chunks[0].showTrees();
-
+        for (const chunkLine of this.chunkLines) chunkLine.chunks[0].showObstacles();
 
 
         // parent.addToUpdateList(this);
@@ -125,12 +125,12 @@ class ChunkManager extends Group {
         this.position.z += 3 * speedLevel;
         this.position.y += 0.25 * speedLevel;
 
-        for (let chunkLine of this.chunkLines) {
-            for (let reward of chunkLine.rewards) {
-                reward.update(timeStamp);
-            }
-            for (let chunk of chunkLine.chunks) {
-                for (let cloud of chunk.clouds) {
+        for (const chunkLine of this.chunkLines) {
+            for (const chunk of chunkLine.chunks) {
+                for (const reward of chunk.rewards) {
+                    if (reward.visible) reward.update(timeStamp);
+                }
+                for (const cloud of chunk.clouds) {
                     cloud.update(timeStamp);
                 }
             }
@@ -159,33 +159,38 @@ class ChunkManager extends Group {
         }
 
 
-        // reward/obstacle updates should happen before moving chunks, so that no trees/obstacles are missed
-        if (this.position.z + this.getCurrentRewards()[0].position.z > 0) this.updateReward();
 
-        let visibleTrees = 0;
+        // show/hide obstacles as they enter the range of the player
         for (const chunkLine of this.chunkLines) {
             while (true) {
                 const chunk = chunkLine.chunks[0];
-                const currentTree = chunk.getCurrentTree();
+                const currentReward = chunk.getCurrentReward();
 
-                if (currentTree !== null && this.position.z + currentTree.position.z + chunk.position.z > 0) chunk.hideCurrentTree();
+                if (currentReward !== null && this.position.z + currentReward.position.z + chunk.position.z > 0) chunk.hideCurrentReward();
                 else break;
             }
             while (true) {
                 const chunk = chunkLine.chunks[1];
-                const nextTree = chunk.getNextTree();
+                const nextReward = chunk.getNextReward();
 
-                if (nextTree !== null && this.position.z + nextTree.position.z + chunk.position.z > -this.state.chunkWidth) chunk.showNextTree();
+                if (nextReward !== null && this.position.z + nextReward.position.z + chunk.position.z > -this.state.chunkWidth) chunk.showNextReward();
                 else break;
             }
+            while (true) {
+                const chunk = chunkLine.chunks[0];
+                const currentObstacle = chunk.getCurrentObstacle();
 
-            for (const chunk of chunkLine.chunks) {
-                for (const tree of chunk.trees) {
-                    if (tree.visible) visibleTrees++;
-                }
+                if (currentObstacle !== null && this.position.z + currentObstacle.position.z + chunk.position.z > 0) chunk.hideCurrentObstacle();
+                else break;
+            }
+            while (true) {
+                const chunk = chunkLine.chunks[1];
+                const nextObstacle = chunk.getNextObstacle();
+
+                if (nextObstacle !== null && this.position.z + nextObstacle.position.z + chunk.position.z > -this.state.chunkWidth) chunk.showNextObstacle();
+                else break;
             }
         }
-        // console.log("visible trees: ", visibleTrees);
 
         // to keep the chunks in the vicinity of the player:
         // z-position is changed chunk-wise     (chunkLine.position.z = 0)
@@ -193,10 +198,9 @@ class ChunkManager extends Group {
 
         // Move first chunk forward when player passes the chunk
         if (this.position.z - this.anchor.z >= this.state.chunkWidth) {
-            if (this.state.rewardIndex != 0) console.log("Some rewards were not moved forward! this probably shouldn't happen unless you're going very fast");
-            this.updateRemainingRewards();
-
             for (const chunkLine of this.chunkLines) chunkLine.cycleChunks();
+            if (this.state.toSpace) this.state.spaceRewardHeight += this.state.rewardHeightMax;
+            console.log(this.state.spaceRewardHeight);
 
             // invariant: at z-chunk change, (anchor.z + chunkwidth/2) + currentChunk.position.z = 0
             this.anchor.z = -this.chunkLines[0].chunks[0].position.z - this.state.chunkWidth / 2;
@@ -230,9 +234,18 @@ class ChunkManager extends Group {
             console.log("NEW ANCHOR: ", this.anchor.x, this.anchor.y, this.anchor.z);
         }
 
-
-
     }
+
+    resetBiome(biome) {
+        if (biome === undefined) biome = {};
+        this.updateBiome(biome);
+        for (const chunkLine of this.chunkLines) {
+            for (const chunk of chunkLine.chunks) {
+                chunk.updateNoise(this.state);
+            }
+        }
+    }
+
 
     updateBiome(newBiome) {
         newBiome = { ...default_biome, ...newBiome };
@@ -243,18 +256,9 @@ class ChunkManager extends Group {
     }
 
 
-    updateRemainingRewards() {
-        while (this.state.rewardIndex != 0) this.updateReward();
-    }
-
-    updateReward() {
-        for (const chunkLine of this.chunkLines) chunkLine.updateRewardAtIndex(this.state.rewardIndex);
-        this.state.rewardIndex++;
-        if (this.state.rewardIndex == this.state.maxRewardNum) this.state.rewardIndex = 0;
-    }
 
     getCurrentRewards() {
-        return this.chunkLines.map(chunkLine => chunkLine.rewards[this.state.rewardIndex]);
+        return this.chunkLines.map(chunkLine => chunkLine.chunks[0].rewards[chunkLine.chunks[0].currentRewardIndex]);
     }
 
     getCurrentChunkLine() {

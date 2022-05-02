@@ -2,11 +2,13 @@ import { Group, Color, PlaneBufferGeometry, VertexColors, PlaneGeometry, MeshSta
 import * as THREE from 'three';
 import SimplexNoise from 'simplex-noise';
 //import { Water } from 'three/examples/js/objects/Water.js';
-import { Tree } from '../Tree';
+import { Obstacle } from '../Obstacle';
 import { Turbine } from '../Turbine';
 import { Cloud } from '../Cloud';
-import { Obstacle } from '../Obstacle';
 
+
+const obstaclesLength = 25; // maximum number of obstacles supported per chunk
+const rewardsLength = 20; // maximum number of obstacles supported per chunk
 
 function random(min, max) { return Math.random() * (max - min) + min; }
 
@@ -15,8 +17,6 @@ function random(min, max) { return Math.random() * (max - min) + min; }
 function transition(x, rate) {
     return 1 / (1 + Math.exp(-x * rate));
 }
-
-const treesLength = 50; // maximum number of trees supported per chunk
 
 
 function sinStep(x, transitionRange, width) {
@@ -69,24 +69,33 @@ class Chunk extends Group {
         this.geometry.colorsNeedUpdate = true;
 
 
-        this.activeTreeNum = 0;
-        this.currentTreeIndex = 0;
-        this.nextTreeIndex = 0;
-
-
-        this.trees = Array.from(Array(treesLength));
-        const tree0 = new Obstacle(true);
-        for (let i = 0; i < treesLength; i++) {
-            const tree = i == 0 ? tree0 : tree0.clone();
-            tree.setObstacle(this.CMState.obstacle);
-            tree.visible = false;
-            tree.matrixAutoUpdate = false;
-            this.add(tree);
-            this.trees[i] = tree;
+        this.activeObstacleNum = 0;
+        this.currentObstacleIndex = 0;
+        this.nextObstacleIndex = 0;
+        this.obstacles = Array.from(Array(obstaclesLength));
+        const obstacle0 = new Obstacle(true);
+        for (let i = 0; i < obstaclesLength; i++) {
+            const obstacle = i == 0 ? obstacle0 : obstacle0.clone();
+            obstacle.setObstacle(this.CMState.obstacle);
+            obstacle.visible = false;
+            obstacle.matrixAutoUpdate = false;
+            this.add(obstacle);
+            this.obstacles[i] = obstacle;
         }
 
-        console.log(Object.is(tree0.material, tree0.clone().material));
-        console.log(this.trees);
+
+        this.currentRewardIndex = 0;
+        this.nextRewardIndex = 0;
+        this.rewards = Array.from(Array(rewardsLength));
+        const reward0 = new Turbine();
+        for (let i = 0; i < rewardsLength; i++) {
+            const reward = i == 0 ? reward0 : reward0.clone();
+            reward.visible = false;
+            this.add(reward);
+            this.rewards[i] = reward;
+        }
+
+
 
         this.clouds = Array.from(Array(this.CMState.maxCloudNum), () => new Cloud());
         for (const cloud of this.clouds) {
@@ -212,8 +221,8 @@ class Chunk extends Group {
         this.geometry.computeFlatVertexNormals();
     }
 
-    updateObstacles() {
-        let treeIndex = 0;
+    updateObstaclesRewards() {
+        let obstacleIndex = 0;
         let cloudIndex = 0;
 
         let totalProb = 0;
@@ -221,7 +230,7 @@ class Chunk extends Group {
             for (let j = 0; j < this.heightMap[0].length; j++) {
                 const v = this.getVertexAtCoords(i, j);
                 const h = this.heightMap[i][j];
-                if (this.CMState.treeHeightMin <= v.z && v.z <= this.CMState.treeHeightMax) totalProb += 1 / (1 + Math.exp(h - .5));
+                if (this.CMState.obstacleHeightMin <= v.z && v.z <= this.CMState.obstacleHeightMax) totalProb += 1 / (1 + Math.exp(h - .5));
             }
         }
 
@@ -230,17 +239,17 @@ class Chunk extends Group {
                 const v = this.getVertexAtCoords(i, j);
                 const pos = this.getPositionAtCoords(i, j);
                 const h = this.heightMap[i][j];
-                if (treeIndex < this.CMState.maxTreeNum
-                    && this.CMState.treeHeightMin <= v.z && v.z <= this.CMState.treeHeightMax
-                    && Math.random() < (this.CMState.maxTreeNum / totalProb) * 1 / (1 + Math.exp(h - .5))
+                if (obstacleIndex < this.CMState.maxObstacleNum
+                    && this.CMState.obstacleHeightMin <= v.z && v.z <= this.CMState.obstacleHeightMax
+                    && Math.random() < (this.CMState.maxObstacleNum / totalProb) * 1 / (1 + Math.exp(h - .5))
                 ) {
-                    this.trees[treeIndex].position.set(pos.x, pos.y, pos.z); // plane is rotated
                     if (this.CMState.obstacle != "cloud") {
-                        this.trees[treeIndex].rotation.y = Math.random() * Math.PI * 2;
+                        this.obstacles[obstacleIndex].rotation.y = Math.random() * Math.PI * 2;
                     }
-                    this.trees[treeIndex].updateMatrix();
-                    // this.trees[treeIndex].position.set(-this.state.parent.position.x * .9, -50, pos.z); // plane is rotated
-                    treeIndex++;
+                    this.obstacles[obstacleIndex].position.set(pos.x, pos.y, pos.z); // plane is rotated
+                    this.obstacles[obstacleIndex].updateMatrix();
+                    // this.obstacles[obstacleIndex].position.set(-this.state.parent.position.x * .9, -50, pos.z); // plane is rotated
+                    obstacleIndex++;
                 }
                 if (cloudIndex < this.clouds.length && Math.random() < 25 / this.geometry.vertices.length) {
                     this.clouds[cloudIndex].visible = true;
@@ -249,55 +258,119 @@ class Chunk extends Group {
                 }
             }
         }
+
         // want a hit rate that is close to 1.0 but not always 1.0
         // console.log(
-        //     "tree hit rate:", this.CMState.maxTreeNum != 0 ? treeIndex / this.CMState.maxTreeNum : "(maxTreeNum is 0); ",
+        //     "obstacle hit rate:", this.CMState.maxObstacleNum != 0 ? obstacleIndex / this.CMState.maxObstacleNum : "(maxObstacleNum is 0); ",
         //     "cloud hit rate:", this.CMState.maxCloudNum != 0 ? cloudIndex / this.CMState.maxCloudNum : "(maxCloudNum is 0)"
         // );
-        this.activeTreeNum = treeIndex;
+        this.activeObstacleNum = obstacleIndex;
         this.activeCloudNum = cloudIndex;
         for (let i = cloudIndex; i < this.clouds.length; i++) this.clouds[i].visible = false;
-    }
 
-    showTrees() {
-        for (let i = 0; i < this.activeTreeNum; i++) this.trees[i].visible = true;
-        this.currentTreeIndex = 0;
-        this.nextTreeIndex = this.activeTreeNum;
-    }
 
-    hideTrees() {
-        for (const tree of this.trees) tree.visible = false;
-        this.currentTreeIndex = 0;
-        this.nextTreeIndex = 0;
-    }
+        for (let rewardIndex = 0; rewardIndex < this.CMState.maxRewardNum; rewardIndex++) {
+            const iCoord = Math.floor(this.CMState.chunkVertWidth * (this.CMState.maxRewardNum - rewardIndex - 1) / this.CMState.maxRewardNum);
+            if (this.CMState.toSpace) {
+                const pos = this.getPositionAtCoords(iCoord, Math.floor(random(0, this.CMState.chunkVertWidth - 1)));
+                this.rewards[rewardIndex].position.set(
+                    0,
+                    this.state.chunkManager.state.spaceRewardHeight + this.CMState.groundY + rewardIndex * this.CMState.rewardHeightMax / this.CMState.maxRewardNum,
+                    pos.z
+                );
+            } else {
+                let pos;
+                for (let i = 0; i < 10; i++) {
+                    pos = this.getPositionAtCoords(iCoord, Math.floor(random(0, this.CMState.chunkVertWidth - 1)));
+                    if (pos.y <= this.CMState.rewardHeightMax + this.CMState.groundY) break;
+                    if (i == 9) console.log("couldn't find a good spot!");
+                }
 
-    // get first visible tree
-    getCurrentTree() {
-        if (0 <= this.currentTreeIndex && this.currentTreeIndex < this.activeTreeNum) {
-            return this.trees[this.currentTreeIndex];
-        } else return null;
-    }
-
-    // get next invisible tree
-    getNextTree() {
-        if (0 <= this.nextTreeIndex && this.nextTreeIndex < this.activeTreeNum) {
-            return this.trees[this.nextTreeIndex];
-        } else return null;
-    }
-
-    hideCurrentTree() {
-        const currentTree = this.getCurrentTree();
-        if (currentTree !== null) {
-            currentTree.visible = false;
-            this.currentTreeIndex++;
+                this.rewards[rewardIndex].position.set(pos.x, random(pos.y, this.CMState.rewardHeightMax + this.CMState.groundY), pos.z);
+                // this.rewards[rewardIndex].position.set(0, -50, pos.z);
+            }
         }
     }
 
-    showNextTree() {
-        const nextTree = this.getNextTree();
-        if (nextTree !== null) {
-            nextTree.visible = true;
-            this.nextTreeIndex++;
+
+
+
+
+    showRewards() {
+        for (let i = 0; i < this.CMState.maxRewardNum; i++) this.rewards[i].visible = true;
+        this.currentRewardIndex = 0;
+        this.nextRewardIndex = this.CMState.maxRewardNum;
+    }
+    hideRewards() {
+        for (const reward of this.rewards) reward.visible = false;
+        this.currentRewardIndex = 0;
+        this.nextRewardIndex = 0;
+    }
+    // get first visible reward
+    getCurrentReward() {
+        if (0 <= this.currentRewardIndex && this.currentRewardIndex < this.CMState.maxRewardNum) {
+            return this.rewards[this.currentRewardIndex];
+        } else return null;
+    }
+    // get next invisible reward
+    getNextReward() {
+        if (0 <= this.nextRewardIndex && this.nextRewardIndex < this.CMState.maxRewardNum) {
+            return this.rewards[this.nextRewardIndex];
+        } else return null;
+    }
+    hideCurrentReward() {
+        const currentReward = this.getCurrentReward();
+        if (currentReward !== null) {
+            currentReward.visible = false;
+            this.currentRewardIndex++;
+        }
+    }
+    showNextReward() {
+        const nextReward = this.getNextReward();
+        if (nextReward !== null) {
+            nextReward.visible = true;
+            this.nextRewardIndex++;
+        }
+    }
+
+
+
+
+
+    showObstacles() {
+        for (let i = 0; i < this.activeObstacleNum; i++) this.obstacles[i].visible = true;
+        this.currentObstacleIndex = 0;
+        this.nextObstacleIndex = this.activeObstacleNum;
+    }
+    hideObstacles() {
+        for (const obstacle of this.obstacles) obstacle.visible = false;
+        this.currentObstacleIndex = 0;
+        this.nextObstacleIndex = 0;
+    }
+    // get first visible obstacle
+    getCurrentObstacle() {
+        if (0 <= this.currentObstacleIndex && this.currentObstacleIndex < this.activeObstacleNum) {
+            return this.obstacles[this.currentObstacleIndex];
+        } else return null;
+    }
+    // get next invisible obstacle
+    getNextObstacle() {
+        if (0 <= this.nextObstacleIndex && this.nextObstacleIndex < this.activeObstacleNum) {
+            return this.obstacles[this.nextObstacleIndex];
+        } else return null;
+    }
+    hideCurrentObstacle() {
+        const currentObstacle = this.getCurrentObstacle();
+        if (currentObstacle !== null) {
+            currentObstacle.visible = false;
+            this.currentObstacleIndex++;
+        }
+    }
+    showNextObstacle() {
+        const nextObstacle = this.getNextObstacle();
+        if (nextObstacle !== null) {
+            nextObstacle.visible = true;
+            this.nextObstacleIndex++;
         }
     }
 
@@ -305,17 +378,17 @@ class Chunk extends Group {
         if (CMState !== undefined) {
             console.log("using obstacle: ", CMState.obstacle);
             if (this.CMState.obstacle !== CMState.obstacle) {
-                for (const tree of this.trees) tree.setObstacle(CMState.obstacle);
+                for (const obstacle of this.obstacles) obstacle.setObstacle(CMState.obstacle);
             }
             this.CMState = { ...CMState };
         }
-        if (this.CMState.maxTreeNum > treesLength) {
-            console.log("Provided maxTreeNum (" + this.CMState.maxTreeNum + ") is too large! Max is " + treesLength);
-            this.CMState.maxTreeNum = treesLength;
+        if (this.CMState.maxObstacleNum > obstaclesLength) {
+            console.log("Provided maxObstacleNum (" + this.CMState.maxObstacleNum + ") is too large! Max is " + obstaclesLength);
+            this.CMState.maxObstacleNum = obstaclesLength;
         }
         this.updateHeightMap();
         this.updateTerrainGeo();
-        this.updateObstacles();
+        this.updateObstaclesRewards();
     }
 
     // from https://medium.com/@joshmarinacci/low-poly-style-terrain-generation-8a017ab02e7b

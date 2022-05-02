@@ -24,7 +24,7 @@ const desert_biome = {
     peakColor: new THREE.Color(252, 203, 78),
     exaggeration: 10,
     freq: 4,
-    maxTreeNum: 25,
+    maxObstacleNum: 10,
     obstacle: "cactus",
 }
 const volcano_biome = {
@@ -34,7 +34,7 @@ const volcano_biome = {
     peakColor: new THREE.Color(242, 64, 24),
     exaggeration: 27,
     freq: 3,
-    maxTreeNum: 0,
+    maxObstacleNum: 0,
 }
 const grassland_biome = {
     waterColor: new THREE.Color(0, 127, 255),
@@ -43,7 +43,7 @@ const grassland_biome = {
     peakColor: new THREE.Color(223, 255, 0),
     exaggeration: 15,
     freq: 1,
-    maxTreeNum: 20,
+    maxObstacleNum: 20,
     obstacle: "sheep",
 }
 const arctic_biome = {
@@ -53,11 +53,12 @@ const arctic_biome = {
     peakColor: new THREE.Color(209, 225, 255),
     exaggeration: 40,
     freq: 2,
-    maxTreeNum: 20,
-    rewardHeightMax: 120,
+    maxObstacleNum: 20,
+    rewardHeightMax: 200,
     obstacle: "penguin",
-    treeHeightMax: 3,
-    treeHeightMin: 0,
+    obstacleHeightMax: 3,
+    obstacleHeightMin: 0,
+    maxRewardNum: 15,
 }
 const stone_biome = {
     waterColor: new THREE.Color(5, 78, 5),
@@ -72,8 +73,17 @@ const stone_biome = {
     gamma: 5,
     smoothPeaks: true,
     rewardHeightMax: 40,
-    maxTreeNum: 50,
+    maxObstacleNum: 25,
     obstacle: "tree",
+}
+const space_biome = {
+    waterColor: new THREE.Color(0, 0, 0),
+    bankColor: new THREE.Color(0, 0, 0),
+    middleColor: new THREE.Color(0, 0, 0),
+    peakColor: new THREE.Color(0, 0, 0),
+    exaggeration: 0,
+    toSpace: true,
+    maxObstacleNum: 0,
 }
 
 const biomes = [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
@@ -231,6 +241,10 @@ const onAnimationFrameHandler = (timeStamp) => {
 
         if (frameCounter - lastTerrainUpdate > 500) {
             chunkManager.updateBiome(biomes[Math.floor(Math.random() * biomes.length)]);
+<<<<<<< HEAD
+=======
+            // chunkManager.updateBiome(biomes[1]);
+>>>>>>> 47fefa24b8c1ce17b4ac5a50c66dabc7565a50cd
             lastTerrainUpdate = frameCounter;
         }
 
