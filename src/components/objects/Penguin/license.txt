@@ -1,0 +1,11 @@
+Model Information:
+* title:	Penguin Swimming
+* source:	https://sketchfab.com/3d-models/penguin-swimming-855d54f1e67a4564aac7871b30ef687d
+* author:	rkuhlf (https://sketchfab.com/rkuhlf)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Penguin Swimming" (https://sketchfab.com/3d-models/penguin-swimming-855d54f1e67a4564aac7871b30ef687d) by rkuhlf (https://sketchfab.com/rkuhlf) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

@@ -1,6 +1,6 @@
 import * as Dat from 'dat.gui';
 import { Scene, Color } from 'three';
-import { Flower, Land, Kite, Falcon, Paper, Terrain, Airplane, ChunkManager, Turbine, Tree } from '../../objects';
+import { Flower, Land, Kite, Falcon, Paper, Terrain, Airplane, ChunkManager, Turbine, Tree, Penguin } from '../../objects';
 import { BasicLights } from 'lights';
 import * as THREE from 'three'
 import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js'
@@ -47,7 +47,7 @@ class SeedScene extends Scene {
 
         this.sun = new THREE.Vector3();
 
-        // let sheep = new Sheep(this);
+        // let penguin = new Penguin(this);
         this.add(this.lights, this.sky, airplane, chunkManager);
         // this.add(this.hemiLight, this.dirLight, this.sky, airplane, chunkManager);
 

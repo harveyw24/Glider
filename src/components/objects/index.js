@@ -14,3 +14,4 @@ export * from './Sky';
 export * from './Obstacle';
 export * from './Cactus';
 export * from './Sheep';
+export * from './Penguin';

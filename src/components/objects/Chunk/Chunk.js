@@ -221,7 +221,7 @@ class Chunk extends Group {
             for (let j = 0; j < this.heightMap[0].length; j++) {
                 const v = this.getVertexAtCoords(i, j);
                 const h = this.heightMap[i][j];
-                if (this.CMState.treeHeightMin < v.z && v.z < this.CMState.treeHeightMax) totalProb += 1 / (1 + Math.exp(h - .5));
+                if (this.CMState.treeHeightMin <= v.z && v.z <= this.CMState.treeHeightMax) totalProb += 1 / (1 + Math.exp(h - .5));
             }
         }
 
@@ -231,11 +231,11 @@ class Chunk extends Group {
                 const pos = this.getPositionAtCoords(i, j);
                 const h = this.heightMap[i][j];
                 if (treeIndex < this.CMState.maxTreeNum
-                    && this.CMState.treeHeightMin < v.z && v.z < this.CMState.treeHeightMax
+                    && this.CMState.treeHeightMin <= v.z && v.z <= this.CMState.treeHeightMax
                     && Math.random() < (this.CMState.maxTreeNum / totalProb) * 1 / (1 + Math.exp(h - .5))
                 ) {
                     this.trees[treeIndex].position.set(pos.x, pos.y, pos.z); // plane is rotated
-                    if (this.CMState.obstacle == "sheep") {
+                    if (this.CMState.obstacle != "cloud") {
                         this.trees[treeIndex].rotation.y = Math.random() * Math.PI * 2;
                     }
                     this.trees[treeIndex].updateMatrix();

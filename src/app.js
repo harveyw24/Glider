@@ -53,8 +53,11 @@ const arctic_biome = {
     peakColor: new THREE.Color(209, 225, 255),
     exaggeration: 40,
     freq: 2,
-    maxTreeNum: 0,
-    rewardHeightMax: 120
+    maxTreeNum: 20,
+    rewardHeightMax: 120,
+    obstacle: "penguin",
+    treeHeightMax: 3,
+    treeHeightMin: 0,
 }
 const stone_biome = {
     waterColor: new THREE.Color(5, 78, 5),
@@ -73,8 +76,8 @@ const stone_biome = {
     obstacle: "tree",
 }
 
-const biomes = [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
-// const biomes = [default_biome, grassland_biome];
+// const biomes = [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
+const biomes = [default_biome, arctic_biome];
 
 
 // Initialize core ThreeJS components
@@ -227,7 +230,8 @@ const onAnimationFrameHandler = (timeStamp) => {
         }
 
         if (frameCounter - lastTerrainUpdate > 500) {
-            chunkManager.updateBiome(biomes[Math.floor(Math.random() * biomes.length)])
+            // chunkManager.updateBiome(biomes[Math.floor(Math.random() * biomes.length)]);
+            chunkManager.updateBiome(biomes[1]);
             lastTerrainUpdate = frameCounter;
         }
 

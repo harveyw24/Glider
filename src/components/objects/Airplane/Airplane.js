@@ -96,15 +96,15 @@ class Airplane extends Group {
         if (this.state.reward) {
             this.state.rewardTime = timeStamp;
             this.state.reward = false
-            if (Math.abs(this.rotation.z) > 0.07) {
+            if (Math.abs(this.rotation.z) > 0.07 && !this.state.barrel) {
                 this.state.barrel = this.rotation.z;
             }
         }
 
         if (this.state.barrel) {
             let sign = Math.sign(this.state.barrel);
-            this.rotation.z += 0.15 * sign
-            if (Math.abs(this.rotation.z) > Math.abs(this.state.barrel) + 2 * Math.PI - 0.15) {
+            this.rotation.z += 0.2 * sign
+            if (Math.abs(this.rotation.z) > Math.abs(this.state.barrel) + 2 * Math.PI - 0.2) {
                 this.rotation.z = this.state.barrel;
                 this.state.barrel = 0;
             }

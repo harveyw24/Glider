@@ -27,7 +27,7 @@ const default_biome = {
     gamma: 0, // if gamma is zero, then no gamma is applied
     smoothPeaks: false,
     maxTreeNum: 50,
-    treeHeightMin: 0,
+    treeHeightMin: 1,
     treeHeightMax: 50,
     maxCloudNum: 25,
     cloudHeightMin: 100,
