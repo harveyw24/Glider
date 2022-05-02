@@ -76,8 +76,8 @@ const stone_biome = {
     obstacle: "tree",
 }
 
-// const biomes = [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
-const biomes = [default_biome, arctic_biome];
+const biomes = [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
+// const biomes = [default_biome, arctic_biome];
 
 
 // Initialize core ThreeJS components
