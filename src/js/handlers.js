@@ -231,14 +231,13 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
         document.getElementById('audio').pause();
 
         let fillScreen = document.getElementById('fillScreen');
-            fillScreen.classList.add('death');
-            setTimeout(function() {
-                fillScreen.classList.remove('death');
-            }, 3000);
+        fillScreen.classList.add('death');
+        setTimeout(function() {
+            fillScreen.classList.remove('death');
+        }, 3000);
         screens['ending'] = true;
         pages.quit(document, score);
-
-        console.log("Crash!");
+        chunkManager.resetBiome();
 
         // screens['menu'] = false;
         // screens['pause'] = false;
@@ -366,8 +365,7 @@ export function updateAudioSpeed(document, sounds, scene) {
     let target = new THREE.Vector3();
     chunkManager.getWorldPosition(target);
     let height = target.y;
-    let newPlaybackSpeed = height / 400 + 1;
-    let newPitch = -(newPlaybackSpeed - 1) * 1200;
+    let newPlaybackSpeed = Math.min(1, height / 400 + 1);
     let audio = document.getElementById('audio');
     audio.playbackRate = newPlaybackSpeed;
 }
