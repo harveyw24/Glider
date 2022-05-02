@@ -222,7 +222,7 @@ const onAnimationFrameHandler = (timeStamp) => {
         handlers.updateAudioSpeed(document, sounds, scene);
 
         let elapsed = clock.getElapsedTime();
-        if (elapsed - oldTime > 5 && speedLevel < 2) {
+        if (elapsed - oldTime > 15 && speedLevel < 3) {
             speedLevel *= 1.1;
             oldTime = elapsed;
         }
