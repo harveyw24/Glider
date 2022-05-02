@@ -90,14 +90,16 @@ const menuRenderer = new WebGLRenderer({ antialias: true });
 
 camera.add(listener);
 const sounds = [];
-const menu = new THREE.Audio(listener);
+// const menu = new THREE.Audio(listener);
 const whirring = new THREE.Audio(listener);
 const damage = new THREE.Audio(listener);
 const powerup = new THREE.Audio(listener);
+const explosion = new THREE.Audio(listener);
 //  sounds['menu'] = menu;
 sounds['whirring'] = whirring;
 sounds['damage'] = damage;
 sounds['powerup'] = powerup;
+sounds['explosion'] = explosion;
 
 let frameCounter = 0;
 let lastSpeedUpdate = 0;
@@ -108,10 +110,10 @@ scene.initSky(renderer, camera);
 menuScene.initSky(menuRenderer, camera);
 
 const audioLoader = new THREE.AudioLoader();
-audioLoader.load('src/sounds/menu.wav', function(buffer) {
-    menu.setBuffer(buffer);
-    menu.setLoop(true);
-    menu.setVolume(1);
+audioLoader.load('src/sounds/explosion.wav', function(buffer) {
+    explosion.setBuffer(buffer);
+    explosion.setLoop(false);
+    explosion.setVolume(0.3);
 });
 
 audioLoader.load('src/sounds/whirring.wav', function(buffer) {
