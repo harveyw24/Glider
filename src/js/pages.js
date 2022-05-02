@@ -42,7 +42,11 @@ export function quit(document, score) {
     else if (score < 45) scoreComment.innerHTML = 'Maybe you have potential after all.'
     else if (score < 60) scoreComment.innerHTML = 'You\'re a true pilot.'
     else if (score < 75) scoreComment.innerHTML = 'I\'m impressed!'
-    else scoreComment.innerHTML = 'You have transcended the mortal realm.'
+    else if (score < 100) scoreComment.innerHTML = 'You have transcended the mortal realm.'
+    else if (score < 150) scoreComment.innerHTML = 'You have surpassed the heavens.'
+    else if (score < 200) scoreComment.innerHTML = 'If you\'ve gotten this far...Why are you spending so much time on this game? Go do your PSET or something.'
+    else if (score < 250) scoreComment.innerHTML = 'How is this score even humanly impossible?'
+    else scoreComment.innerHTML = 'Either you\'re Harvey, you\'re cheating, or both.'
 
     document.getElementById('score').remove();
     document.getElementById("canvas").remove();

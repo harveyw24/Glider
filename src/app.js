@@ -99,9 +99,9 @@ sounds['whirring'] = whirring;
 sounds['damage'] = damage;
 sounds['powerup'] = powerup;
 
-
-const clock = new THREE.Clock();
-const terrainClock = new THREE.Clock();
+let frameCounter = 0;
+let lastSpeedUpdate = 0;
+let lastTerrainUpdate = 0;
 let speedLevel = 1;
 
 scene.initSky(renderer, camera);
@@ -176,9 +176,6 @@ controls.minDistance = 4;
 controls.maxDistance = 16;
 controls.update();
 
-clock.start()
-terrainClock.start()
-
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {
 
@@ -211,6 +208,7 @@ const onAnimationFrameHandler = (timeStamp) => {
     // controls.update();
     window.requestAnimationFrame(onAnimationFrameHandler);
     if (!screens["menu"] && !screens["ending"] && !screens["pause"]) {
+        frameCounter += 1;
         let chunkManager = scene.getObjectByName('chunkManager');
         chunkManager.update(timeStamp, speedLevel);
 
@@ -221,16 +219,14 @@ const onAnimationFrameHandler = (timeStamp) => {
         handlers.handleCharacterControls(scene, keypress, character, camera, speedLevel);
         handlers.updateAudioSpeed(document, sounds, scene);
 
-        let elapsed = clock.getElapsedTime();
-        if (elapsed - oldTime > 5 && speedLevel < 2) {
+        if (frameCounter - lastSpeedUpdate > 450 && speedLevel < 3) {
             speedLevel *= 1.1;
-            oldTime = elapsed;
+            lastSpeedUpdate = frameCounter;
         }
 
-        let terrainElapsed = terrainClock.getElapsedTime();
-        if (terrainElapsed - terrainOldTime > 10) {
+        if (frameCounter - lastTerrainUpdate > 500) {
             chunkManager.updateBiome(biomes[Math.floor(Math.random() * biomes.length)])
-            terrainOldTime = terrainElapsed;
+            lastTerrainUpdate = frameCounter;
         }
 
 
