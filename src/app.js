@@ -54,7 +54,7 @@ const arctic_biome = {
     exaggeration: 40,
     freq: 2,
     maxObstacleNum: 20,
-    rewardHeightMax: 200,
+    rewardHeightMax: 180,
     obstacle: "penguin",
     obstacleHeightMax: 3,
     obstacleHeightMin: 0,
