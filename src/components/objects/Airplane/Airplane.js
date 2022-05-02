@@ -102,9 +102,9 @@ class Airplane extends Group {
         }
 
         if (this.state.barrel) {
-            let sign = Math.sign(this.state.barrel)
-            this.rotation.z += 0.1 * sign
-            if (Math.abs(this.rotation.z) > Math.abs(this.state.barrel) + 2 * Math.PI - 0.1) {
+            let sign = Math.sign(this.state.barrel);
+            this.rotation.z += 0.15 * sign
+            if (Math.abs(this.rotation.z) > Math.abs(this.state.barrel) + 2 * Math.PI - 0.15) {
                 this.rotation.z = this.state.barrel;
                 this.state.barrel = 0;
             }

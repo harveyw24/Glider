@@ -156,7 +156,7 @@ class SeedScene extends Scene {
 
         if (curAzimuth < 100 || curAzimuth > 260) {
             // console.log("NIGHT");
-            this.state.azimuth += 3;
+            this.state.azimuth += 0.5;
             this.state.elevation = 0;
         }
         else if (curAzimuth < 150 || curAzimuth > 210) {
@@ -165,7 +165,7 @@ class SeedScene extends Scene {
             this.state.azimuth += 0.06 * Math.pow(weight, 4);
         } else {
             // console.log("DAY");
-            this.state.azimuth += 0.06;
+            this.state.azimuth += 0.04;
         }
         const phi = THREE.MathUtils.degToRad(90 - this.state.elevation);
         const theta = THREE.MathUtils.degToRad(this.state.azimuth);
