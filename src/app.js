@@ -241,13 +241,8 @@ const onAnimationFrameHandler = (timeStamp) => {
 
         if (frameCounter - lastTerrainUpdate > 500) {
             chunkManager.updateBiome(biomes[Math.floor(Math.random() * biomes.length)]);
-<<<<<<< HEAD
-=======
-            // chunkManager.updateBiome(biomes[1]);
->>>>>>> 47fefa24b8c1ce17b4ac5a50c66dabc7565a50cd
             lastTerrainUpdate = frameCounter;
         }
-
 
         if (!screens["menu"] && !screens["ending"] && !screens["pause"]) {
             score_num += 0.01;
