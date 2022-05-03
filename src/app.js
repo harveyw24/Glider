@@ -9,126 +9,57 @@
 import { WebGLRenderer, PerspectiveCamera, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SeedScene, MenuScene } from 'scenes';
-import { ChunkManager } from "objects"
 import *  as handlers from './js/handlers.js';
 import * as pages from "./js/pages.js";
 import './styles.css';
 import * as THREE from 'three';
+import * as utils from "./js/utils.js"
 
 
-const default_biome = { biome: "default" }
-const desert_biome = {
-    biome: "desert",
-    waterColor: new THREE.Color(97, 32, 13),
-    bankColor: new THREE.Color(97, 32, 13),
-    middleColor: new THREE.Color(232, 161, 90),
-    peakColor: new THREE.Color(252, 203, 78),
-    exaggeration: 10,
-    freq: 4,
-    maxObstacleNum: 10,
-    obstacle: "cactus",
-}
-const volcano_biome = {
-    biome: "volcano",
-    waterColor: new THREE.Color(100, 0, 0),
-    bankColor: new THREE.Color(0, 0, 0),
-    middleColor: new THREE.Color(0, 0, 0),
-    peakColor: new THREE.Color(242, 64, 24),
-    exaggeration: 27,
-    freq: 3,
-    maxObstacleNum: 0,
-}
-const grassland_biome = {
-    biome: "grassland",
-    waterColor: new THREE.Color(0, 127, 255),
-    bankColor: new THREE.Color(34, 139, 34),
-    middleColor: new THREE.Color(154, 205, 50),
-    peakColor: new THREE.Color(223, 255, 0),
-    exaggeration: 15,
-    freq: 1,
-    maxObstacleNum: 20,
-    obstacle: "sheep",
-}
-const arctic_biome = {
-    biome: "arctic",
-    waterColor: new THREE.Color(1, 12, 48),
-    bankColor: new THREE.Color(39, 168, 247),
-    middleColor: new THREE.Color(152, 212, 255),
-    peakColor: new THREE.Color(209, 225, 255),
-    exaggeration: 40,
-    freq: 2,
-    maxObstacleNum: 20,
-    rewardHeightMax: 180,
-    obstacle: "penguin",
-    obstacleHeightMax: 3,
-    obstacleHeightMin: 0,
-    maxRewardNum: 15,
-}
-const stone_biome = {
-    biome: "stone",
-    waterColor: new THREE.Color(5, 78, 5),
-    bankColor: new THREE.Color(54, 82, 54),
-    middleColor: new THREE.Color(223, 175, 115),
-    peakColor: new THREE.Color(55, 46, 29),
-    exaggeration: 30,
-    freq: 8,
-    octaves: 1,
-    colorWiggle: -1,
-    middleGradient: .8,
-    gamma: 5,
-    smoothPeaks: true,
-    rewardHeightMax: 50,
-    maxObstacleNum: 25,
-    obstacle: "tree",
-}
-const space_biome = {
-    biome: "space",
-    waterColor: new THREE.Color(0, 0, 0),
-    bankColor: new THREE.Color(0, 0, 0),
-    middleColor: new THREE.Color(0, 0, 0),
-    peakColor: new THREE.Color(0, 0, 0),
-    exaggeration: 0,
-    toSpace: true,
-    maxObstacleNum: 0,
-    rewardHeightMax: 15,
-}
 
-const biomes = [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
-// const biomes = [default_biome, arctic_biome];
-
-
-// Initialize core ThreeJS components
+/************************THREEJS + SCENES *****************************/
+// game scene
 let scene = new SeedScene();
 const camera = new PerspectiveCamera();
 const renderer = new WebGLRenderer({ powerPreference: "high-performance", antialias: true });
-const listener = new THREE.AudioListener();
+scene.initSky(renderer, camera);
+camera.position.set(0, 2, 20);
+camera.lookAt(new Vector3(0, 0, 0));
 
+// Set up renderer, canvas, and minor CSS adjustments
+renderer.setPixelRatio(window.devicePixelRatio);
+const canvas = renderer.domElement;
+canvas.id = 'canvas';
+canvas.style.display = 'block'; // Removes padding below canvas
+document.body.style.margin = 0; // Removes margin around page
+document.body.style.overflow = 'hidden'; // Fix scrolling
+
+//menu scene
 let menuScene = new MenuScene();
 const menuCamera = new PerspectiveCamera();
 const menuRenderer = new WebGLRenderer({ antialias: true });
+menuScene.initSky(menuRenderer, camera);
+menuCamera.position.set(-0.5, 0.5, -3)
+menuCamera.lookAt(new Vector3(-2, 0.5, 0))
 
+menuRenderer.setPixelRatio(window.devicePixelRatio);
+const menuCanvas = menuRenderer.domElement;
+menuCanvas.id = 'menuCanvas';
+menuCanvas.style.display = 'block'; // Removes padding below canvas
 
+const biomes = utils.generateBiomes();
+/****************************AUDIO*************************************/
+const listener = new THREE.AudioListener();
 camera.add(listener);
 const sounds = [];
-// const menu = new THREE.Audio(listener);
 const whirring = new THREE.Audio(listener);
 const damage = new THREE.Audio(listener);
 const powerup = new THREE.Audio(listener);
 const explosion = new THREE.Audio(listener);
-//  sounds['menu'] = menu;
 sounds['whirring'] = whirring;
 sounds['damage'] = damage;
 sounds['powerup'] = powerup;
 sounds['explosion'] = explosion;
-
-let frameCounter = 0;
-let lastSpeedUpdate = 0;
-let lastTerrainUpdate = 0;
-let speedLevel = 1;
-const spaceScore = 300;
-
-scene.initSky(renderer, camera);
-menuScene.initSky(menuRenderer, camera);
 
 const audioLoader = new THREE.AudioLoader();
 audioLoader.load('https://raw.githubusercontent.com/harveyw24/Glider/main/src/sounds/explosion.wav', function(buffer) {
@@ -159,56 +90,22 @@ audioLoader.load('https://raw.githubusercontent.com/harveyw24/Glider/main/src/so
     powerup.setLoop(false);
     powerup.setVolume(0.6);
 });
-
-// Initialize global variables
+/**************************OTHER GLOBAL VARIABLES**********************/
+let frameCounter = 0;
+let lastSpeedUpdate = 0;
+let lastTerrainUpdate = 0;
+let speedLevel = 1;
+const spaceScore = 300;
 const keypress = {};
 const screens = { "menu": true, "ending": false, "pause": false };
 const character = 'plane';
 let score;
 let score_num = 0;
 
-// Set up camera
-camera.position.set(0, 2, 20);
-camera.lookAt(new Vector3(0, 0, 0));
-
-menuCamera.position.set(-0.5, 0.5, -3)
-menuCamera.lookAt(new Vector3(-2, 0.5, 0))
-
-// Set up renderer, canvas, and minor CSS adjustments
-renderer.setPixelRatio(window.devicePixelRatio);
-const canvas = renderer.domElement;
-canvas.id = 'canvas';
-canvas.style.display = 'block'; // Removes padding below canvas
-document.body.style.margin = 0; // Removes margin around page
-document.body.style.overflow = 'hidden'; // Fix scrolling
-
-// menu scene
-menuRenderer.setPixelRatio(window.devicePixelRatio);
-const menuCanvas = menuRenderer.domElement;
-menuCanvas.id = 'menuCanvas';
-menuCanvas.style.display = 'block'; // Removes padding below canvas
-
-
-// Set up controls
-const controls = new OrbitControls(camera, canvas);
-controls.enableDamping = true;
-controls.enablePan = false;
-controls.minDistance = 4;
-controls.maxDistance = 16;
-controls.update();
-
+/**************************RENDER LOOP*********************************/
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {
-
-
-    // ***DEBUGGING***
-    // let plane = scene.getObjectByName(character);
-    // plane.visible = false;
-    // let chunkManager = scene.getObjectByName('chunkManager');
-    // chunkManager.position.set(0, 0, 0);
-
-
-
+    // reset the game on menu screen
     if (screens['menu']) {
         menuRenderer.render(menuScene, menuCamera)
         let plane = scene.getObjectByName(character);
@@ -229,8 +126,8 @@ const onAnimationFrameHandler = (timeStamp) => {
 
         score_num = 0;
     }
-    // controls.update();
     window.requestAnimationFrame(onAnimationFrameHandler);
+    // if on game screen and not paused
     if (!screens["menu"] && !screens["ending"] && !screens["pause"]) {
         frameCounter += 1;
         let chunkManager = scene.getObjectByName('chunkManager');
@@ -326,25 +223,11 @@ const windowResizeHandler = () => {
 windowResizeHandler();
 window.addEventListener('resize', windowResizeHandler, false);
 
-// Listen for user input (arrow keys)
 /**************************EVENT LISTENERS*****************************/
 window.addEventListener('keydown', event => handlers.handleKeyDown(event, keypress), false);
 window.addEventListener('keyup', event => handlers.handleKeyUp(event, keypress), false);
 window.addEventListener('keydown', event => handlers.handleScreens(event, screens, document, canvas, character, scene, menuCanvas, sounds, score));
 
-/**********************************************************************/
-let titleFont = document.createElement('link');
-titleFont.id = 'titleFont'
-titleFont.rel = "stylesheet";
-titleFont.href = "https://fonts.googleapis.com/css?family=Audiowide";
-document.head.appendChild(titleFont)
-
-let font = document.createElement('link');
-font.id = 'font'
-font.rel = "stylesheet";
-font.href = "https://fonts.googleapis.com/css?family=Radio+Canada";
-document.head.appendChild(font)
-
-
-// document.body.appendChild(canvas);
+/****************************INIT HTML*********************************/
+pages.init_fonts(document);
 pages.init_page(document, menuCanvas);
