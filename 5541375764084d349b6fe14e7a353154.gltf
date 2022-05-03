@@ -10315,15 +10315,15 @@
   "buffers": [
     {
       "byteLength": 595840,
-      "uri": "src/components/objects/Airplane/scene.bin"
+      "uri": "./src/components/objects/Airplane/scene.bin"
     }
   ],
   "images": [
     {
-      "uri": "src/components/objects/Airplane/textures/pasted__lambert2_baseColor.jpeg"
+      "uri": "./src/components/objects/Airplane/textures/pasted__lambert2_baseColor.jpeg"
     },
     {
-      "uri": "src/components/objects/Airplane/textures/Blur_effect_baseColor.png"
+      "uri": "./src/components/objects/Airplane/textures/Blur_effect_baseColor.png"
     }
   ],
   "materials": [
