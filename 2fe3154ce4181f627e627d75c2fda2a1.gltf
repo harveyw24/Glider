@@ -10315,15 +10315,15 @@
   "buffers": [
     {
       "byteLength": 595840,
-      "uri": "scene.bin"
+      "uri": "https://raw.githubusercontent.com/harveyw24/Glider/main/src/components/objects/Airplane/scene.bin"
     }
   ],
   "images": [
     {
-      "uri": "textures/pasted__lambert2_baseColor.jpeg"
+      "uri": "https://raw.githubusercontent.com/harveyw24/Glider/main/src/components/objects/Airplane/textures/pasted__lambert2_baseColor.jpeg"
     },
     {
-      "uri": "textures/Blur_effect_baseColor.png"
+      "uri": "https://raw.githubusercontent.com/harveyw24/Glider/main/src/components/objects/Airplane/textures/Blur_effect_baseColor.png"
     }
   ],
   "materials": [
