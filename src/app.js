@@ -7,7 +7,6 @@
  *
 */
 import { WebGLRenderer, PerspectiveCamera, Vector3 } from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { SeedScene, MenuScene } from 'scenes';
 import *  as handlers from './js/handlers.js';
 import * as pages from "./js/pages.js";
@@ -158,7 +157,7 @@ const onAnimationFrameHandler = (timeStamp) => {
 
 
         if (score > spaceScore && !chunkManager.state.toSpace) {
-            chunkManager.updateBiome(space_biome);
+            chunkManager.updateBiome(utils.space_biome);
             pages.space(document)
         }
         if (chunkManager.state.toSpace) {

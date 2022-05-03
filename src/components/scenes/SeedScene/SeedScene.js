@@ -1,10 +1,8 @@
 import * as Dat from 'dat.gui';
 import { Scene, Color } from 'three';
-import { Flower, Land, Kite, Falcon, Paper, Terrain, Airplane, ChunkManager, Turbine, Tree, Penguin } from '../../objects';
+import { Airplane, ChunkManager } from '../../objects';
 import { BasicLights } from 'lights';
 import * as THREE from 'three'
-import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js'
-import * as utils from "../../../js/utils.js"
 import { Sky } from '../../objects/index.js';
 
 class SeedScene extends Scene {
@@ -28,7 +26,6 @@ class SeedScene extends Scene {
 
         // Add fog
         this.fog = new THREE.FogExp2(this.fogColor, 0.0015);
-        // this.fog =  new THREE.Fog(0xADD8E6, 10, 1500);
 
         // Add meshes to scene
         const airplane = new Airplane(this)
@@ -45,13 +42,6 @@ class SeedScene extends Scene {
         this.sun = new THREE.Vector3();
 
         this.add(this.lights, this.sky, airplane, chunkManager);
-        // this.add(this.hemiLight, this.dirLight, this.sky, airplane, chunkManager);
-
-        // player hitbox visualization
-        // let geo = new THREE.SphereGeometry(.1, 7, 8);
-        // let material = new THREE.MeshBasicMaterial({ color: 0x000000 });
-        // let mesh = new THREE.Mesh(geo, material);
-        // this.add(mesh);
 
         // Populate GUI
         this.state.gui.add(this.state, 'rotationSpeed', -5, 5);
@@ -111,9 +101,7 @@ class SeedScene extends Scene {
     }
 
     update(timeStamp) {
-        // this.spotLight.position.z += 3;
         const { rotationSpeed, updateList } = this.state;
-        // this.rotation.y = (rotationSpeed * timeStamp) / 10000;
 
         let skyUniforms = this.sky.material.uniforms;
 
@@ -132,16 +120,13 @@ class SeedScene extends Scene {
         this.state.elevation = Math.min(6, Math.max(0, this.state.elevation + Math.sign(delta) * Math.pow(Math.abs(delta), 0.2) / 180));
 
         if (curAzimuth < 100 || curAzimuth > 260) {
-            // console.log("NIGHT");
             this.state.azimuth += 0.5;
             this.state.elevation = 0;
         }
         else if (curAzimuth < 150 || curAzimuth > 210) {
-            // console.log("SUN SETTING/RISING");
             let weight = Math.abs(180 - curAzimuth) / 30;
             this.state.azimuth += 0.06 * Math.pow(weight, 4);
         } else {
-            // console.log("DAY");
             this.state.azimuth += 0.04;
         }
         const phi = THREE.MathUtils.degToRad(90 - this.state.elevation);

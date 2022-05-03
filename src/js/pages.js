@@ -80,6 +80,8 @@ export function space(document) {
 
 // render game screen
 export function start(document, canvas) {
+    document.getElementById('footer').remove();
+
     document.getElementById("menu").remove();
     document.getElementById('menuCanvas').remove()
     document.body.appendChild(canvas);

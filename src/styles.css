@@ -70,10 +70,16 @@ hr {
     bottom: 0px;
     height: 50px;
     width: 100%;
-    background: white;
-    color: rgb(255, 122, 60);
+    color: white;
+    font-size: 0.75rem;
     padding-left: 50px;
     z-index: 2;
+}
+
+a:-webkit-any-link {
+    color: white;
+    cursor: pointer;
+    text-decoration: underline;
 }
 
 #score{

@@ -91,3 +91,15 @@ export function generateBiomes() {
     }
     return [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
 }
+
+export const space_biome = {
+    biome: "space",
+    waterColor: new THREE.Color(0, 0, 0),
+    bankColor: new THREE.Color(0, 0, 0),
+    middleColor: new THREE.Color(0, 0, 0),
+    peakColor: new THREE.Color(0, 0, 0),
+    exaggeration: 0,
+    toSpace: true,
+    maxObstacleNum: 0,
+    rewardHeightMax: 15,
+}
