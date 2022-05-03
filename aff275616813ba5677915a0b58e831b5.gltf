@@ -91,12 +91,12 @@
   "buffers": [
     {
       "byteLength": 8428,
-      "uri": "https://raw.githubusercontent.com/harveyw/426project/main/src/components/objects/Tree/scene.bin"
+      "uri": "scene.bin"
     }
   ],
   "images": [
     {
-      "uri": "src/components/objects/Tree/textures/initialShadingGroup_baseColor.png"
+      "uri": "textures/initialShadingGroup_baseColor.png"
     }
   ],
   "materials": [

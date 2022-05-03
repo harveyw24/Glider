@@ -117,15 +117,15 @@
   "buffers": [
     {
       "byteLength": 161136,
-      "uri": "src/components/objects/Cactus/scene.bin"
+      "uri": "scene.bin"
     }
   ],
   "images": [
     {
-      "uri": "src/components/objects/Cactus/textures/lambert1_baseColor.png"
+      "uri": "textures/lambert1_baseColor.png"
     },
     {
-      "uri": "src/components/objects/Cactus/textures/lambert1_normal.png"
+      "uri": "textures/lambert1_normal.png"
     }
   ],
   "materials": [
