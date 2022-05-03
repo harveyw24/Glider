@@ -96,7 +96,7 @@
   ],
   "images": [
     {
-      "uri": "textures/initialShadingGroup_baseColor.png"
+      "uri": "https://raw.githubusercontent.com/harveyw24/Glider/main/src/components/objects/Tree/textures/initialShadingGroup_baseColor.png"
     }
   ],
   "materials": [
