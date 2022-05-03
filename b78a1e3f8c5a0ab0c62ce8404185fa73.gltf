@@ -259,12 +259,12 @@
   "buffers": [
     {
       "byteLength": 67336,
-      "uri": "src/components/objects/Sheep/scene.bin"
+      "uri": "scene.bin"
     }
   ],
   "images": [
     {
-      "uri": "src/components/objects/Sheep/textures/material_baseColor.png"
+      "uri": "textures/material_baseColor.png"
     }
   ],
   "materials": [
