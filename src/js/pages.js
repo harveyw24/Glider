@@ -22,7 +22,7 @@ export function init_page(document, menuCanvas) {
     document.body.appendChild(footer)
 
     let audio = document.createElement('audio');
-    audio.setAttribute('src', 'src/sounds/menu.wav');
+    audio.setAttribute('src', 'https://raw.githubusercontent.com/harveyw24/Glider/main/src/sounds/menu.wav');
     audio.id = 'audio';
     audio.loop = true;
     document.body.appendChild(audio)

@@ -1,7 +1,7 @@
 {
   "name": "glider",
   "repository": "Glider",
-  "homepage": "http://harveyw24.github.io/Glider",
+  "homepage": ".",
   "version": "0.1.0",
   "title": "Glider",
   "description": "Stay afloat and try not to hit the ground in this infinite gliding game!",

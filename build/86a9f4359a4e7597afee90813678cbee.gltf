@@ -1523,7 +1523,7 @@
   "buffers": [
     {
       "byteLength": 88712,
-      "uri": "src/components/objects/Penguin/scene.bin"
+      "uri": "scene.bin"
     }
   ],
   "materials": [

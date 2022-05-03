@@ -131,30 +131,30 @@ scene.initSky(renderer, camera);
 menuScene.initSky(menuRenderer, camera);
 
 const audioLoader = new THREE.AudioLoader();
-audioLoader.load('src/sounds/explosion.wav', function(buffer) {
+audioLoader.load('https://raw.githubusercontent.com/harveyw24/Glider/main/src/sounds/explosion.wav', function(buffer) {
     explosion.setBuffer(buffer);
     explosion.setLoop(false);
     explosion.setVolume(0.3);
 });
 
-audioLoader.load('src/sounds/whirring.wav', function(buffer) {
+audioLoader.load('https://raw.githubusercontent.com/harveyw24/Glider/main/src/sounds/whirring.wav', function(buffer) {
     whirring.setBuffer(buffer);
     whirring.setLoop(true);
     whirring.setVolume(0.4);
 });
 
-audioLoader.load('src/sounds/whirring.wav', function(buffer) {
+audioLoader.load('https://raw.githubusercontent.com/harveyw24/Glider/main/src/sounds/whirring.wav', function(buffer) {
     whirring.setBuffer(buffer);
     whirring.setLoop(true);
     whirring.setVolume(0.4);
 });
 
-audioLoader.load('src/sounds/damage.wav', function(buffer) {
+audioLoader.load('https://raw.githubusercontent.com/harveyw24/Glider/main/src/sounds/damage.wav', function(buffer) {
     damage.setBuffer(buffer);
     damage.setLoop(false);
     damage.setVolume(0.6);
 });
-audioLoader.load('src/sounds/powerup.wav', function(buffer) {
+audioLoader.load('https://raw.githubusercontent.com/harveyw24/Glider/main/src/sounds/powerup.wav', function(buffer) {
     powerup.setBuffer(buffer);
     powerup.setLoop(false);
     powerup.setVolume(0.6);
