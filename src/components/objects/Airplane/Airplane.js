@@ -20,7 +20,9 @@ class Airplane extends Group {
             reward: null,
             rewardTime: null,
             barrel: null,
-            speed: 1000
+            barrelSign: null,
+            speed: 1000,
+            direction: null
         };
 
         this.name = 'plane';
@@ -64,6 +66,7 @@ class Airplane extends Group {
     }
 
     update(timeStamp) {
+        console.log(this.direction)
         if (this.state.prevTimeStamp === null) {
             this.state.prevTimeStamp = timeStamp;
         }
@@ -98,12 +101,12 @@ class Airplane extends Group {
             this.state.reward = false
             if (Math.abs(this.rotation.z) > 0.07 && !this.state.barrel) {
                 this.state.barrel = this.rotation.z;
+                this.state.barrelSign = this.direction;
             }
         }
 
         if (this.state.barrel) {
-            let sign = Math.sign(this.state.barrel);
-            this.rotation.z += 0.2 * sign
+            this.rotation.z += 0.3 * this.state.barrelSign;
             if (Math.abs(this.rotation.z) > Math.abs(this.state.barrel) + 2 * Math.PI - 0.2) {
                 this.rotation.z = this.state.barrel;
                 this.state.barrel = 0;
