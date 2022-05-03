@@ -8,7 +8,7 @@ import { Cloud } from '../Cloud';
 
 
 const obstaclesLength = 25; // maximum number of obstacles supported per chunk
-const rewardsLength = 20; // maximum number of obstacles supported per chunk
+const rewardsLength = 15; // maximum number of obstacles supported per chunk
 
 function random(min, max) { return Math.random() * (max - min) + min; }
 
@@ -287,9 +287,12 @@ class Chunk extends Group {
                 }
 
                 this.rewards[rewardIndex].position.set(pos.x, random(pos.y, this.CMState.rewardHeightMax + this.CMState.groundY), pos.z);
-                // this.rewards[rewardIndex].position.set(0, -50, pos.z);
+                // this.rewards[rewardIndex].position.set(-500, 0, pos.z);
             }
         }
+
+        this.hideRewards();
+        this.hideObstacles();
     }
 
 
@@ -376,7 +379,6 @@ class Chunk extends Group {
 
     updateNoise(CMState) {
         if (CMState !== undefined) {
-            console.log("using obstacle: ", CMState.obstacle);
             if (this.CMState.obstacle !== CMState.obstacle) {
                 for (const obstacle of this.obstacles) obstacle.setObstacle(CMState.obstacle);
             }
@@ -385,6 +387,9 @@ class Chunk extends Group {
         if (this.CMState.maxObstacleNum > obstaclesLength) {
             console.log("Provided maxObstacleNum (" + this.CMState.maxObstacleNum + ") is too large! Max is " + obstaclesLength);
             this.CMState.maxObstacleNum = obstaclesLength;
+            console.log("Provided maxRewardNum (" + this.CMState.maxRewardNum + ") is too large! Max is " + rewardsLength);
+        } else if (this.CMState.maxRewardNum > rewardsLength) {
+            this.CMState.maxRewardNum = rewardsLength;
         }
         this.updateHeightMap();
         this.updateTerrainGeo();

@@ -16,8 +16,9 @@ import './styles.css';
 import * as THREE from 'three';
 
 
-const default_biome = {}
+const default_biome = { biome: "default" }
 const desert_biome = {
+    biome: "desert",
     waterColor: new THREE.Color(97, 32, 13),
     bankColor: new THREE.Color(97, 32, 13),
     middleColor: new THREE.Color(232, 161, 90),
@@ -28,6 +29,7 @@ const desert_biome = {
     obstacle: "cactus",
 }
 const volcano_biome = {
+    biome: "volcano",
     waterColor: new THREE.Color(100, 0, 0),
     bankColor: new THREE.Color(0, 0, 0),
     middleColor: new THREE.Color(0, 0, 0),
@@ -37,6 +39,7 @@ const volcano_biome = {
     maxObstacleNum: 0,
 }
 const grassland_biome = {
+    biome: "grassland",
     waterColor: new THREE.Color(0, 127, 255),
     bankColor: new THREE.Color(34, 139, 34),
     middleColor: new THREE.Color(154, 205, 50),
@@ -47,6 +50,7 @@ const grassland_biome = {
     obstacle: "sheep",
 }
 const arctic_biome = {
+    biome: "arctic",
     waterColor: new THREE.Color(1, 12, 48),
     bankColor: new THREE.Color(39, 168, 247),
     middleColor: new THREE.Color(152, 212, 255),
@@ -61,6 +65,7 @@ const arctic_biome = {
     maxRewardNum: 15,
 }
 const stone_biome = {
+    biome: "stone",
     waterColor: new THREE.Color(5, 78, 5),
     bankColor: new THREE.Color(54, 82, 54),
     middleColor: new THREE.Color(223, 175, 115),
@@ -72,11 +77,12 @@ const stone_biome = {
     middleGradient: .8,
     gamma: 5,
     smoothPeaks: true,
-    rewardHeightMax: 40,
+    rewardHeightMax: 50,
     maxObstacleNum: 25,
     obstacle: "tree",
 }
 const space_biome = {
+    biome: "space",
     waterColor: new THREE.Color(0, 0, 0),
     bankColor: new THREE.Color(0, 0, 0),
     middleColor: new THREE.Color(0, 0, 0),
@@ -84,6 +90,7 @@ const space_biome = {
     exaggeration: 0,
     toSpace: true,
     maxObstacleNum: 0,
+    rewardHeightMax: 15,
 }
 
 const biomes = [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
@@ -118,6 +125,7 @@ let frameCounter = 0;
 let lastSpeedUpdate = 0;
 let lastTerrainUpdate = 0;
 let speedLevel = 1;
+const spaceScore = 300;
 
 scene.initSky(renderer, camera);
 menuScene.initSky(menuRenderer, camera);
@@ -158,8 +166,6 @@ const screens = { "menu": true, "ending": false, "pause": false };
 const character = 'plane';
 let score;
 let score_num = 0;
-let oldTime = 0;
-let terrainOldTime = 0;
 
 // Set up camera
 camera.position.set(0, 2, 20);
@@ -215,8 +221,11 @@ const onAnimationFrameHandler = (timeStamp) => {
         plane.state.hit = false;
         speedLevel = 1;
         chunkManager.position.y = 0;
+        chunkManager.state.toSpace = false;
+        chunkManager.state.spaceRewardHeight = 0;
         chunkManager.state.falling = 0;
         chunkManager.state.climbing = 0;
+        if (chunkManager.state.biome != "default") chunkManager.resetBiome();
 
         score_num = 0;
     }
@@ -239,7 +248,7 @@ const onAnimationFrameHandler = (timeStamp) => {
             lastSpeedUpdate = frameCounter;
         }
 
-        if (frameCounter - lastTerrainUpdate > 500) {
+        if (frameCounter - lastTerrainUpdate > 500 && !chunkManager.state.toSpace) {
             chunkManager.updateBiome(biomes[Math.floor(Math.random() * biomes.length)]);
             lastTerrainUpdate = frameCounter;
         }
@@ -249,16 +258,55 @@ const onAnimationFrameHandler = (timeStamp) => {
             score = score_num.toFixed(2);
             handlers.updateScore(document, score)
         }
-        // console.log(score)
 
-        // let land = scene.getObjectByName('land');
-        // let boxHelper = new THREE.BoxHelper( land, 0xffffff );
-        // scene.add(boxHelper);
 
-        // let plane = scene.getObjectByName('paper');
-        // let boxHelper2 = new THREE.BoxHelper( plane, 0xffffff );
-        // scene.add(boxHelper2);
-        // console.log(scene.getObjectByName('falcon').position.y-sealevel)
+        if (score > spaceScore && !chunkManager.state.toSpace) {
+            chunkManager.updateBiome(space_biome);
+            pages.space(document)
+        }
+        if (chunkManager.state.toSpace) {
+            const message = document.getElementById("message");
+            const thresholdTexts = [
+                [spaceScore + 80, "Ending song: \"interstellar railway\" by Louie Zong"],
+                [spaceScore + 70, ""],
+                [spaceScore + 60, "Congratulations."],
+                [spaceScore + 45, ""],
+                [spaceScore + 35, "You have ascended."],
+                [spaceScore + 30, "Against all odds..."],
+                [spaceScore + 25, "...and you dodged the treacherous volcanoes and survived the towering arctic icebergs."],
+                [spaceScore + 20, "...You wove through the peaks of the stone forest, persevered through the deserts..."],
+                [spaceScore + 15, "You conquered the mountains, breezed over the grasslands..."],
+            ]
+            for (const thresholdText of thresholdTexts) {
+                const threshold = thresholdText[0];
+                const text = thresholdText[1];
+                if (score > threshold) {
+                    if (message.innerHTML != text) message.innerHTML = text;
+                    break;
+                }
+            }
+            if (score > spaceScore + 10) {
+                const victorySong = document.getElementById('victory-song');
+                if (victorySong.paused) victorySong.play();
+
+            }
+            if (score > spaceScore) {
+                const audio = document.getElementById('audio');
+                if (audio.volume > 0 || sounds["powerup"] > 0) {
+                    const delta = 0.001;
+                    const fadeAudio = setInterval(function() {
+                        audio.volume = Math.max(0.0, audio.volume - delta);
+                        sounds["powerup"].setVolume(Math.max(0.0, sounds["powerup"].getVolume() - delta))
+                        if (audio.volume == 0.0 && sounds["powerup"].getVolume() == 0.0) clearInterval(fadeAudio);
+                    }, 200);
+                }
+                else {
+                    audio.pause();
+                    sounds["powerup"].pause();
+                    sounds['whirring'].setVolume(0.4);
+                }
+            }
+        }
 
     }
 };

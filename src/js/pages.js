@@ -3,6 +3,7 @@ import FOOTER from "../footer.html"
 import END from "../ending.html"
 import INSTRUCTIONS from "../instructions.html";
 import PAUSE from "../pause.html"
+import MESSAGE from "../message.html"
 
 
 // idea from https://github.com/efyang/portal-0.5/blob/main/src/app.js
@@ -21,8 +22,8 @@ export function init_page(document, menuCanvas) {
     document.body.appendChild(footer)
 
     let audio = document.createElement('audio');
-    audio.setAttribute('src','src/sounds/menu.wav');
-    audio.id = 'audio'
+    audio.setAttribute('src', 'src/sounds/menu.wav');
+    audio.id = 'audio';
     audio.loop = true;
     document.body.appendChild(audio)
 }
@@ -36,7 +37,7 @@ export function quit(document, score) {
     finalScore.innerHTML = 'Score: '.concat(score);
 
     let scoreComment = document.getElementById('scoreComment');
-    if (score <5) scoreComment.innerHTML = 'Were you even trying?'
+    if (score < 5) scoreComment.innerHTML = 'Were you even trying?'
     else if (score < 15) scoreComment.innerHTML = 'You could do better.'
     else if (score < 30) scoreComment.innerHTML = 'Not too shabby.'
     else if (score < 45) scoreComment.innerHTML = 'Maybe you have potential after all.'
@@ -52,6 +53,25 @@ export function quit(document, score) {
     document.getElementById("canvas").remove();
     document.getElementById('instructions').remove();
     document.getElementById('pause').remove();
+
+    const space = document.getElementById('space');
+    if (space) {
+        space.remove();
+        document.getElementById('victory-song').remove();
+    }
+}
+
+export function space(document) {
+    let space = document.createElement('div');
+    space.id = 'space';
+    space.innerHTML = MESSAGE;
+    document.body.appendChild(space);
+
+    let victorySong = document.createElement('audio');
+    victorySong.setAttribute('src', 'src/sounds/interstellar-railway.wav');
+    victorySong.id = 'victory-song';
+    victorySong.loop = true;
+    document.body.appendChild(victorySong);
 }
 
 export function start(document, canvas) {

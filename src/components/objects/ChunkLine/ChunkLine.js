@@ -53,8 +53,6 @@ class ChunkLine extends Group {
         );
         if (this.state.chunkManager.state !== this.chunks[0].CMState) this.chunks[0].updateNoise(this.state.chunkManager.state);
         else this.chunks[0].updateNoise();
-        this.chunks[0].hideObstacles();
-        this.chunks[0].hideRewards();
         this.chunks.push(this.chunks.shift());
     }
 

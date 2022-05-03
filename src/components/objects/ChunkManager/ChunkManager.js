@@ -11,6 +11,7 @@ const chunkPxWidth = 1000;
 const chunkVertexWidth = 100;
 
 const default_biome = {
+    biome: "default",
     breathOffset: 5,
     breathLength: 5,
     octaves: 3,
@@ -26,7 +27,7 @@ const default_biome = {
     freq: 4.4,
     gamma: 0, // if gamma is zero, then no gamma is applied
     smoothPeaks: false,
-    maxObstacleNum: 50,
+    maxObstacleNum: 25,
     obstacleHeightMin: 1,
     obstacleHeightMax: 50,
     maxCloudNum: 25,
@@ -76,7 +77,10 @@ class ChunkManager extends Group {
             this.add(chunk);
             this.chunkLines.push(chunk);
         }
-        for (const chunkLine of this.chunkLines) chunkLine.chunks[0].showObstacles();
+        for (const chunkLine of this.chunkLines) {
+            chunkLine.chunks[0].showObstacles();
+            chunkLine.chunks[0].showRewards();
+        }
 
 
         // parent.addToUpdateList(this);
@@ -150,7 +154,7 @@ class ChunkManager extends Group {
         // Gradual climbing
         if (this.state.climbing > 0) {
             if (this.state.climbing < 80) {
-                const offset = Math.pow(120 - this.state.climbing, 0.3) / 2;
+                const offset = speedLevel * Math.pow(120 - this.state.climbing, 0.3) / 2;
                 this.state.climbing += offset;
                 this.position.y -= offset;
             } else {
@@ -200,7 +204,6 @@ class ChunkManager extends Group {
         if (this.position.z - this.anchor.z >= this.state.chunkWidth) {
             for (const chunkLine of this.chunkLines) chunkLine.cycleChunks();
             if (this.state.toSpace) this.state.spaceRewardHeight += this.state.rewardHeightMax;
-            console.log(this.state.spaceRewardHeight);
 
             // invariant: at z-chunk change, (anchor.z + chunkwidth/2) + currentChunk.position.z = 0
             this.anchor.z = -this.chunkLines[0].chunks[0].position.z - this.state.chunkWidth / 2;
@@ -237,17 +240,23 @@ class ChunkManager extends Group {
     }
 
     resetBiome(biome) {
-        if (biome === undefined) biome = {};
+        if (biome === undefined) biome = { biome: "default" };
         this.updateBiome(biome);
         for (const chunkLine of this.chunkLines) {
             for (const chunk of chunkLine.chunks) {
                 chunk.updateNoise(this.state);
             }
+            chunkLine.chunks[0].showObstacles();
+            chunkLine.chunks[0].showRewards();
         }
     }
 
 
     updateBiome(newBiome) {
+        if (!newBiome.hasOwnProperty("biome")) {
+            console.log("Unknown biome has no 'biome' property.");
+            return;
+        }
         newBiome = { ...default_biome, ...newBiome };
         for (const [name, value] of Object.entries(newBiome)) {
             if (modifiableFields.includes(name)) this.state[name] = value;

@@ -66,7 +66,6 @@ class Airplane extends Group {
     }
 
     update(timeStamp) {
-        console.log(this.direction)
         if (this.state.prevTimeStamp === null) {
             this.state.prevTimeStamp = timeStamp;
         }
@@ -116,8 +115,8 @@ class Airplane extends Group {
             else {
                 this.state.barrel = 0;
             }
-            
-        }   
+
+        }
 
         // wobble if hit previously
         if ((timeStamp - this.state.hitTime) < 5000) {
@@ -144,7 +143,7 @@ class Airplane extends Group {
         if (this.state.mixer) {
             this.state.mixer.update(delta);
         }
-        
+
     }
 
     null() {

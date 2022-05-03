@@ -237,7 +237,6 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
         }, 3000);
         screens['ending'] = true;
         pages.quit(document, score);
-        chunkManager.resetBiome();
 
         // screens['menu'] = false;
         // screens['pause'] = false;
@@ -365,7 +364,7 @@ export function updateAudioSpeed(document, sounds, scene) {
     let target = new THREE.Vector3();
     chunkManager.getWorldPosition(target);
     let height = target.y;
-    let newPlaybackSpeed = Math.min(1, height / 400 + 1);
+    let newPlaybackSpeed = Math.max(1, height / 400 + 1);
     let audio = document.getElementById('audio');
     audio.playbackRate = newPlaybackSpeed;
 }

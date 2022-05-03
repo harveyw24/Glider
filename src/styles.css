@@ -18,6 +18,25 @@ hr {
     height: 100%;
 }
 
+#space {
+    background-color: transparent;
+    background-size: cover;
+    background-position-y: center;
+    height: 100%;
+}
+#space-end {
+    position: fixed;
+    top: 25%;
+    left: 50%;
+    text-align: center;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+#message {
+    color: white;
+    font-size: 2rem;
+}
+
 #start {
     position: fixed;
     top: 50%;

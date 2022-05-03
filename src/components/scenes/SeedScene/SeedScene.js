@@ -31,8 +31,6 @@ class SeedScene extends Scene {
         // this.fog =  new THREE.Fog(0xADD8E6, 10, 1500);
 
         // Add meshes to scene
-        // const land = new Land();
-        // const paper = new Paper(this)
         const airplane = new Airplane(this)
 
         // LIGHTING
@@ -43,32 +41,11 @@ class SeedScene extends Scene {
 
         this.sky = new Sky();
         this.sky.scale.setScalar(1000);
-        console.log(this.sky.position);
 
         this.sun = new THREE.Vector3();
 
-        // let penguin = new Penguin(this);
         this.add(this.lights, this.sky, airplane, chunkManager);
         // this.add(this.hemiLight, this.dirLight, this.sky, airplane, chunkManager);
-
-        // object hitbox testing
-        // const obj1 = new THREE.Object3D();
-        // const obj2 = new THREE.Object3D();
-        // const turbine = new Turbine(this);
-        // obj1.add(turbine);
-        // obj2.add(turbine);
-        // obj1.position.set(-10, 0, -20);
-        // obj2.position.set(10, 0, -20);
-        // this.add(obj1);
-        // this.add(obj2);
-
-        const tree = new Tree();
-        const turbine = new Turbine();
-        console.log(tree, turbine);
-        // this.add(tree);
-
-
-
 
         // player hitbox visualization
         // let geo = new THREE.SphereGeometry(.1, 7, 8);
