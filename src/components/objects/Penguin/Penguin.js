@@ -10,16 +10,17 @@ class Penguin extends Group {
         // Call parent Group() constructor
         super();
 
-
         const loader = new GLTFLoader();
 
         this.name = 'penguin';
         loader.load(MODEL, (gltf) => {
             gltf.scene.scale.multiplyScalar(2.5);
 
-            // const meshes = [];
-            // utils.findType(gltf.scene, "Mesh", meshes);
-            // meshes[0].material = new THREE.MeshLambertMaterial({ color: 0x2E6021 });
+            const meshes = [];
+            utils.findType(gltf.scene, "SkinnedMesh", meshes);
+            meshes[0].material = new THREE.MeshLambertMaterial({ color: 0x080808 });
+            meshes[1].material = new THREE.MeshLambertMaterial({ color: 0xBDBDBD });
+            meshes[2].material = new THREE.MeshLambertMaterial({ color: 0xCC5705 });
 
             const box = new THREE.Box3().setFromObject( gltf.scene, true);
             const center = box.getCenter( new THREE.Vector3() );

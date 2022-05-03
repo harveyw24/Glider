@@ -132,19 +132,7 @@ class Chunk extends Group {
     }
 
     update(timeStamp, x, y, z) {
-        // update colors, "land breathing", etc
-        /*console.log("update")
-        var offset = this.CMState.breathOffset*Math.sin(timeStamp/(this.CMState.breathLength*1000));
-        offset *= 10;
-        console.log(offset)
-        for(let i = 0; i < this.geometry.vertices.length; i++) {
-          console.log("z = " + this.geometry.vertices[i].z);
-          if(this.geometry.vertices[i] > this.CMState.waterHeight) {
-            this.geometry.vertices[i].z = this.geometry.vertices[i].z + offset;
-          }
-        } */
 
-        //console.log("TS = " + timeStamp + "(" + x + ", " + y + ", " + z + ")")
     }
 
 
@@ -188,13 +176,6 @@ class Chunk extends Group {
                 return f.color.setRGB((this.CMState.waterColor.r + Math.random() * wiggle) / 255,
                     (this.CMState.waterColor.g + Math.random() * wiggle) / 255,
                     (this.CMState.waterColor.b + Math.random() * wiggle) / 255)
-                //     geometry2.faceVertexUvs[0].push([
-                //     new THREE.Vector2(0,0),        //play with these values
-                //     new THREE.Vector2(0.5,0),
-                //     new THREE.Vector2(0.5,0.5)
-                //
-                // ]);
-                // geometry2.uvsNeedUpdate = true;
             }
             if (max - this.CMState.waterHeight > this.CMState.exaggeration * 7) return f.color.setRGB((this.CMState.peakColor.r + Math.random() * wiggle) / 255, (this.CMState.peakColor.g + Math.random() * wiggle) / 255, (this.CMState.peakColor.b + Math.random() * wiggle) / 255)
 

@@ -17,9 +17,13 @@ class Sheep extends Group {
         loader.load(MODEL, (gltf) => {
             gltf.scene.scale.multiplyScalar(10);
 
-            // const meshes = [];
-            // utils.findType(gltf.scene, "Mesh", meshes);
-            // meshes[0].material = new THREE.MeshLambertMaterial({ color: 0x2E6021 });
+            const meshes = [];
+            utils.findType(gltf.scene, "Mesh", meshes);
+            console.log(gltf.scene)
+            meshes[0].material = new THREE.MeshLambertMaterial({ color: 0x161616 });
+            meshes[1].material = new THREE.MeshLambertMaterial({ color: 0xFFB986 });
+            meshes[2].material = new THREE.MeshLambertMaterial({ color: 0xD6D6D6 });
+            meshes[3].material = new THREE.MeshLambertMaterial({ color: 0xffffff });
 
             const box = new THREE.Box3().setFromObject( gltf.scene, true);
             const center = box.getCenter( new THREE.Vector3() );
