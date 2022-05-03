@@ -106,11 +106,17 @@ class Airplane extends Group {
         }
 
         if (this.state.barrel) {
-            this.rotation.z += 0.3 * this.state.barrelSign;
-            if (Math.abs(this.rotation.z) > Math.abs(this.state.barrel) + 2 * Math.PI - 0.2) {
-                this.rotation.z = this.state.barrel;
+            if (Math.sign(this.rotation.z) == this.state.barrelSign) {
+                this.rotation.z += 0.3 * this.state.barrelSign;
+                if (Math.abs(this.rotation.z) > Math.abs(this.state.barrel) + 2 * Math.PI - 0.2) {
+                    this.rotation.z = this.state.barrel;
+                    this.state.barrel = 0;
+                }
+            }
+            else {
                 this.state.barrel = 0;
             }
+            
         }   
 
         // wobble if hit previously

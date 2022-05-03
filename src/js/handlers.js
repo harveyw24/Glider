@@ -55,6 +55,7 @@ export function handleCharacterControls(scene, keypress, character, camera, spee
         }
     }
     if (keypress['right']) {
+        plane.direction = -1
         const delta = 2 * Math.sqrt(speedLevel) * (Math.min(0.5, Math.abs(plane.rotation.z)) + 0.5);
         chunkManager.position.x -= delta;
         // plane.state.rotation = "right";
@@ -68,6 +69,7 @@ export function handleCharacterControls(scene, keypress, character, camera, spee
         // need to somehow rotate bounding box
     }
     if (keypress['left']) {
+        plane.direction = 1
         const delta = 2 * Math.sqrt(speedLevel) * (Math.min(0.5, Math.abs(plane.rotation.z)) + 0.5);
         chunkManager.position.x += delta;
         // plane.state.rotation = "left";
@@ -98,8 +100,6 @@ export function handleCharacterControls(scene, keypress, character, camera, spee
 
     // obj.position.y = clamp(obj.position.y, -h,h);
     // obj.position.x = clamp(obj.position.x, -w,w);
-
-
 
 }
 // Handle screens
