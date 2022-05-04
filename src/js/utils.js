@@ -43,7 +43,7 @@ export function generateBiomes() {
         peakColor: new THREE.Color(223, 255, 0),
         exaggeration: 15,
         freq: 1,
-        maxObstacleNum: 20,
+        maxObstacleNum: 15,
         obstacle: "sheep",
     }
     const arctic_biome = {
@@ -54,7 +54,7 @@ export function generateBiomes() {
         peakColor: new THREE.Color(209, 225, 255),
         exaggeration: 40,
         freq: 2,
-        maxObstacleNum: 20,
+        maxObstacleNum: 15,
         rewardHeightMax: 180,
         obstacle: "penguin",
         obstacleHeightMax: 3,
