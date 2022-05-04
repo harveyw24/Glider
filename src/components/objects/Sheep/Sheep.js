@@ -19,7 +19,6 @@ class Sheep extends Group {
 
             const meshes = [];
             utils.findType(gltf.scene, "Mesh", meshes);
-            console.log(gltf.scene)
             meshes[0].material = new THREE.MeshLambertMaterial({ color: 0x161616 });
             meshes[1].material = new THREE.MeshLambertMaterial({ color: 0xFFB986 });
             meshes[2].material = new THREE.MeshLambertMaterial({ color: 0xD6D6D6 });
