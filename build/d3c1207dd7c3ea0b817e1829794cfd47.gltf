@@ -117,15 +117,15 @@
   "buffers": [
     {
       "byteLength": 161136,
-      "uri": "scene.bin"
+      "uri": "https://raw.githubusercontent.com/harveyw24/Glider/main/src/components/objects/Cactus/scene.bin"
     }
   ],
   "images": [
     {
-      "uri": "textures/lambert1_baseColor.png"
+      "uri": "https://raw.githubusercontent.com/harveyw24/Glider/main/src/components/objects/Cactus/textures/lambert1_baseColor.png"
     },
     {
-      "uri": "textures/lambert1_normal.png"
+      "uri": "https://raw.githubusercontent.com/harveyw24/Glider/main/src/components/objects/Cactus/textures/lambert1_normal.png"
     }
   ],
   "materials": [

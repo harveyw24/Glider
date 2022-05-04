@@ -122,7 +122,7 @@ class ChunkManager extends Group {
         for (const chunkLine of this.chunkLines) chunkLine.updateTerrainGeo();
     }
 
-    // the key invariant to maintain here is that the plane is within the first chunk (i.e. this.chunkLines[0]);
+    // the key invariant to smaintain here is that the plane is within the first chunk (i.e. this.chunkLines[0]);
     // if the plane leaves the first chunk, then the first chunk needs to be popped and moved to the back
     update(timeStamp, speedLevel) {
         // Chunk positions are relative to terrain, so updating terrain position is sufficient

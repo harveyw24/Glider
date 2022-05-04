@@ -8,6 +8,8 @@ import MESSAGE from "../message.html"
 
 // idea from https://github.com/efyang/portal-0.5/blob/main/src/app.js
 // https://github.com/efyang/portal-0.5/blob/main/src/instructions.html
+
+// initialize menu/start screen
 export function init_page(document, menuCanvas) {
     document.body.innerHTML = '';
     document.body.appendChild(menuCanvas);
@@ -28,6 +30,8 @@ export function init_page(document, menuCanvas) {
     document.body.appendChild(audio)
 }
 
+
+// render game over screen
 export function quit(document, score) {
     let ending = document.createElement('div');
     ending.id = 'ending';
@@ -74,10 +78,14 @@ export function space(document) {
     document.body.appendChild(victorySong);
 }
 
+// render game screen
 export function start(document, canvas) {
+    document.getElementById('footer').remove();
+
     document.getElementById("menu").remove();
     document.getElementById('menuCanvas').remove()
     document.body.appendChild(canvas);
+
     let scoreCounter = document.createElement('div');
     scoreCounter.id = 'score';
     scoreCounter.classList.add('audioFont')
@@ -87,14 +95,30 @@ export function start(document, canvas) {
     reminders.innerHTML = INSTRUCTIONS;
     reminders.prepend(scoreCounter)
     document.body.appendChild(reminders)
+
     let fillScreen = document.createElement('div');
     fillScreen.id = 'fillScreen';
     fillScreen.style.pointerEvents = "none";
     document.body.appendChild(fillScreen);
+
     let pause = document.createElement('div');
     pause.id = 'pause';
     pause.style.pointerEvents = 'none';
     pause.innerHTML = PAUSE;
     pause.classList.add('invisible')
     document.body.appendChild(pause)
+}
+
+export function init_fonts(document) {
+    let titleFont = document.createElement('link');
+    titleFont.id = 'titleFont'
+    titleFont.rel = "stylesheet";
+    titleFont.href = "https://fonts.googleapis.com/css?family=Audiowide";
+    document.head.appendChild(titleFont)
+
+    let font = document.createElement('link');
+    font.id = 'font'
+    font.rel = "stylesheet";
+    font.href = "https://fonts.googleapis.com/css?family=Radio+Canada";
+    document.head.appendChild(font)
 }

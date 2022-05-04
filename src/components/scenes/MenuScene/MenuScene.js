@@ -1,10 +1,8 @@
 import * as Dat from 'dat.gui';
-import { Scene, Color } from 'three';
-import { Flower, Land, Kite, Falcon, Paper, Terrain, Airplane, ChunkManager, Turbine} from '../../objects';
+import { Scene } from 'three';
+import { Airplane} from '../../objects';
 import { BasicLights } from 'lights';
 import * as THREE from 'three'
-import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js'
-import * as utils from "../../../js/utils.js"
 import { Sky } from '../../objects/index.js';
 
 class MenuScene extends Scene {
@@ -21,7 +19,6 @@ class MenuScene extends Scene {
 
         // Add fog
         this.fog = new THREE.FogExp2(0xd19264, 0.0015);
-        // this.fog =  new THREE.Fog(0xADD8E6, 10, 1500);
 
         const airplane = new Airplane(this)
         this.sky = new Sky();
@@ -46,8 +43,6 @@ class MenuScene extends Scene {
     }
 
     initSky(renderer, camera) {
-        // GUI
-
         const effectController = {
             turbidity: 10,
             rayleigh: 3,
@@ -63,7 +58,6 @@ class MenuScene extends Scene {
         let scene = this
 
         function guiChanged() {
-
             const uniforms = sky.material.uniforms;
             uniforms['turbidity'].value = effectController.turbidity;
             uniforms['rayleigh'].value = effectController.rayleigh;
@@ -79,7 +73,6 @@ class MenuScene extends Scene {
 
             renderer.toneMappingExposure = effectController.exposure;
             renderer.render(scene, camera);
-
         }
 
         this.state.gui.add(effectController, 'turbidity', 0.0, 20.0, 0.1).onChange(guiChanged);
@@ -98,10 +91,7 @@ class MenuScene extends Scene {
     }
 
     update(timeStamp) {
-        // this.spotLight.position.z += 3;
         const { rotationSpeed, updateList } = this.state;
-        // this.rotation.y = (rotationSpeed * timeStamp) / 10000;
-
         // Call update for each object in the updateList
         for (const obj of updateList) {
             obj.update(timeStamp);
