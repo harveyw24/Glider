@@ -1,8 +1,6 @@
 import * as THREE from 'three'
-import { Group, Color, PlaneBufferGeometry, PlaneGeometry, NoToneMapping } from 'three';
+import { Group, Color } from 'three';
 import { ChunkLine } from '../ChunkLine';
-import { Turbine } from '../Turbine';
-import { Obstacle } from '../Obstacle';
 
 
 // SET THESE TO CHANGE CHUNK DIMENSIONS
@@ -10,6 +8,7 @@ const groundY = -200;
 const chunkPxWidth = 1000;
 const chunkVertexWidth = 100;
 
+// Default values for biome conditions
 const default_biome = {
     biome: "default",
     breathOffset: 5,
@@ -70,7 +69,6 @@ class ChunkManager extends Group {
             [this.state.chunkWidth / 2, 0, 0],
         ];
 
-
         this.chunkLines = [];
         for (let i = 0; i < coordinates.length; i++) {
             const chunk = new ChunkLine(this, coordinates[i][0], coordinates[i][1], coordinates[i][2]);
@@ -81,9 +79,6 @@ class ChunkManager extends Group {
             chunkLine.chunks[0].showObstacles();
             chunkLine.chunks[0].showRewards();
         }
-
-
-        // parent.addToUpdateList(this);
 
         // Populate GUI
         const folder1 = this.state.gui.addFolder('BREATH');
@@ -122,7 +117,7 @@ class ChunkManager extends Group {
         for (const chunkLine of this.chunkLines) chunkLine.updateTerrainGeo();
     }
 
-    // the key invariant to smaintain here is that the plane is within the first chunk (i.e. this.chunkLines[0]);
+    // the key invariant to maintain here is that the plane is within the first chunk (i.e. this.chunkLines[0]);
     // if the plane leaves the first chunk, then the first chunk needs to be popped and moved to the back
     update(timeStamp, speedLevel) {
         // Chunk positions are relative to terrain, so updating terrain position is sufficient
@@ -161,8 +156,6 @@ class ChunkManager extends Group {
                 this.state.climbing = 0;
             }
         }
-
-
 
         // show/hide obstacles as they enter the range of the player
         for (const chunkLine of this.chunkLines) {
@@ -263,8 +256,6 @@ class ChunkManager extends Group {
             else console.log("Attempting to change field " + name + ", which is unmodifiable/not a field.");
         }
     }
-
-
 
     getCurrentRewards() {
         return this.chunkLines.map(chunkLine => chunkLine.chunks[0].rewards[chunkLine.chunks[0].currentRewardIndex]);

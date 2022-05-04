@@ -21,12 +21,9 @@ class ChunkLine extends Group {
         this.CMState = this.state.chunkManager.state;
         this.setChunkLinePosition(xOffset, yOffset, zOffset);
 
-
-
         const coordinates = [
             [0, 0, -.5 * this.CMState.chunkWidth],
-            [0, 0, -1.5 * this.CMState.chunkWidth],
-            // [0, 0, -2.5 * this.CMState.chunkWidth],
+            [0, 0, -1.5 * this.CMState.chunkWidth]
         ];
         this.chunks = [];
         for (let i = 0; i < coordinates.length; i++) {
@@ -34,9 +31,6 @@ class ChunkLine extends Group {
             this.add(new_chunk);
             this.chunks.push(new_chunk);
         }
-
-
-
     }
 
     setChunkLinePosition(x, y, z) {
@@ -56,18 +50,13 @@ class ChunkLine extends Group {
         this.chunks.push(this.chunks.shift());
     }
 
-
-
     updateNoise() {
-        // CMState is not snapshotted in chunkLine!
-        // if (CMState !== undefined) this.CMState = CMState;
         for (const chunk of this.chunks) chunk.updateNoise(); // CMState update should NOT propagate to chunks
     }
 
     updateTerrainGeo() {
         for (const chunk of this.chunks) chunk.updateTerrainGeo();
     }
-
 
 }
 

@@ -1,4 +1,4 @@
-import { Group, Color, PlaneBufferGeometry, VertexColors, PlaneGeometry, MeshStandardMaterial, MeshLambertMaterial, Mesh, Vector2 } from 'three';
+import { Group, VertexColors, PlaneGeometry, MeshLambertMaterial, Mesh } from 'three';
 import * as THREE from 'three';
 import SimplexNoise from 'simplex-noise';
 //import { Water } from 'three/examples/js/objects/Water.js';
@@ -12,12 +12,10 @@ const rewardsLength = 15; // maximum number of obstacles supported per chunk
 
 function random(min, max) { return Math.random() * (max - min) + min; }
 
-
 // smoothly transition from 0 to 1.0 as x goes from -infty to +infty
 function transition(x, rate) {
     return 1 / (1 + Math.exp(-x * rate));
 }
-
 
 function sinStep(x, transitionRange, width) {
     if (x < transitionRange) {
@@ -28,22 +26,6 @@ function sinStep(x, transitionRange, width) {
         return 1;
     }
 }
-
-function zeroBoxStep(x, y, transitionRange, width) {
-    let result = 1;
-    if (x < transitionRange) {
-        result *= (Math.sin((x - transitionRange / 2) / transitionRange * Math.PI) + 1) / 2;
-    } else if (x > width - transitionRange) {
-        result *= (-Math.sin((width - x + transitionRange / 2) / transitionRange * Math.PI) + 1) / 2;
-    }
-    if (y < transitionRange) {
-        result *= (Math.sin((y - transitionRange / 2) / transitionRange * Math.PI) + 1) / 2;
-    } else if (y > width - transitionRange) {
-        result *= (-Math.sin((width - y + transitionRange / 2) / transitionRange * Math.PI) + 1) / 2;
-    }
-    return result;
-}
-
 
 class Chunk extends Group {
 
@@ -83,7 +65,6 @@ class Chunk extends Group {
             this.obstacles[i] = obstacle;
         }
 
-
         this.currentRewardIndex = 0;
         this.nextRewardIndex = 0;
         this.rewards = Array.from(Array(rewardsLength));
@@ -95,8 +76,6 @@ class Chunk extends Group {
             this.rewards[i] = reward;
         }
 
-
-
         this.clouds = Array.from(Array(this.CMState.maxCloudNum), () => new Cloud());
         for (const cloud of this.clouds) {
             cloud.visible = false;
@@ -104,7 +83,6 @@ class Chunk extends Group {
         }
 
         const terrain = new Mesh(this.geometry, new MeshLambertMaterial({
-            // wireframe:true,
             vertexColors: VertexColors,
             flatShading: true, //required for flat shading
         }))
@@ -119,9 +97,6 @@ class Chunk extends Group {
         this.heightMap = Array.from(Array(this.CMState.chunkVertWidth), () => Array(this.CMState.chunkVertWidth));
         this.updateNoise(); // get perline noise height map and update the geometry
         this.geometry.computeFlatVertexNormals(); //required for flat shading
-
-        // Add self to parent's update list
-        // parent.addToUpdateList(this);
 
     }
 
@@ -241,10 +216,6 @@ class Chunk extends Group {
         }
 
         // want a hit rate that is close to 1.0 but not always 1.0
-        // console.log(
-        //     "obstacle hit rate:", this.CMState.maxObstacleNum != 0 ? obstacleIndex / this.CMState.maxObstacleNum : "(maxObstacleNum is 0); ",
-        //     "cloud hit rate:", this.CMState.maxCloudNum != 0 ? cloudIndex / this.CMState.maxCloudNum : "(maxCloudNum is 0)"
-        // );
         this.activeObstacleNum = obstacleIndex;
         this.activeCloudNum = cloudIndex;
         for (let i = cloudIndex; i < this.clouds.length; i++) this.clouds[i].visible = false;
@@ -268,15 +239,12 @@ class Chunk extends Group {
                 }
 
                 this.rewards[rewardIndex].position.set(pos.x, random(pos.y, this.CMState.rewardHeightMax + this.CMState.groundY), pos.z);
-                // this.rewards[rewardIndex].position.set(-500, 0, pos.z);
             }
         }
 
         this.hideRewards();
         this.hideObstacles();
     }
-
-
 
 
 
@@ -316,8 +284,6 @@ class Chunk extends Group {
             this.nextRewardIndex++;
         }
     }
-
-
 
 
 
