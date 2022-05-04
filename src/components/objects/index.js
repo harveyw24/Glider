@@ -15,3 +15,4 @@ export * from './Obstacle';
 export * from './Cactus';
 export * from './Sheep';
 export * from './Penguin';
+export * from './Stars';

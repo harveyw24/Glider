@@ -82,17 +82,17 @@ class Chunk extends Group {
             this.add(cloud);
         }
 
-        const terrain = new Mesh(this.geometry, new MeshLambertMaterial({
+        this.terrain = new Mesh(this.geometry, new MeshLambertMaterial({
+            // wireframe:true,
             vertexColors: VertexColors,
             flatShading: true, //required for flat shading
         }))
-        this.add(terrain);
+        this.add(this.terrain);
 
         // update location on the map
-        terrain.position.y = this.CMState.groundY - 1;
-        terrain.rotation.x = -Math.PI / 2;
-        terrain.receiveShadow = true;
-
+        this.terrain.position.y = this.CMState.groundY - 1;
+        this.terrain.rotation.x = -Math.PI / 2;
+        this.terrain.receiveShadow = true;
 
         this.heightMap = Array.from(Array(this.CMState.chunkVertWidth), () => Array(this.CMState.chunkVertWidth));
         this.updateNoise(); // get perline noise height map and update the geometry
@@ -224,7 +224,7 @@ class Chunk extends Group {
         for (let rewardIndex = 0; rewardIndex < this.CMState.maxRewardNum; rewardIndex++) {
             const iCoord = Math.floor(this.CMState.chunkVertWidth * (this.CMState.maxRewardNum - rewardIndex - 1) / this.CMState.maxRewardNum);
             if (this.CMState.toSpace) {
-                const pos = this.getPositionAtCoords(iCoord, Math.floor(random(0, this.CMState.chunkVertWidth - 1)));
+                const pos = this.getPositionAtCoords(iCoord, 0);
                 this.rewards[rewardIndex].position.set(
                     0,
                     this.state.chunkManager.state.spaceRewardHeight + this.CMState.groundY + rewardIndex * this.CMState.rewardHeightMax / this.CMState.maxRewardNum,
@@ -330,6 +330,7 @@ class Chunk extends Group {
                 for (const obstacle of this.obstacles) obstacle.setObstacle(CMState.obstacle);
             }
             this.CMState = { ...CMState };
+            this.terrain.position.y = this.CMState.groundY - 1;
         }
         if (this.CMState.maxObstacleNum > obstaclesLength) {
             console.log("Provided maxObstacleNum (" + this.CMState.maxObstacleNum + ") is too large! Max is " + obstaclesLength);

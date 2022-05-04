@@ -13,7 +13,7 @@ export function findType(object, type, arr) {
 
 
 export function generateBiomes() {
-    const default_biome = {biome: "default"}
+    const default_biome = { biome: "default" }
     const desert_biome = {
         biome: "desert",
         waterColor: new THREE.Color(97, 32, 13),
@@ -78,17 +78,6 @@ export function generateBiomes() {
         maxObstacleNum: 25,
         obstacle: "tree",
     }
-    const space_biome = {
-        biome: "space",
-        waterColor: new THREE.Color(0, 0, 0),
-        bankColor: new THREE.Color(0, 0, 0),
-        middleColor: new THREE.Color(0, 0, 0),
-        peakColor: new THREE.Color(0, 0, 0),
-        exaggeration: 0,
-        toSpace: true,
-        maxObstacleNum: 0,
-        rewardHeightMax: 15,
-    }
     return [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
 }
 
@@ -101,5 +90,24 @@ export const space_biome = {
     exaggeration: 0,
     toSpace: true,
     maxObstacleNum: 0,
-    rewardHeightMax: 15,
+    rewardHeightMax: 50,
+}
+export const warp_biome = {
+    biome: "warp",
+    waterColor: new THREE.Color(0, 0, 0),
+    bankColor: new THREE.Color(0, 0, 0),
+    middleColor: new THREE.Color(0, 0, 0),
+    peakColor: new THREE.Color(0, 0, 0),
+    exaggeration: 0,
+    toSpace: true,
+    maxCloudNum: 0,
+    maxObstacleNum: 0,
+    rewardHeightMax: 0,
+    maxRewardNum: 0,
+    groundY: -1000000000000000,
+    waterHeight: -1000000000000000,
+}
+export const prewarp_biome = {
+    ...warp_biome,
+    biome: "prewarp"
 }

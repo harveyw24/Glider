@@ -15,6 +15,7 @@ const default_biome = {
     breathLength: 5,
     octaves: 3,
     exaggeration: 17,
+    groundY: groundY,
     waterHeight: 0,
     waterColor: new Color(50, 90, 145),
     bankColor: new Color(26, 143, 26),
@@ -52,7 +53,6 @@ class ChunkManager extends Group {
             chunkWidth: chunkPxWidth,
             chunkVertWidth: chunkVertexWidth,
             segmentWidth: chunkPxWidth / (chunkVertexWidth - 1),
-            groundY: groundY,
             loadThreshold: 0.55,
             falling: 0,
             climbing: 0,
@@ -163,28 +163,28 @@ class ChunkManager extends Group {
                 const chunk = chunkLine.chunks[0];
                 const currentReward = chunk.getCurrentReward();
 
-                if (currentReward !== null && this.position.z + currentReward.position.z + chunk.position.z > 0) chunk.hideCurrentReward();
+                if (currentReward !== null && this.position.z + currentReward.position.z + chunk.position.z >= 0) chunk.hideCurrentReward();
                 else break;
             }
             while (true) {
                 const chunk = chunkLine.chunks[1];
                 const nextReward = chunk.getNextReward();
 
-                if (nextReward !== null && this.position.z + nextReward.position.z + chunk.position.z > -this.state.chunkWidth) chunk.showNextReward();
+                if (nextReward !== null && this.position.z + nextReward.position.z + chunk.position.z >= -this.state.chunkWidth) chunk.showNextReward();
                 else break;
             }
             while (true) {
                 const chunk = chunkLine.chunks[0];
                 const currentObstacle = chunk.getCurrentObstacle();
 
-                if (currentObstacle !== null && this.position.z + currentObstacle.position.z + chunk.position.z > 0) chunk.hideCurrentObstacle();
+                if (currentObstacle !== null && this.position.z + currentObstacle.position.z + chunk.position.z >= 0) chunk.hideCurrentObstacle();
                 else break;
             }
             while (true) {
                 const chunk = chunkLine.chunks[1];
                 const nextObstacle = chunk.getNextObstacle();
 
-                if (nextObstacle !== null && this.position.z + nextObstacle.position.z + chunk.position.z > -this.state.chunkWidth) chunk.showNextObstacle();
+                if (nextObstacle !== null && this.position.z + nextObstacle.position.z + chunk.position.z >= -this.state.chunkWidth) chunk.showNextObstacle();
                 else break;
             }
         }
@@ -196,6 +196,7 @@ class ChunkManager extends Group {
         // Move first chunk forward when player passes the chunk
         if (this.position.z - this.anchor.z >= this.state.chunkWidth) {
             for (const chunkLine of this.chunkLines) chunkLine.cycleChunks();
+
             if (this.state.toSpace) this.state.spaceRewardHeight += this.state.rewardHeightMax;
 
             // invariant: at z-chunk change, (anchor.z + chunkwidth/2) + currentChunk.position.z = 0

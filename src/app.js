@@ -7,6 +7,14 @@
  *
 */
 import { WebGLRenderer, PerspectiveCamera, Vector3 } from 'three';
+
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { AfterimagePass } from 'three/examples/jsm/postprocessing/AfterimagePass.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
+import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
+
 import { SeedScene, MenuScene } from 'scenes';
 import *  as handlers from './js/handlers.js';
 import * as pages from "./js/pages.js";
@@ -14,11 +22,12 @@ import './styles.css';
 import * as THREE from 'three';
 import * as utils from "./js/utils.js"
 
+import { Stars } from './components/objects/Stars'
 
 
 /************************THREEJS + SCENES *****************************/
 // game scene
-let scene = new SeedScene();
+const scene = new SeedScene();
 const camera = new PerspectiveCamera();
 const renderer = new WebGLRenderer({ powerPreference: "high-performance", antialias: true });
 scene.initSky(renderer, camera);
@@ -27,6 +36,17 @@ camera.lookAt(new Vector3(0, 0, 0));
 
 // Set up renderer, canvas, and minor CSS adjustments
 renderer.setPixelRatio(window.devicePixelRatio);
+
+const composer = new EffectComposer(renderer);
+const afterimagePass = new AfterimagePass(.9);
+const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0, 0, .4);
+
+composer.setSize(window.innerWidth, window.innerHeight);
+composer.addPass(new RenderPass(scene, camera));
+composer.addPass(afterimagePass);
+composer.addPass(bloomPass);
+
+
 const canvas = renderer.domElement;
 canvas.id = 'canvas';
 canvas.style.display = 'block'; // Removes padding below canvas
@@ -34,7 +54,7 @@ document.body.style.margin = 0; // Removes margin around page
 document.body.style.overflow = 'hidden'; // Fix scrolling
 
 //menu scene
-let menuScene = new MenuScene();
+const menuScene = new MenuScene();
 const menuCamera = new PerspectiveCamera();
 const menuRenderer = new WebGLRenderer({ antialias: true });
 menuScene.initSky(menuRenderer, camera);
@@ -101,6 +121,8 @@ const character = 'plane';
 let score;
 let score_num = 0;
 
+
+
 /**************************RENDER LOOP*********************************/
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {
@@ -109,6 +131,7 @@ const onAnimationFrameHandler = (timeStamp) => {
         menuRenderer.render(menuScene, menuCamera)
         let plane = scene.getObjectByName(character);
         let chunkManager = scene.getObjectByName('chunkManager');
+        let stars = scene.getObjectByName("stars");
         plane.position.x = 0;
         plane.position.y = 0;
         plane.position.z = 0;
@@ -122,6 +145,8 @@ const onAnimationFrameHandler = (timeStamp) => {
         chunkManager.state.falling = 0;
         chunkManager.state.climbing = 0;
         if (chunkManager.state.biome != "default") chunkManager.resetBiome();
+        if (stars !== undefined) scene.remove(stars);
+        bloomPass.strength = 0;
 
         score_num = 0;
     }
@@ -132,12 +157,13 @@ const onAnimationFrameHandler = (timeStamp) => {
         let chunkManager = scene.getObjectByName('chunkManager');
         chunkManager.update(timeStamp, speedLevel);
 
-        renderer.render(scene, camera);
+        render(chunkManager);
         scene.update && scene.update(timeStamp);
 
         handlers.handleCollisions(document, scene, character, screens, sounds, score, camera); // needs to happen immediately after update for accuracy
         handlers.handleCharacterControls(scene, keypress, character, camera, speedLevel);
         handlers.updateAudioSpeed(document, sounds, scene);
+        handlers.handleSpace(document, bloomPass, sounds, scene, spaceScore, score_num);
 
         if (frameCounter - lastSpeedUpdate > 450 && speedLevel < 3) {
             speedLevel *= 1.1;
@@ -152,66 +178,28 @@ const onAnimationFrameHandler = (timeStamp) => {
         if (!screens["menu"] && !screens["ending"] && !screens["pause"]) {
             score_num += 0.01;
             score = score_num.toFixed(2);
-            handlers.updateScore(document, score)
+            handlers.updateScore(document, scene, score)
         }
 
 
-        if (score > spaceScore && !chunkManager.state.toSpace) {
-            chunkManager.updateBiome(utils.space_biome);
-            pages.space(document)
-        }
-        if (chunkManager.state.toSpace) {
-            const message = document.getElementById("message");
-            const thresholdTexts = [
-                [spaceScore + 80, "Ending song: \"interstellar railway\" by Louie Zong"],
-                [spaceScore + 70, ""],
-                [spaceScore + 60, "Congratulations."],
-                [spaceScore + 45, ""],
-                [spaceScore + 35, "You have ascended."],
-                [spaceScore + 30, "Against all odds..."],
-                [spaceScore + 25, "...and you dodged the treacherous volcanoes and survived the towering arctic icebergs."],
-                [spaceScore + 20, "...You wove through the peaks of the stone forest, persevered through the deserts..."],
-                [spaceScore + 15, "You conquered the mountains, breezed over the grasslands..."],
-            ]
-            for (const thresholdText of thresholdTexts) {
-                const threshold = thresholdText[0];
-                const text = thresholdText[1];
-                if (score > threshold) {
-                    if (message.innerHTML != text) message.innerHTML = text;
-                    break;
-                }
-            }
-            if (score > spaceScore + 10) {
-                const victorySong = document.getElementById('victory-song');
-                if (victorySong.paused) victorySong.play();
-
-            }
-            if (score > spaceScore) {
-                const audio = document.getElementById('audio');
-                if (audio.volume > 0 || sounds["powerup"] > 0) {
-                    const delta = 0.001;
-                    const fadeAudio = setInterval(function() {
-                        audio.volume = Math.max(0.0, audio.volume - delta);
-                        sounds["powerup"].setVolume(Math.max(0.0, sounds["powerup"].getVolume() - delta))
-                        if (audio.volume == 0.0 && sounds["powerup"].getVolume() == 0.0) clearInterval(fadeAudio);
-                    }, 200);
-                }
-                else {
-                    audio.pause();
-                    sounds["powerup"].pause();
-                    sounds['whirring'].setVolume(0.4);
-                }
-            }
-        }
 
     }
 };
 window.requestAnimationFrame(onAnimationFrameHandler);
 
+function render(chunkManager) {
+    if (chunkManager.state.biome == "warp") {
+        composer.render();
+    } else {
+        renderer.render(scene, camera);
+    }
+}
+
 // Resize Handler
 const windowResizeHandler = () => {
     const { innerHeight, innerWidth } = window;
     renderer.setSize(innerWidth, innerHeight);
+    composer.setSize(innerWidth, innerHeight);
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
 
