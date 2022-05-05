@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { Group, Color } from 'three';
 import { ChunkLine } from '../ChunkLine';
+import { Water } from 'three/examples/jsm/objects/water.js';
 
 
 // SET THESE TO CHANGE CHUNK DIMENSIONS
@@ -60,7 +61,6 @@ class ChunkManager extends Group {
             ...default_biome,
         }
 
-
         // invariant: at z-chunk change, (anchor.z + chunkwidth/2) + currentChunk.position.z = 0
         // invariant: at x-chunk change, (anchor.x + chunkwidth/2) + currentChunk.position.x = 0
         this.anchor = new THREE.Vector3();
@@ -79,6 +79,7 @@ class ChunkManager extends Group {
             chunkLine.chunks[0].showObstacles();
             chunkLine.chunks[0].showRewards();
         }
+        
 
         // Populate GUI
         const folder1 = this.state.gui.addFolder('BREATH');
@@ -270,6 +271,15 @@ class ChunkManager extends Group {
     }
     getCurrentChunk() {
         return this.getCurrentChunkLine().chunks[0];
+    }
+
+    addActiveWater() {
+        this.add(this.water)
+    }
+  
+    updateWaterLevel() {
+        this.water.position.y = this.state.waterHeight;
+        this.updateTerrainGeo();
     }
 }
 
