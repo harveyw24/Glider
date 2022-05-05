@@ -29,7 +29,15 @@ import { Stars } from './components/objects/Stars'
 // game scene
 const scene = new SeedScene();
 const camera = new PerspectiveCamera();
-const renderer = new WebGLRenderer({ powerPreference: "high-performance", antialias: true });
+let pixelRatio = window.devicePixelRatio
+
+let AA = true
+if (pixelRatio > 1) {
+  AA = false
+}
+console.log(AA)
+
+const renderer = new WebGLRenderer({ powerPreference: "high-performance", antialias: false });
 scene.initSky(renderer, camera);
 camera.position.set(0, 2, 20);
 camera.lookAt(new Vector3(0, 0, 0));
