@@ -7,7 +7,7 @@ import { Turbine } from '../Turbine';
 import { Cloud } from '../Cloud';
 
 
-const obstaclesLength = 25; // maximum number of obstacles supported per chunk
+const obstaclesLength = 0; // maximum number of obstacles supported per chunk
 const rewardsLength = 15; // maximum number of obstacles supported per chunk
 
 function random(min, max) { return Math.random() * (max - min) + min; }
