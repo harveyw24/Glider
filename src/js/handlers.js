@@ -96,7 +96,7 @@ export function handleCharacterControls(scene, keypress, character, camera, spee
 
 // handle switching between screen states such as menu, game, game over, mute, and pause states
 export function handleScreens(event, screens, document, canvas, character, scene, menuCanvas, sounds, score) {
-    if (event.key == 'm') {
+    if (event.key == 'm' && !screens['ending'] && !screens['menu']) {
         mute = !mute;
         if (!mute && !screens['ending'] && !screens['menu']) {
             document.getElementById('audio').play();
