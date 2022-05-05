@@ -45,7 +45,7 @@ export function generateBiomes() {
         peakColor: new THREE.Color(223, 255, 0),
         exaggeration: 15,
         freq: 1,
-        maxObstacleNum: 15,
+        maxObstacleNum: 8,
         obstacle: "sheep",
         water: false,
     }

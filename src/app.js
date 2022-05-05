@@ -36,7 +36,7 @@ if (pixelRatio > 1) {
   AA = false
 }
 console.log(AA)
-const renderer = new WebGLRenderer({ powerPreference: "high-performance", antialias: false });
+const renderer = new WebGLRenderer({ powerPreference: "high-performance", antialias: AA });
 scene.initSky(renderer, camera);
 camera.position.set(0, 2, 20);
 camera.lookAt(new Vector3(0, 0, 0));
