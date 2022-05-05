@@ -1,7 +1,7 @@
 import { Group, VertexColors, PlaneGeometry, MeshLambertMaterial, Mesh } from 'three';
 import * as THREE from 'three';
 import SimplexNoise from 'simplex-noise';
-import { Water } from 'three/examples/jsm/objects/water.js';
+import { Water } from 'three/examples/jsm/objects/Water.js';
 import { Obstacle } from '../Obstacle';
 import { Turbine } from '../Turbine';
 import { Cloud } from '../Cloud';
@@ -50,26 +50,6 @@ class Chunk extends Group {
         this.geometry.verticesNeedUpdate = true;
         this.geometry.colorsNeedUpdate = true;
 
-        this.waterGeometry = new THREE.PlaneGeometry(1000, 1000);
-        this.water = new Water(
-          this.waterGeometry,
-          {
-            textureWidth: 512,
-            textureHeight: 512,
-            waterNormals: new THREE.TextureLoader().load('', function ( texture ) {
-              texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-            }),
-            alpha: 1.0,
-            sunDirection: new THREE.Vector3(),
-            sunColor: 0xffffff,
-            waterColor: 0x001e0f,
-            distortionScale: 3.7,
-          }
-        );
-        this.water.rotation.x =- Math.PI / 2;
-        this.water.position.y = -199;
-        this.add(this.water);
-        this.waterUniforms = this.water.material.uniforms;
 
         this.activeObstacleNum = 0;
         this.currentObstacleIndex = 0;

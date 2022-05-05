@@ -28,7 +28,7 @@ class SeedScene extends Scene {
         this.fog = new THREE.FogExp2(this.fogColor, 0.0015);
 
         // Add meshes to scene
-        const airplane = new Airplane(this)
+        const airplane = new Airplane(this);
 
         // LIGHTING
         this.lights = new BasicLights();

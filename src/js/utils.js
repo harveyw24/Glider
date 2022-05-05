@@ -24,6 +24,7 @@ export function generateBiomes() {
         freq: 4,
         maxObstacleNum: 10,
         obstacle: "cactus",
+        water: false,
     }
     const volcano_biome = {
         biome: "volcano",
@@ -34,6 +35,7 @@ export function generateBiomes() {
         exaggeration: 27,
         freq: 3,
         maxObstacleNum: 0,
+        water: false,
     }
     const grassland_biome = {
         biome: "grassland",
@@ -45,6 +47,7 @@ export function generateBiomes() {
         freq: 1,
         maxObstacleNum: 15,
         obstacle: "sheep",
+        water: false,
     }
     const arctic_biome = {
         biome: "arctic",
@@ -60,6 +63,7 @@ export function generateBiomes() {
         obstacleHeightMax: 3,
         obstacleHeightMin: 0,
         maxRewardNum: 15,
+        water: false,
     }
     const stone_biome = {
         biome: "stone",
@@ -75,8 +79,9 @@ export function generateBiomes() {
         gamma: 5,
         smoothPeaks: true,
         rewardHeightMax: 50,
-        maxObstacleNum: 25,
+        maxObstacleNum: 10,
         obstacle: "tree",
+        water: false,
     }
     return [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
 }

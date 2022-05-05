@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { Group, Color } from 'three';
 import { ChunkLine } from '../ChunkLine';
-import { Water } from 'three/examples/jsm/objects/water.js';
+import { Water } from 'three/examples/jsm/objects/Water.js';
 
 
 // SET THESE TO CHANGE CHUNK DIMENSIONS
@@ -28,7 +28,7 @@ const default_biome = {
     freq: 4.4,
     gamma: 0, // if gamma is zero, then no gamma is applied
     smoothPeaks: false,
-    maxObstacleNum: 25,
+    maxObstacleNum: 0,
     obstacleHeightMin: 1,
     obstacleHeightMax: 50,
     maxCloudNum: 25,
@@ -38,6 +38,7 @@ const default_biome = {
     rewardHeightMax: 100,
     obstacle: "tree",
     toSpace: false,
+    water: true,
 };
 const modifiableFields = Object.keys(default_biome);
 
@@ -79,7 +80,32 @@ class ChunkManager extends Group {
             chunkLine.chunks[0].showObstacles();
             chunkLine.chunks[0].showRewards();
         }
-        
+
+
+
+        this.waterGeometry = new THREE.PlaneGeometry(1500, 1000);
+        this.water = new Water(
+            this.waterGeometry,
+            {
+                textureWidth: 512,
+                textureHeight: 512,
+                waterNormals: new THREE.TextureLoader().load('', function(texture) {
+                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                }),
+                alpha: 1.0,
+                sunDirection: new THREE.Vector3(),
+                sunColor: 0xffffff,
+                waterColor: 0x001e0f,
+                distortionScale: 3.7,
+            }
+        );
+        this.water.position.z = -this.state.chunkWidth / 2;
+        this.water.rotation.x = - Math.PI / 2;
+        this.water.position.y = this.state.groundY + 1;
+        this.add(this.water);
+        this.waterUniforms = this.water.material.uniforms;
+        this.water.visible = this.state.water;
+
 
         // Populate GUI
         const folder1 = this.state.gui.addFolder('BREATH');
@@ -124,6 +150,11 @@ class ChunkManager extends Group {
         // Chunk positions are relative to terrain, so updating terrain position is sufficient
         this.position.z += 3 * speedLevel;
         this.position.y += 0.25 * speedLevel;
+        // this.water.updateMatrix();
+        this.water.position.x = -this.position.x;
+        this.water.position.z = -this.position.z - this.state.chunkWidth / 2;
+        console.log(this.water.position);
+
 
         for (const chunkLine of this.chunkLines) {
             for (const chunk of chunkLine.chunks) {
@@ -277,7 +308,7 @@ class ChunkManager extends Group {
     addActiveWater() {
         this.add(this.water)
     }
-  
+
     updateWaterLevel() {
         this.water.position.y = this.state.waterHeight;
         this.updateTerrainGeo();
