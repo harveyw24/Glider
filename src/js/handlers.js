@@ -320,15 +320,15 @@ export function handleSpace(document, bloomPass, sounds, scene, spaceScore, scor
 
         const message = document.getElementById("message");
         const thresholdTexts = [
-            [spaceScore + 60, ""],
-            [spaceScore + 45, "Ending song: \"interstellar railway\" by Louie Zong"],
-            [spaceScore + 40, ""],
-            [spaceScore + 37, "Congratulations."],
-            [spaceScore + 30, ""],
-            [spaceScore + 24, "Against all odds...You have ascended."],
-            [spaceScore + 21, "...and you survived the treacherous volcanoes and scaled the towering arctic icebergs."],
-            [spaceScore + 18, "...You wove through the peaks of the stone forest, persevered through the deserts..."],
-            [spaceScore + 15, "You conquered the mountains, breezed over the grasslands..."],
+            [spaceScore + 39, ""],
+            [spaceScore + 36, "Ending song: \"interstellar railway\" by Louie Zong"],
+            [spaceScore + 35, ""],
+            [spaceScore + 32, "Congratulations."],
+            [spaceScore + 25, ""],
+            [spaceScore + 19, "Against all odds...You have ascended."],
+            [spaceScore + 16, "...and you survived the treacherous volcanoes and scaled the towering arctic icebergs."],
+            [spaceScore + 13, "...You wove through the peaks of the stone forest, persevered through the deserts..."],
+            [spaceScore + 10, "You conquered the mountains, breezed over the grasslands..."],
         ]
         for (const thresholdText of thresholdTexts) {
             const threshold = thresholdText[0];
@@ -338,7 +338,7 @@ export function handleSpace(document, bloomPass, sounds, scene, spaceScore, scor
                 break;
             }
         }
-        if (score_num > spaceScore + 35) {
+        if (score_num > spaceScore + 39) {
             const stars = scene.getObjectByName("stars");
             if (chunkManager.state.biome != "warp") {
                 if (Math.abs(scene.state.azimuth % 360 - 180) < 1) {

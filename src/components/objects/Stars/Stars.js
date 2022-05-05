@@ -49,7 +49,7 @@ class Stars extends Group {
             starGeo.colors.push(randomStarColor());
         }
 
-        const sprite = new THREE.TextureLoader().load("src/components/objects/Stars/disc.png");
+        const sprite = new THREE.TextureLoader().load("https://raw.githubusercontent.com/harveyw24/Glider/main/src/components/objects/Stars/disc.png");
         const starMaterial = new THREE.PointsMaterial({
             vertexColors: THREE.VertexColors,
             size: 2,

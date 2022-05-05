@@ -73,7 +73,7 @@ export function space(document) {
     document.body.appendChild(space);
 
     let victorySong = document.createElement('audio');
-    victorySong.setAttribute('src', 'src/sounds/interstellar-railway.wav');
+    victorySong.setAttribute('src', 'https://raw.githubusercontent.com/harveyw24/Glider/main/src/sounds/interstellar-railway.wav');
     victorySong.id = 'victory-song';
     victorySong.loop = true;
     document.body.appendChild(victorySong);
