@@ -152,6 +152,7 @@ class ChunkManager extends Group {
         this.position.y += 0.25 * speedLevel;
         // this.water.updateMatrix();
         this.water.position.x = -this.position.x;
+        this.water.position.y = this.state.groundY + 1;
         this.water.position.z = -this.position.z - this.state.chunkWidth / 2;
         console.log(this.water.position);
 

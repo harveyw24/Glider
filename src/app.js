@@ -29,14 +29,13 @@ import { Stars } from './components/objects/Stars'
 // game scene
 const scene = new SeedScene();
 const camera = new PerspectiveCamera();
+// Check pixel density for anit-aliasing
 let pixelRatio = window.devicePixelRatio
-
 let AA = true
 if (pixelRatio > 1) {
   AA = false
 }
 console.log(AA)
-
 const renderer = new WebGLRenderer({ powerPreference: "high-performance", antialias: false });
 scene.initSky(renderer, camera);
 camera.position.set(0, 2, 20);
@@ -122,7 +121,7 @@ let frameCounter = 0;
 let lastSpeedUpdate = 0;
 let lastTerrainUpdate = 0;
 let speedLevel = 1;
-const spaceScore = 75;
+const spaceScore = 0;
 const keypress = {};
 const screens = { "menu": true, "ending": false, "pause": false };
 const character = 'plane';
