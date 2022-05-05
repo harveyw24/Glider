@@ -320,7 +320,7 @@ export function handleSpace(document, bloomPass, sounds, scene, spaceScore, scor
 
         const message = document.getElementById("message");
         const thresholdTexts = [
-            [spaceScore + 39, ""],
+            [spaceScore + 50, ""],
             [spaceScore + 36, "Ending song: \"interstellar railway\" by Louie Zong"],
             [spaceScore + 35, ""],
             [spaceScore + 32, "Congratulations."],
