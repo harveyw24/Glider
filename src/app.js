@@ -114,7 +114,7 @@ let frameCounter = 0;
 let lastSpeedUpdate = 0;
 let lastTerrainUpdate = 0;
 let speedLevel = 1;
-const spaceScore = 75;
+const spaceScore = 150;
 const keypress = {};
 const screens = { "menu": true, "ending": false, "pause": false };
 const character = 'plane';
@@ -133,6 +133,7 @@ const onAnimationFrameHandler = (timeStamp) => {
 
         bloomPass.strength = 0;
         speedLevel = 1;
+        score_num = 0;
     }
     window.requestAnimationFrame(onAnimationFrameHandler);
     // if on game screen and not paused
