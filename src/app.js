@@ -114,7 +114,7 @@ let frameCounter = 0;
 let lastSpeedUpdate = 0;
 let lastTerrainUpdate = 0;
 let speedLevel = 1;
-const spaceScore = 300;
+const spaceScore = 75;
 const keypress = {};
 const screens = { "menu": true, "ending": false, "pause": false };
 const character = 'plane';
@@ -129,26 +129,10 @@ const onAnimationFrameHandler = (timeStamp) => {
     // reset the game on menu screen
     if (screens['menu']) {
         menuRenderer.render(menuScene, menuCamera)
-        let plane = scene.getObjectByName(character);
-        let chunkManager = scene.getObjectByName('chunkManager');
-        let stars = scene.getObjectByName("stars");
-        plane.position.x = 0;
-        plane.position.y = 0;
-        plane.position.z = 0;
-        plane.rotation.z = 0;
-        plane.rotation.x = 0;
-        plane.state.hit = false;
-        speedLevel = 1;
-        chunkManager.position.y = 0;
-        chunkManager.state.toSpace = false;
-        chunkManager.state.spaceRewardHeight = 0;
-        chunkManager.state.falling = 0;
-        chunkManager.state.climbing = 0;
-        if (chunkManager.state.biome != "default") chunkManager.resetBiome();
-        if (stars !== undefined) scene.remove(stars);
-        bloomPass.strength = 0;
+        scene.reset(character);
 
-        score_num = 0;
+        bloomPass.strength = 0;
+        speedLevel = 1;
     }
     window.requestAnimationFrame(onAnimationFrameHandler);
     // if on game screen and not paused
@@ -176,9 +160,10 @@ const onAnimationFrameHandler = (timeStamp) => {
         }
 
         if (!screens["menu"] && !screens["ending"] && !screens["pause"]) {
-            score_num += 0.01;
+            if (chunkManager.state.biome == "warp") score_num = Number.POSITIVE_INFINITY;
+            else score_num += 0.01;
             score = score_num.toFixed(2);
-            handlers.updateScore(document, scene, score)
+            handlers.updateScore(document, score)
         }
 
 
@@ -188,11 +173,9 @@ const onAnimationFrameHandler = (timeStamp) => {
 window.requestAnimationFrame(onAnimationFrameHandler);
 
 function render(chunkManager) {
-    if (chunkManager.state.biome == "warp") {
-        composer.render();
-    } else {
-        renderer.render(scene, camera);
-    }
+    if (chunkManager.state.biome == "warp") composer.render();
+    else renderer.render(scene, camera);
+
 }
 
 // Resize Handler

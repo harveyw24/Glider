@@ -388,13 +388,9 @@ export function handleSpace(document, bloomPass, sounds, scene, spaceScore, scor
 
 
 // update score counter on the top left corner of game screen
-export function updateScore(document, scene, score) {
+export function updateScore(document, score) {
     let scoreCounter = document.getElementById('score');
-    let chunkManager = scene.getObjectByName('chunkManager');
-    if (chunkManager.state.biome == "warp") {
-        score = "∞"
-    }
-    scoreCounter.innerHTML = 'Score: '.concat(score);
+    scoreCounter.innerHTML = 'Score: '.concat(score != "Infinity" ? score : "∞");
 }
 
 // increase audio speed the closer the player is to the ground
