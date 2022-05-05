@@ -145,6 +145,28 @@ class SeedScene extends Scene {
             obj.update(timeStamp);
         }
     }
+
+    reset(character) {
+        const plane = this.getObjectByName(character);
+        const chunkManager = this.getObjectByName('chunkManager');
+        const stars = this.getObjectByName("stars");
+
+        plane.position.x = 0;
+        plane.position.y = 0;
+        plane.position.z = 0;
+        plane.rotation.z = 0;
+        plane.rotation.x = 0;
+        plane.state.hit = false;
+
+        chunkManager.position.y = 0;
+        chunkManager.state.toSpace = false;
+        chunkManager.state.spaceRewardHeight = 0;
+        chunkManager.state.falling = 0;
+        chunkManager.state.climbing = 0;
+        if (chunkManager.state.biome != "default") chunkManager.resetBiome();
+
+        if (stars !== undefined) this.remove(stars);
+    }
 }
 
 export default SeedScene;

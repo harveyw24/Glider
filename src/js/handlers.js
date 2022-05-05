@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import * as pages from "./pages.js"
 import * as utils from "./utils.js"
+import { Stars } from "../components/objects/Stars"
 
 // maintan boolens to keep track if buffer period is active and if 
 // game is muted
@@ -279,7 +280,7 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
                 fillScreen.classList.remove('red');
             }, 500);
             if (!mute) sounds['damage'].play();
-        
+
             timer = setTimeout(function() { buffer = false; }, 2500);
         }
 
@@ -308,10 +309,88 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
     }
 }
 
+export function handleSpace(document, bloomPass, sounds, scene, spaceScore, score_num) {
+    const chunkManager = scene.getObjectByName("chunkManager");
+    if (score_num > spaceScore && !chunkManager.state.toSpace) {
+        chunkManager.updateBiome(utils.space_biome);
+        scene.add(new Stars(scene));
+        pages.space(document)
+    }
+    if (chunkManager.state.toSpace) {
+
+        const message = document.getElementById("message");
+        const thresholdTexts = [
+            [spaceScore + 60, ""],
+            [spaceScore + 45, "Ending song: \"interstellar railway\" by Louie Zong"],
+            [spaceScore + 40, ""],
+            [spaceScore + 37, "Congratulations."],
+            [spaceScore + 30, ""],
+            [spaceScore + 24, "Against all odds...You have ascended."],
+            [spaceScore + 21, "...and you survived the treacherous volcanoes and scaled the towering arctic icebergs."],
+            [spaceScore + 18, "...You wove through the peaks of the stone forest, persevered through the deserts..."],
+            [spaceScore + 15, "You conquered the mountains, breezed over the grasslands..."],
+        ]
+        for (const thresholdText of thresholdTexts) {
+            const threshold = thresholdText[0];
+            const text = thresholdText[1];
+            if (score_num > threshold) {
+                if (message.innerHTML != text) message.innerHTML = text;
+                break;
+            }
+        }
+        if (score_num > spaceScore + 35) {
+            const stars = scene.getObjectByName("stars");
+            if (chunkManager.state.biome != "warp") {
+                if (Math.abs(scene.state.azimuth % 360 - 180) < 1) {
+                    chunkManager.updateBiome(utils.warp_biome);
+                    stars.state.becomingVisible = true;
+                }
+            } else {
+                stars.update();
+                if (bloomPass.strength < 3) bloomPass.strength += .01
+                else bloomPass.strength = 3
+
+                if (Math.abs(scene.state.azimuth % 360) < 1) {
+                    scene.state.azimuth = 0;
+                    scene.state.elevation = 0;
+                }
+            }
+        }
+        if (score_num > spaceScore + 30) {
+            if (chunkManager.state.biome != "prewarp" && chunkManager.state.biome != "warp") {
+                chunkManager.updateBiome(utils.prewarp_biome);
+            }
+        }
+        if (score_num > spaceScore + 10) {
+            const victorySong = document.getElementById('victory-song');
+            if (victorySong.paused) victorySong.play();
+        }
+        if (score_num > spaceScore) {
+            const audio = document.getElementById('audio');
+            if (audio.volume > 0 || sounds["powerup"] > 0) {
+                const delta = 0.001;
+                const fadeAudio = setInterval(function() {
+                    audio.volume = Math.max(0.0, audio.volume - delta);
+                    sounds["powerup"].setVolume(Math.max(0.0, sounds["powerup"].getVolume() - delta))
+                    if (audio.volume == 0.0 && sounds["powerup"].getVolume() == 0.0) clearInterval(fadeAudio);
+                }, 200);
+            }
+            else {
+                audio.pause();
+                sounds["powerup"].pause();
+                sounds['whirring'].setVolume(0.4);
+            }
+        }
+    }
+}
+
+
+
+
 // update score counter on the top left corner of game screen
 export function updateScore(document, score) {
     let scoreCounter = document.getElementById('score');
-    scoreCounter.innerHTML = 'Score: '.concat(score);
+    scoreCounter.innerHTML = 'Score: '.concat(score != "Infinity" ? score : "∞");
 }
 
 // increase audio speed the closer the player is to the ground
@@ -320,7 +399,7 @@ export function updateAudioSpeed(document, sounds, scene) {
     let target = new THREE.Vector3();
     chunkManager.getWorldPosition(target);
     let height = target.y;
-    let newPlaybackSpeed = Math.max(1, height / 400 + 1);
+    let newPlaybackSpeed = Math.min(2, Math.max(1, height / 400 + 1));
     let audio = document.getElementById('audio');
     audio.playbackRate = newPlaybackSpeed;
 }

@@ -37,8 +37,9 @@ export function quit(document, score) {
     ending.id = 'ending';
     ending.innerHTML = END;
     document.body.appendChild(ending)
+
     let finalScore = document.getElementById('finalScore');
-    finalScore.innerHTML = 'Score: '.concat(score);
+    finalScore.innerHTML = 'Score: '.concat(score != "Infinity" ? score : "∞");
 
     let scoreComment = document.getElementById('scoreComment');
     if (score < 5) scoreComment.innerHTML = 'Were you even trying?'
