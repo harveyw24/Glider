@@ -29,7 +29,7 @@ import { Stars } from './components/objects/Stars'
 // game scene
 const scene = new SeedScene();
 const camera = new PerspectiveCamera();
-const renderer = new WebGLRenderer({ powerPreference: "high-performance", antialias: true });
+const renderer = new WebGLRenderer({ powerPreference: "high-performance" });
 scene.initSky(renderer, camera);
 camera.position.set(0, 2, 20);
 camera.lookAt(new Vector3(0, 0, 0));
@@ -114,7 +114,7 @@ let frameCounter = 0;
 let lastSpeedUpdate = 0;
 let lastTerrainUpdate = 0;
 let speedLevel = 1;
-const spaceScore = 75;
+const spaceScore = 0;
 const keypress = {};
 const screens = { "menu": true, "ending": false, "pause": false };
 const character = 'plane';
