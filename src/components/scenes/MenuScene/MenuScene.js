@@ -18,7 +18,7 @@ class MenuScene extends Scene {
         };
 
         // Add fog
-        this.fog = new THREE.FogExp2(0xd19264, 0.0015);
+        this.fog = new THREE.FogExp2(0xd19264, 0.015);
 
         const airplane = new Airplane(this)
         this.sky = new Sky();
