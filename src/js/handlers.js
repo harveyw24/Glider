@@ -207,17 +207,22 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
 
 
     if (interp.y > obj.position.y) {
-        if (!mute) sounds['explosion'].play();
-        sounds['whirring'].stop();
-        document.getElementById('audio').pause();
-
+        
         let fillScreen = document.getElementById('fillScreen');
         fillScreen.classList.add('death');
         setTimeout(function() {
             fillScreen.classList.remove('death');
         }, 3000);
         screens['ending'] = true;
+        
         pages.quit(document, score);
+
+        if (!mute) 
+        {
+            sounds['explosion'].play();
+            sounds['whirring'].stop();
+            document.getElementById('audio').pause();
+        }
     }
 
 
