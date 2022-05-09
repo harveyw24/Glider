@@ -1,6 +1,9 @@
 import * as THREE from 'three'
 import { Group, Color } from 'three';
 import { ChunkLine } from '../ChunkLine';
+import { Cloud } from '../Cloud';
+import { Turbine } from '../Turbine';
+import { Obstacle } from '../Obstacle';
 import { Water } from 'three/examples/jsm/objects/Water.js';
 
 
@@ -59,8 +62,12 @@ class ChunkManager extends Group {
             falling: 0,
             climbing: 0,
             spaceRewardHeight: 0,
+            cloudPool: Array.from(Array(3), () => new Cloud(true)),
+            rewardOrigin: new Turbine(true),
+            obstacleOrigin: new Obstacle(true),
             ...default_biome,
         }
+
 
         // invariant: at z-chunk change, (anchor.z + chunkwidth/2) + currentChunk.position.z = 0
         // invariant: at x-chunk change, (anchor.x + chunkwidth/2) + currentChunk.position.x = 0
@@ -80,7 +87,6 @@ class ChunkManager extends Group {
             chunkLine.chunks[0].showObstacles();
             chunkLine.chunks[0].showRewards();
         }
-
 
 
         this.waterGeometry = new THREE.PlaneGeometry(1500, 1000);
@@ -150,20 +156,25 @@ class ChunkManager extends Group {
         // Chunk positions are relative to terrain, so updating terrain position is sufficient
         this.position.z += 3 * speedLevel;
         this.position.y += 0.25 * speedLevel;
-        // this.water.updateMatrix();
+
+
         this.water.position.x = -this.position.x;
         this.water.position.y = this.state.groundY + 1;
-        this.water.position.z = -this.position.z - this.state.chunkWidth / 2;
+
+        const chunkLine = this.getCurrentChunkLine();
+        if (chunkLine.chunks[0].CMState.water && chunkLine.chunks[1].CMState.water) {
+            this.water.position.z = -this.position.z - this.state.chunkWidth / 2;
+        }
+        else if (chunkLine.chunks[0].CMState.water) this.water.position.z = chunkLine.chunks[0].position.z;
+        else if (chunkLine.chunks[1].CMState.water) this.water.position.z = chunkLine.chunks[1].position.z;
+        else this.water.position.z = this.state.chunkWidth; // water is behind player and hence invisible
+
 
 
         for (const chunkLine of this.chunkLines) {
             for (const chunk of chunkLine.chunks) {
-                for (const reward of chunk.rewards) {
-                    if (reward.visible) reward.update(timeStamp);
-                }
-                for (const cloud of chunk.clouds) {
-                    cloud.update(timeStamp);
-                }
+                for (const reward of chunk.rewards) if (reward.visible) reward.update(timeStamp);
+                for (const cloud of chunk.clouds) cloud.update(timeStamp);
             }
         }
 

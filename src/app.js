@@ -11,9 +11,7 @@ import { WebGLRenderer, PerspectiveCamera, Vector3 } from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { AfterimagePass } from 'three/examples/jsm/postprocessing/AfterimagePass.js';
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
-import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 
 import { SeedScene, MenuScene } from 'scenes';
 import *  as handlers from './js/handlers.js';
@@ -21,8 +19,6 @@ import * as pages from "./js/pages.js";
 import './styles.css';
 import * as THREE from 'three';
 import * as utils from "./js/utils.js"
-
-import { Stars } from './components/objects/Stars'
 
 
 /************************THREEJS + SCENES *****************************/
@@ -33,7 +29,7 @@ const camera = new PerspectiveCamera();
 let pixelRatio = window.devicePixelRatio
 let AA = true
 if (pixelRatio > 1) {
-  AA = false
+    AA = false
 }
 console.log(AA)
 const renderer = new WebGLRenderer({ powerPreference: "high-performance", antialias: AA });
@@ -77,101 +73,125 @@ const biomes = utils.generateBiomes();
 /****************************AUDIO*************************************/
 const listener = new THREE.AudioListener();
 camera.add(listener);
-const sounds = [];
+const sounds = {};
 const whirring = new THREE.Audio(listener);
 const damage = new THREE.Audio(listener);
 const powerup = new THREE.Audio(listener);
 const explosion = new THREE.Audio(listener);
-sounds['whirring'] = whirring;
-sounds['damage'] = damage;
-sounds['powerup'] = powerup;
-sounds['explosion'] = explosion;
+sounds.whirring = whirring;
+sounds.damage = damage;
+sounds.powerup = powerup;
+sounds.explosion = explosion;
 
 const audioLoader = new THREE.AudioLoader();
 audioLoader.load('https://raw.githubusercontent.com/harveyw24/Glider/main/src/sounds/explosion.wav', function(buffer) {
     explosion.setBuffer(buffer);
     explosion.setLoop(false);
-    explosion.setVolume(0.3);
 });
-
 audioLoader.load('https://raw.githubusercontent.com/harveyw24/Glider/main/src/sounds/whirring.wav', function(buffer) {
     whirring.setBuffer(buffer);
     whirring.setLoop(true);
-    whirring.setVolume(0.4);
 });
-
-audioLoader.load('https://raw.githubusercontent.com/harveyw24/Glider/main/src/sounds/whirring.wav', function(buffer) {
-    whirring.setBuffer(buffer);
-    whirring.setLoop(true);
-    whirring.setVolume(0.4);
-});
-
 audioLoader.load('https://raw.githubusercontent.com/harveyw24/Glider/main/src/sounds/damage.wav', function(buffer) {
     damage.setBuffer(buffer);
     damage.setLoop(false);
-    damage.setVolume(0.6);
 });
 audioLoader.load('https://raw.githubusercontent.com/harveyw24/Glider/main/src/sounds/powerup.wav', function(buffer) {
     powerup.setBuffer(buffer);
     powerup.setLoop(false);
-    powerup.setVolume(0.6);
 });
+
 /**************************OTHER GLOBAL VARIABLES**********************/
-let frameCounter = 0;
-let lastSpeedUpdate = 0;
-let lastTerrainUpdate = 0;
-let speedLevel = 1;
-const spaceScore = 75;
-const keypress = {};
-const screens = { "menu": true, "ending": false, "pause": false };
-const character = 'plane';
-let score;
-let score_num = 0;
+
+// Gamestate container
+const GS = {
+    initialize() {
+        this.document = document;
+        this.camera = camera;
+        this.menuCamera = menuCamera;
+
+        this.renderer = renderer;
+        this.menuRenderer = menuRenderer;
+        this.composer = composer;
+        this.bloomPass = bloomPass;
+
+        this.canvas = canvas;
+        this.menuCanvas = menuCanvas;
+
+        this.menuScene = menuScene;
+        this.scene = scene;
+
+        this.spaceScore = 150;
+        this.score_max = this.spaceScore + 50;
+        this.keypress = {};
+        this.screens = { "menu": true, "ending": false, "pause": false };
+        this.sounds = sounds;
+        this.character = 'plane';
+        for (const [_, sound] of Object.entries(this.sounds)) sound.play();
+        this.reset();
+    },
+    reset() {
+        this.frameCounter = 0;
+        this.lastSpeedUpdate = 0;
+        this.lastTerrainUpdate = 0;
+        this.speedLevel = 1;
+        this.score_num = 0;
 
 
+        this.scene.reset(this.character);
+
+        for (const [_, sound] of Object.entries(this.sounds)) sound.stop();
+        this.sounds.powerup.setVolume(0.6);
+        this.sounds.damage.setVolume(0.6);
+        this.sounds.whirring.setVolume(0.4);
+        this.sounds.explosion.setVolume(0.3);
+
+        this.bloomPass.strength = 0;
+    }
+}
+
+
+GS.initialize();
 
 /**************************RENDER LOOP*********************************/
 // Render loop
 const onAnimationFrameHandler = (timeStamp) => {
     // reset the game on menu screen
-    if (screens['menu']) {
-        menuRenderer.render(menuScene, menuCamera)
-        scene.reset(character);
-
-        bloomPass.strength = 0;
-        speedLevel = 1;
-        score_num = 0;
+    if (GS.screens['menu']) {
+        GS.menuRenderer.render(GS.menuScene, GS.menuCamera)
+        GS.reset();
     }
     window.requestAnimationFrame(onAnimationFrameHandler);
     // if on game screen and not paused
-    if (!screens["menu"] && !screens["ending"] && !screens["pause"]) {
-        frameCounter += 1;
-        let chunkManager = scene.getObjectByName('chunkManager');
-        chunkManager.update(timeStamp, speedLevel);
+    if (!GS.screens["menu"] && !GS.screens["ending"] && !GS.screens["pause"]) {
+        GS.frameCounter += 1;
+        let chunkManager = GS.scene.getObjectByName('chunkManager');
+        chunkManager.update(timeStamp, GS.speedLevel);
 
+        GS.scene.update && GS.scene.update(timeStamp);
         render(chunkManager);
-        scene.update && scene.update(timeStamp);
 
-        handlers.handleCollisions(document, scene, character, screens, sounds, score, camera); // needs to happen immediately after update for accuracy
-        handlers.handleCharacterControls(scene, keypress, character, camera, speedLevel);
-        handlers.updateAudioSpeed(document, sounds, scene);
-        handlers.handleSpace(document, bloomPass, sounds, scene, spaceScore, score_num);
+        // TODO: fix score handling
+        handlers.handleCollisions(GS); // needs to happen immediately after update for accuracy
+        handlers.handleCharacterControls(GS);
+        handlers.updateAudioSpeed(GS);
+        handlers.handleSpace(GS);
 
-        if (frameCounter - lastSpeedUpdate > 450 && speedLevel < 3) {
-            speedLevel *= 1.1;
-            lastSpeedUpdate = frameCounter;
+        if (GS.frameCounter - GS.lastSpeedUpdate > 450 && GS.speedLevel < 3) {
+            GS.speedLevel *= 1.1;
+            GS.lastSpeedUpdate = GS.frameCounter;
         }
 
-        if (frameCounter - lastTerrainUpdate > 500 && !chunkManager.state.toSpace) {
+        if (GS.frameCounter - GS.lastTerrainUpdate > 500 && !chunkManager.state.toSpace) {
             chunkManager.updateBiome(biomes[Math.floor(Math.random() * biomes.length)]);
-            lastTerrainUpdate = frameCounter;
+            GS.lastTerrainUpdate = GS.frameCounter;
         }
 
-        if (!screens["menu"] && !screens["ending"] && !screens["pause"]) {
-            if (chunkManager.state.biome == "warp") score_num = Number.POSITIVE_INFINITY;
-            else score_num += 0.01;
-            score = score_num.toFixed(2);
-            handlers.updateScore(document, score)
+        if (!GS.screens["menu"] && !GS.screens["ending"] && !GS.screens["pause"]) {
+            if (GS.score_num < GS.score_max) GS.score_num += 0.01;
+            else GS.score_num = GS.score_max;
+            GS.score = GS.score_num.toFixed(2);
+            handlers.updateScore(document, GS.score)
         }
 
 
@@ -181,30 +201,29 @@ const onAnimationFrameHandler = (timeStamp) => {
 window.requestAnimationFrame(onAnimationFrameHandler);
 
 function render(chunkManager) {
-    if (chunkManager.state.biome == "warp") composer.render();
-    else renderer.render(scene, camera);
-
+    if (chunkManager.state.biome == "warp") GS.composer.render();
+    else GS.renderer.render(GS.scene, GS.camera);
 }
 
 // Resize Handler
 const windowResizeHandler = () => {
     const { innerHeight, innerWidth } = window;
-    renderer.setSize(innerWidth, innerHeight);
-    composer.setSize(innerWidth, innerHeight);
-    camera.aspect = innerWidth / innerHeight;
-    camera.updateProjectionMatrix();
+    GS.renderer.setSize(innerWidth, innerHeight);
+    GS.composer.setSize(innerWidth, innerHeight);
+    GS.camera.aspect = innerWidth / innerHeight;
+    GS.camera.updateProjectionMatrix();
 
-    menuRenderer.setSize(innerWidth, innerHeight);
-    menuCamera.aspect = innerWidth / innerHeight;
-    menuCamera.updateProjectionMatrix();
+    GS.menuRenderer.setSize(innerWidth, innerHeight);
+    GS.menuCamera.aspect = innerWidth / innerHeight;
+    GS.menuCamera.updateProjectionMatrix();
 };
 windowResizeHandler();
 window.addEventListener('resize', windowResizeHandler, false);
 
 /**************************EVENT LISTENERS*****************************/
-window.addEventListener('keydown', event => handlers.handleKeyDown(event, keypress), false);
-window.addEventListener('keyup', event => handlers.handleKeyUp(event, keypress), false);
-window.addEventListener('keydown', event => handlers.handleScreens(event, screens, document, canvas, character, scene, menuCanvas, sounds, score));
+window.addEventListener('keydown', event => handlers.handleKeyDown(event, GS.keypress), false);
+window.addEventListener('keyup', event => handlers.handleKeyUp(event, GS.keypress), false);
+window.addEventListener('keydown', event => handlers.handleScreens(GS, event));
 
 /****************************INIT HTML*********************************/
 pages.init_fonts(document);

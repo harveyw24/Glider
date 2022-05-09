@@ -47,7 +47,7 @@ export function generateBiomes() {
         freq: 1,
         maxObstacleNum: 8,
         obstacle: "sheep",
-        water: false,
+        water: true,
     }
     const arctic_biome = {
         biome: "arctic",
@@ -63,7 +63,7 @@ export function generateBiomes() {
         obstacleHeightMax: 3,
         obstacleHeightMin: 0,
         maxRewardNum: 15,
-        water: false,
+        water: true,
     }
     const stone_biome = {
         biome: "stone",
@@ -81,9 +81,10 @@ export function generateBiomes() {
         rewardHeightMax: 50,
         maxObstacleNum: 10,
         obstacle: "tree",
-        water: false,
+        water: true,
     }
     return [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
+    // return [desert_biome];
 }
 
 export const space_biome = {
@@ -96,6 +97,7 @@ export const space_biome = {
     toSpace: true,
     maxObstacleNum: 0,
     rewardHeightMax: 50,
+    water: true,
 }
 export const warp_biome = {
     biome: "warp",
@@ -111,6 +113,7 @@ export const warp_biome = {
     maxRewardNum: 0,
     groundY: -1000000000000000,
     waterHeight: -1000000000000000,
+    water: false,
 }
 export const prewarp_biome = {
     ...warp_biome,

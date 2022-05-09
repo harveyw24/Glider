@@ -1,13 +1,9 @@
 import { Group, VertexColors, PlaneGeometry, MeshLambertMaterial, Mesh } from 'three';
 import * as THREE from 'three';
 import SimplexNoise from 'simplex-noise';
-import { Water } from 'three/examples/jsm/objects/Water.js';
-import { Obstacle } from '../Obstacle';
-import { Turbine } from '../Turbine';
-import { Cloud } from '../Cloud';
 
 
-const obstaclesLength = 15; // maximum number of obstacles supported per chunk
+const obstaclesLength = 25; // maximum number of obstacles supported per chunk
 const rewardsLength = 15; // maximum number of obstacles supported per chunk
 
 function random(min, max) { return Math.random() * (max - min) + min; }
@@ -54,32 +50,24 @@ class Chunk extends Group {
         this.activeObstacleNum = 0;
         this.currentObstacleIndex = 0;
         this.nextObstacleIndex = 0;
-        this.obstacles = Array.from(Array(obstaclesLength));
-        const obstacle0 = new Obstacle(true);
+        this.obstacles = Array(obstaclesLength);
         for (let i = 0; i < obstaclesLength; i++) {
-            const obstacle = i == 0 ? obstacle0 : obstacle0.clone();
+            const obstacle = this.CMState.obstacleOrigin.clone();
             obstacle.setObstacle(this.CMState.obstacle);
-            obstacle.visible = false;
             obstacle.matrixAutoUpdate = false;
-            this.add(obstacle);
             this.obstacles[i] = obstacle;
         }
 
         this.currentRewardIndex = 0;
         this.nextRewardIndex = 0;
-        this.rewards = Array.from(Array(rewardsLength));
-        const reward0 = new Turbine();
+        this.rewards = Array(rewardsLength);
         for (let i = 0; i < rewardsLength; i++) {
-            const reward = i == 0 ? reward0 : reward0.clone();
-            reward.visible = false;
-            this.add(reward);
-            this.rewards[i] = reward;
+            this.rewards[i] = this.CMState.rewardOrigin.clone();
         }
 
-        this.clouds = Array.from(Array(this.CMState.maxCloudNum), () => new Cloud());
-        for (const cloud of this.clouds) {
-            cloud.visible = false;
-            this.add(cloud);
+        this.clouds = Array(this.CMState.maxCloudNum);
+        for (let i = 0; i < this.CMState.maxCloudNum; i++) {
+            this.clouds[i] = this.CMState.cloudPool[Math.floor(this.CMState.cloudPool.length * Math.random())].clone();
         }
 
         this.terrain = new Mesh(this.geometry, new MeshLambertMaterial({
@@ -208,7 +196,7 @@ class Chunk extends Group {
                     obstacleIndex++;
                 }
                 if (cloudIndex < this.clouds.length && Math.random() < 25 / this.geometry.vertices.length) {
-                    this.clouds[cloudIndex].visible = true;
+                    this.add(this.clouds[cloudIndex]);
                     this.clouds[cloudIndex].position.set(v.x, random(this.CMState.cloudHeightMin, this.CMState.cloudHeightMax) + this.CMState.groundY, -v.y);
                     cloudIndex++;
                 }
@@ -218,7 +206,7 @@ class Chunk extends Group {
         // want a hit rate that is close to 1.0 but not always 1.0
         this.activeObstacleNum = obstacleIndex;
         this.activeCloudNum = cloudIndex;
-        for (let i = cloudIndex; i < this.clouds.length; i++) this.clouds[i].visible = false;
+        for (let i = cloudIndex; i < this.clouds.length; i++) this.remove(this.clouds[i]);
 
 
         for (let rewardIndex = 0; rewardIndex < this.CMState.maxRewardNum; rewardIndex++) {
@@ -242,6 +230,8 @@ class Chunk extends Group {
             }
         }
 
+        console.log(this.activeCloudNum);
+
         this.hideRewards();
         this.hideObstacles();
     }
@@ -249,12 +239,12 @@ class Chunk extends Group {
 
 
     showRewards() {
-        for (let i = 0; i < this.CMState.maxRewardNum; i++) this.rewards[i].visible = true;
+        for (let i = 0; i < this.CMState.maxRewardNum; i++) this.add(this.rewards[i]);
         this.currentRewardIndex = 0;
         this.nextRewardIndex = this.CMState.maxRewardNum;
     }
     hideRewards() {
-        for (const reward of this.rewards) reward.visible = false;
+        for (const reward of this.rewards) this.remove(reward);
         this.currentRewardIndex = 0;
         this.nextRewardIndex = 0;
     }
@@ -273,14 +263,14 @@ class Chunk extends Group {
     hideCurrentReward() {
         const currentReward = this.getCurrentReward();
         if (currentReward !== null) {
-            currentReward.visible = false;
+            this.remove(currentReward);
             this.currentRewardIndex++;
         }
     }
     showNextReward() {
         const nextReward = this.getNextReward();
         if (nextReward !== null) {
-            nextReward.visible = true;
+            this.add(nextReward);
             this.nextRewardIndex++;
         }
     }
@@ -288,12 +278,12 @@ class Chunk extends Group {
 
 
     showObstacles() {
-        for (let i = 0; i < this.activeObstacleNum; i++) this.obstacles[i].visible = true;
+        for (let i = 0; i < this.activeObstacleNum; i++) this.add(this.obstacles[i]);
         this.currentObstacleIndex = 0;
         this.nextObstacleIndex = this.activeObstacleNum;
     }
     hideObstacles() {
-        for (const obstacle of this.obstacles) obstacle.visible = false;
+        for (const obstacle of this.obstacles) this.remove(obstacle);
         this.currentObstacleIndex = 0;
         this.nextObstacleIndex = 0;
     }
@@ -312,14 +302,14 @@ class Chunk extends Group {
     hideCurrentObstacle() {
         const currentObstacle = this.getCurrentObstacle();
         if (currentObstacle !== null) {
-            currentObstacle.visible = false;
+            this.remove(currentObstacle);
             this.currentObstacleIndex++;
         }
     }
     showNextObstacle() {
         const nextObstacle = this.getNextObstacle();
         if (nextObstacle !== null) {
-            nextObstacle.visible = true;
+            this.add(nextObstacle);
             this.nextObstacleIndex++;
         }
     }

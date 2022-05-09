@@ -28,15 +28,15 @@ export function handleKeyUp(event, keypress) {
 }
 
 // move the terrain and airplane in response to user controls input
-export function handleCharacterControls(scene, keypress, character, camera, speedLevel) {
-    let plane = scene.getObjectByName(character);
-    let chunkManager = scene.getObjectByName('chunkManager');
+export function handleCharacterControls(GS) {
+    let plane = GS.scene.getObjectByName(GS.character);
+    let chunkManager = GS.scene.getObjectByName('chunkManager');
     const maxRotation = 0.5;
     const maxPitch = 0.2;
     const rotationRate = 0.02;
 
-    if (keypress['up'] && plane.position.y < 20) {
-        const delta = 0.2 * speedLevel;
+    if (GS.keypress['up'] && plane.position.y < 20) {
+        const delta = 0.2 * GS.speedLevel;
         chunkManager.position.y -= delta;
         if (plane.rotation.x < maxPitch) {
             if (plane.rotation.x > maxPitch - 0.02) {
@@ -46,8 +46,8 @@ export function handleCharacterControls(scene, keypress, character, camera, spee
             }
         }
     }
-    if (keypress['down']) {
-        const delta = 0.4 * speedLevel;
+    if (GS.keypress['down']) {
+        const delta = 0.4 * GS.speedLevel;
         chunkManager.position.y += delta;
 
         if (plane.rotation.x > -maxPitch) {
@@ -58,9 +58,9 @@ export function handleCharacterControls(scene, keypress, character, camera, spee
             }
         }
     }
-    if (keypress['right']) {
+    if (GS.keypress['right']) {
         plane.direction = -1
-        const delta = 2 * Math.sqrt(speedLevel) * (Math.min(0.5, Math.abs(plane.rotation.z)) + 0.5);
+        const delta = 2 * Math.sqrt(GS.speedLevel) * (Math.min(0.5, Math.abs(plane.rotation.z)) + 0.5);
         chunkManager.position.x -= delta;
         // plane.state.rotation = "right";
         if (plane.rotation.z > -maxRotation) {
@@ -72,9 +72,9 @@ export function handleCharacterControls(scene, keypress, character, camera, spee
         }
         // need to somehow rotate bounding box
     }
-    if (keypress['left']) {
+    if (GS.keypress['left']) {
         plane.direction = 1
-        const delta = 2 * Math.sqrt(speedLevel) * (Math.min(0.5, Math.abs(plane.rotation.z)) + 0.5);
+        const delta = 2 * Math.sqrt(GS.speedLevel) * (Math.min(0.5, Math.abs(plane.rotation.z)) + 0.5);
         chunkManager.position.x += delta;
         // plane.state.rotation = "left";
         if (plane.rotation.z < maxRotation) {
@@ -87,69 +87,69 @@ export function handleCharacterControls(scene, keypress, character, camera, spee
     }
 
     if (!plane.state.barrel) {
-        camera.rotation.z = plane.rotation.z / 3;
+        GS.camera.rotation.z = plane.rotation.z / 3;
     } else {
-        camera.rotation.z = plane.state.barrel / 3;
+        GS.camera.rotation.z = plane.state.barrel / 3;
     }
-    camera.position.y = 2 + plane.rotation.x * 2;
+    GS.camera.position.y = 2 + plane.rotation.x * 2;
 }
 
 // handle switching between screen states such as menu, game, game over, mute, and pause states
-export function handleScreens(event, screens, document, canvas, character, scene, menuCanvas, sounds, score) {
-    if (event.key == 'm' && !screens['ending'] && !screens['menu']) {
+export function handleScreens(GS, event) {
+    if (event.key == 'm') {
         mute = !mute;
-        if (!mute && !screens['ending'] && !screens['menu']) {
+        if (!mute && !GS.screens['ending'] && !GS.screens['menu']) {
             document.getElementById('audio').play();
-            sounds['whirring'].play();
+            GS.sounds.whirring.play();
         }
         else if (mute) {
             document.getElementById('audio').pause();
-            sounds['whirring'].stop();
+            GS.sounds.whirring.stop();
         }
     }
     // quit: game -> ending
-    if (event.key == 'q' && !screens['ending'] && !screens['menu']) {
-        screens['menu'] = false;
-        screens['pause'] = false;
-        screens['ending'] = true;
-        pages.quit(document, score);
-        sounds['whirring'].stop()
+    if (event.key == 'q' && !GS.screens['ending'] && !GS.screens['menu']) {
+        GS.screens['menu'] = false;
+        GS.screens['pause'] = false;
+        GS.screens['ending'] = true;
+        pages.quit(document, GS.score);
+        GS.sounds.whirring.stop()
         document.getElementById('audio').pause();
 
     }
     // restart: ending -> menu
-    else if (event.key == " " && screens["ending"]) {
-        let plane = scene.getObjectByName(character);
+    else if (event.key == " " && GS.screens["ending"]) {
+        let plane = GS.scene.getObjectByName(GS.character);
         plane.null()
-        screens["ending"] = false;
-        screens['pause'] = false;
-        screens['menu'] = true;
-        pages.init_page(document, menuCanvas)
+        GS.screens["ending"] = false;
+        GS.screens['pause'] = false;
+        GS.screens['menu'] = true;
+        pages.init_page(document, GS.menuCanvas)
     }
     // start: menu -> game
-    else if (event.key == " " && screens["menu"]) {
-        screens["menu"] = false;
-        pages.start(document, canvas);
+    else if (event.key == " " && GS.screens["menu"]) {
+        GS.screens["menu"] = false;
+        pages.start(document, GS.canvas);
         buffer = false;
         clearTimeout(timer);
 
         if (!mute) {
-            sounds['whirring'].play()
+            GS.sounds.whirring.play()
             document.getElementById('audio').play()
         }
     }
     // unpause: pause -> game
-    else if (event.key == " " && screens["pause"]) {
-        screens["pause"] = false;
-        sounds['whirring'].setVolume(0.4);
+    else if (event.key == " " && GS.screens["pause"]) {
+        GS.screens["pause"] = false;
+        GS.sounds.whirring.setVolume(0.4);
         document.getElementById('audio').volume = 1;
         let pause = document.getElementById("pause");
         pause.classList.add('invisible');
     }
     // pause: game -> pause
-    else if (event.key == " " && !screens["ending"]) {
-        screens["pause"] = true;
-        sounds['whirring'].setVolume(0.1);
+    else if (event.key == " " && !GS.screens["ending"]) {
+        GS.screens["pause"] = true;
+        GS.sounds.whirring.setVolume(0.1);
         document.getElementById('audio').volume = 0.5;
 
         let pause = document.getElementById("pause");
@@ -158,10 +158,10 @@ export function handleScreens(event, screens, document, canvas, character, scene
 }
 
 // handle collisions with terrain, obstacles, and objectives
-export function handleCollisions(document, scene, character, screens, sounds, score, camera) {
-    let chunkManager = scene.getObjectByName('chunkManager');
+export function handleCollisions(GS) {
+    let chunkManager = GS.scene.getObjectByName('chunkManager');
 
-    let obj = scene.getObjectByName(character);
+    let obj = GS.scene.getObjectByName(GS.character);
     let chunkManagerPos = chunkManager.position;
     let chunkWidth = chunkManager.state.chunkWidth;
     let chunkLine = chunkManager.getCurrentChunkLine(); // TODO: change to current chunk
@@ -207,22 +207,19 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
 
 
     if (interp.y > obj.position.y) {
-        
         let fillScreen = document.getElementById('fillScreen');
         fillScreen.classList.add('death');
         setTimeout(function() {
             fillScreen.classList.remove('death');
         }, 3000);
-        screens['ending'] = true;
-        
-        pages.quit(document, score);
 
-        if (!mute) 
-        {
-            sounds['explosion'].play();
-            sounds['whirring'].stop();
+        if (!mute) {
+            GS.sounds.explosion.play();
+            GS.sounds.whirring.stop();
             document.getElementById('audio').pause();
         }
+        GS.screens['ending'] = true;
+        pages.quit(document, GS.score);
     }
 
 
@@ -233,11 +230,11 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
 
         if (obj.position.distanceTo(rewardWorldPos) < 15) {
             obj.state.reward = true
-            if (!mute) sounds['powerup'].play();
-            sounds['whirring'].setVolume(1)
+            if (!mute) GS.sounds.powerup.play();
+            GS.sounds.whirring.setVolume(1)
 
             setTimeout(function() {
-                sounds['whirring'].setVolume(0.4)
+                GS.sounds.whirring.setVolume(0.4)
             }, 2000);
 
             if (chunkManager.state.climbing == 0) {
@@ -250,7 +247,7 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
     if (!buffer) {
         let clouds = [];
 
-        scene.traverseVisible(function(child) {
+        GS.scene.traverseVisible(function(child) {
             if (child.name === "cloud") {
                 let vector_pos = new THREE.Vector3();
                 child.getWorldPosition(vector_pos);
@@ -284,7 +281,7 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
             setTimeout(function() {
                 fillScreen.classList.remove('red');
             }, 500);
-            if (!mute) sounds['damage'].play();
+            if (!mute) GS.sounds.damage.play();
 
             timer = setTimeout(function() { buffer = false; }, 2500);
         }
@@ -314,76 +311,77 @@ export function handleCollisions(document, scene, character, screens, sounds, sc
     }
 }
 
-export function handleSpace(document, bloomPass, sounds, scene, spaceScore, score_num) {
-    const chunkManager = scene.getObjectByName("chunkManager");
-    if (score_num > spaceScore && !chunkManager.state.toSpace) {
+export function handleSpace(GS) {
+    const chunkManager = GS.scene.getObjectByName("chunkManager");
+    if (GS.score_num > GS.spaceScore && !chunkManager.state.toSpace) {
         chunkManager.updateBiome(utils.space_biome);
-        scene.add(new Stars(scene));
+        GS.scene.add(new Stars(GS.scene));
         pages.space(document)
     }
     if (chunkManager.state.toSpace) {
 
         const message = document.getElementById("message");
         const thresholdTexts = [
-            [spaceScore + 50, ""],
-            [spaceScore + 36, "Ending song: \"interstellar railway\" by Louie Zong"],
-            [spaceScore + 35, ""],
-            [spaceScore + 32, "Congratulations."],
-            [spaceScore + 25, ""],
-            [spaceScore + 19, "Against all odds...You have ascended."],
-            [spaceScore + 16, "...and you survived the treacherous volcanoes and scaled the towering arctic icebergs."],
-            [spaceScore + 13, "...You wove through the peaks of the stone forest, persevered through the deserts..."],
-            [spaceScore + 10, "You conquered the mountains, breezed over the grasslands..."],
+            [GS.spaceScore + 49, ""],
+            [GS.spaceScore + 36, "Ending song: \"interstellar railway\" by Louie Zong"],
+            [GS.spaceScore + 35, ""],
+            [GS.spaceScore + 32, "Congratulations."],
+            [GS.spaceScore + 25, ""],
+            [GS.spaceScore + 19, "Against all odds...You have ascended."],
+            [GS.spaceScore + 16, "...and you survived the treacherous volcanoes and scaled the towering arctic icebergs."],
+            [GS.spaceScore + 13, "...You wove through the peaks of the stone forest, persevered through the deserts..."],
+            [GS.spaceScore + 10, "You conquered the mountains, breezed over the grasslands..."],
         ]
         for (const thresholdText of thresholdTexts) {
             const threshold = thresholdText[0];
             const text = thresholdText[1];
-            if (score_num > threshold) {
+            if (GS.score_num > threshold) {
                 if (message.innerHTML != text) message.innerHTML = text;
                 break;
             }
         }
-        if (score_num > spaceScore + 39) {
-            const stars = scene.getObjectByName("stars");
+        if (GS.score_num > GS.spaceScore + 39) {
+            const stars = GS.scene.getObjectByName("stars");
             if (chunkManager.state.biome != "warp") {
-                if (Math.abs(scene.state.azimuth % 360 - 180) < 1) {
+                if (Math.abs(GS.scene.state.azimuth % 360 - 180) < 1) {
                     chunkManager.updateBiome(utils.warp_biome);
                     stars.state.becomingVisible = true;
                 }
             } else {
+                GS.score_num = GS.spaceScore + 50;
                 stars.update();
-                if (bloomPass.strength < 3) bloomPass.strength += .01
-                else bloomPass.strength = 3
+                if (GS.bloomPass.strength < 3) GS.bloomPass.strength += .01
+                else GS.bloomPass.strength = 3
 
-                if (Math.abs(scene.state.azimuth % 360) < 1) {
-                    scene.state.azimuth = 0;
-                    scene.state.elevation = 0;
+                if (Math.abs(GS.scene.state.azimuth % 360) < 1) {
+                    GS.scene.state.azimuth = 0;
+                    GS.scene.state.elevation = 0;
                 }
             }
         }
-        if (score_num > spaceScore + 30) {
+        if (GS.score_num > GS.spaceScore + 30) {
             if (chunkManager.state.biome != "prewarp" && chunkManager.state.biome != "warp") {
                 chunkManager.updateBiome(utils.prewarp_biome);
             }
         }
-        if (score_num > spaceScore + 10) {
+        if (GS.score_num > GS.spaceScore + 10) {
             const victorySong = document.getElementById('victory-song');
             if (victorySong.paused) victorySong.play();
         }
-        if (score_num > spaceScore) {
+        if (GS.score_num > GS.spaceScore) {
             const audio = document.getElementById('audio');
-            if (audio.volume > 0 || sounds["powerup"] > 0) {
+            if (audio.volume > 0 || GS.sounds.powerup > 0) {
                 const delta = 0.001;
                 const fadeAudio = setInterval(function() {
                     audio.volume = Math.max(0.0, audio.volume - delta);
-                    sounds["powerup"].setVolume(Math.max(0.0, sounds["powerup"].getVolume() - delta))
-                    if (audio.volume == 0.0 && sounds["powerup"].getVolume() == 0.0) clearInterval(fadeAudio);
+                    GS.sounds.powerup.setVolume(Math.max(0.0, GS.sounds.powerup.getVolume() - delta))
+                    if (audio.volume == 0.0 && GS.sounds.powerup.getVolume() == 0.0) clearInterval(fadeAudio);
                 }, 200);
             }
             else {
                 audio.pause();
-                sounds["powerup"].pause();
-                sounds['whirring'].setVolume(0.4);
+                GS.sounds.powerup.pause();
+                GS.sounds.whirring.setVolume(0.4);
             }
         }
     }
@@ -399,8 +397,8 @@ export function updateScore(document, score) {
 }
 
 // increase audio speed the closer the player is to the ground
-export function updateAudioSpeed(document, sounds, scene) {
-    let chunkManager = scene.getObjectByName('chunkManager');
+export function updateAudioSpeed(GS) {
+    let chunkManager = GS.scene.getObjectByName('chunkManager');
     let target = new THREE.Vector3();
     chunkManager.getWorldPosition(target);
     let height = target.y;

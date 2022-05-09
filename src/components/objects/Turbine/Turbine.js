@@ -7,21 +7,12 @@ const scale = 15;
 export const radius = .75 * scale;
 
 class Turbine extends Group {
-    constructor(parent) {
+    constructor(init = false) {
         // Call parent Group() constructor
         super();
+        this.name = 'turbine';
 
         const loader = new GLTFLoader();
-
-        this.name = 'turbine';
-        // this.hitbox = null;
-        this.state = {
-            parent: parent,
-        };
-
-        // Add update list
-        // parent.state.parent.state.parent.addToUpdateList(this);
-
         loader.load(MODEL, (gltf) => {
             gltf.scene.position.x = 0;
             gltf.scene.position.y = 0;
@@ -32,11 +23,12 @@ class Turbine extends Group {
             gltf.scene.position.add(new THREE.Vector3(.83, .65, -2).multiplyScalar(scale));
             gltf.scene.scale.multiplyScalar(scale);
             this.add(gltf.scene);
-
-            this.box = new THREE.Box3().setFromObject(gltf.scene);
-
-            // this.add(gltf.scene);
         });
+
+        if (init) this.newHitbox();
+    }
+
+    newHitbox() {
 
         // hitbox visualization
         const geo = new THREE.SphereGeometry(radius, 6, 6);
@@ -51,8 +43,6 @@ class Turbine extends Group {
 
     update(timeStamp) {
         this.rotation.y += 0.01
-
-
     }
 }
 

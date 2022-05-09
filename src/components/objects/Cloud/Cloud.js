@@ -19,17 +19,20 @@ function getRandomInt(min, max) {
 }
 
 class Cloud extends Group {
-    constructor() {
+    constructor(init = false) {
         // Call parent Group() constructor
         super();
         this.name = 'cloud';
+        this.speed = Math.random() * 0.6
+        if (init) this.newCloud();
+    }
 
+    newCloud() {
         const material = new MeshLambertMaterial({
             color: "white",
             flatShading: true, //required for flat shading
         });
         const geo = new Geometry()
-        this.speed = Math.random() * 0.6
 
         const decay = .7;
         for (const sign of [-1, 1]) {
@@ -58,8 +61,8 @@ class Cloud extends Group {
 
         const cloud = new Mesh(geo, material);
         this.add(cloud);
-        this.mesh = cloud;
     }
+
 
     update(timeStamp) {
         this.position.x += this.speed;
