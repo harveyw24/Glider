@@ -1,7 +1,5 @@
 import { Group } from 'three';
 import { Chunk } from '../Chunk';
-import { Cloud } from '../Cloud';
-import { Turbine } from '../Turbine';
 
 function random(min, max) {
     return Math.random() * (max - min) + min;
@@ -50,8 +48,8 @@ class ChunkLine extends Group {
         this.chunks.push(this.chunks.shift());
     }
 
-    updateNoise() {
-        for (const chunk of this.chunks) chunk.updateNoise(); // CMState update should NOT propagate to chunks
+    updateNoise(CMState) {
+        for (const chunk of this.chunks) chunk.updateNoise(CMState); // CMState update should NOT propagate to chunks
     }
 
     updateTerrainGeo() {

@@ -20,6 +20,7 @@ class Airplane extends Group {
             reward: null,
             rewardTime: null,
             barrel: null,
+            barrelt: null,
             barrelSign: null,
             speed: 1000,
             direction: null
@@ -30,6 +31,7 @@ class Airplane extends Group {
         this.state.hit = true;
         this.state.reward = false;
         this.state.barrel = 0;
+        this.state.barrelt = 0;
         this.addPlane()
 
         // Add update list
@@ -101,13 +103,15 @@ class Airplane extends Group {
             if (Math.abs(this.rotation.z) > 0.07 && !this.state.barrel) {
                 this.state.barrel = this.rotation.z;
                 this.state.barrelSign = this.direction;
+                this.state.barrelt = 0;
             }
         }
 
         if (this.state.barrel) {
             if (Math.sign(this.rotation.z) == this.state.barrelSign) {
-                this.rotation.z += 0.3 * this.state.barrelSign;
-                if (Math.abs(this.rotation.z) > Math.abs(this.state.barrel) + 2 * Math.PI - 0.2) {
+                this.rotation.z = this.state.barrel + this.state.barrelSign * (1 - Math.cos(this.state.barrelt)) * Math.PI;
+                this.state.barrelt += .05;
+                if (Math.abs(this.rotation.z) > Math.abs(this.state.barrel) + 2 * Math.PI - .05) {
                     this.rotation.z = this.state.barrel;
                     this.state.barrel = 0;
                 }

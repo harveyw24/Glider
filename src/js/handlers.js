@@ -12,19 +12,19 @@ let mute = false;
 let timer;
 
 // handle user controls input
-export function handleKeyDown(event, keypress) {
-    if (event.key == "ArrowUp") keypress['up'] = true;
-    if (event.key == "ArrowDown") keypress['down'] = true;
-    if (event.key == "ArrowLeft") keypress['left'] = true;
-    if (event.key == "ArrowRight") keypress['right'] = true;
+export function handleKeyDown(event, GS) {
+    if (event.key == "ArrowUp") GS.keypress['up'] = true;
+    if (event.key == "ArrowDown") GS.keypress['down'] = true;
+    if (event.key == "ArrowLeft") GS.keypress['left'] = true;
+    if (event.key == "ArrowRight") GS.keypress['right'] = true;
 }
 
 // terminate the action caused by user controls input
-export function handleKeyUp(event, keypress) {
-    if (event.key == "ArrowUp") keypress['up'] = false;
-    if (event.key == "ArrowDown") keypress['down'] = false;
-    if (event.key == "ArrowLeft") keypress['left'] = false;
-    if (event.key == "ArrowRight") keypress['right'] = false;
+export function handleKeyUp(event, GS) {
+    if (event.key == "ArrowUp") GS.keypress['up'] = false;
+    if (event.key == "ArrowDown") GS.keypress['down'] = false;
+    if (event.key == "ArrowLeft") GS.keypress['left'] = false;
+    if (event.key == "ArrowRight") GS.keypress['right'] = false;
 }
 
 // move the terrain and airplane in response to user controls input
@@ -112,7 +112,7 @@ export function handleScreens(GS, event) {
         GS.screens['menu'] = false;
         GS.screens['pause'] = false;
         GS.screens['ending'] = true;
-        pages.quit(document, GS.score);
+        pages.quit(document, GS);
         GS.sounds.whirring.stop()
         document.getElementById('audio').pause();
 
@@ -219,7 +219,7 @@ export function handleCollisions(GS) {
             document.getElementById('audio').pause();
         }
         GS.screens['ending'] = true;
-        pages.quit(document, GS.score);
+        pages.quit(document, GS);
     }
 
 
@@ -313,7 +313,7 @@ export function handleCollisions(GS) {
 
 export function handleSpace(GS) {
     const chunkManager = GS.scene.getObjectByName("chunkManager");
-    if (GS.score_num > GS.spaceScore && !chunkManager.state.toSpace) {
+    if (GS.score > GS.spaceScore && !chunkManager.state.toSpace) {
         chunkManager.updateBiome(utils.space_biome);
         GS.scene.add(new Stars(GS.scene));
         pages.space(document)
@@ -335,12 +335,12 @@ export function handleSpace(GS) {
         for (const thresholdText of thresholdTexts) {
             const threshold = thresholdText[0];
             const text = thresholdText[1];
-            if (GS.score_num > threshold) {
+            if (GS.score > threshold) {
                 if (message.innerHTML != text) message.innerHTML = text;
                 break;
             }
         }
-        if (GS.score_num > GS.spaceScore + 39) {
+        if (GS.score > GS.spaceScore + 39) {
             const stars = GS.scene.getObjectByName("stars");
             if (chunkManager.state.biome != "warp") {
                 if (Math.abs(GS.scene.state.azimuth % 360 - 180) < 1) {
@@ -348,7 +348,7 @@ export function handleSpace(GS) {
                     stars.state.becomingVisible = true;
                 }
             } else {
-                GS.score_num = GS.spaceScore + 50;
+                GS.score = GS.spaceScore + 50;
                 stars.update();
                 if (GS.bloomPass.strength < 3) GS.bloomPass.strength += .01
                 else GS.bloomPass.strength = 3
@@ -359,16 +359,16 @@ export function handleSpace(GS) {
                 }
             }
         }
-        if (GS.score_num > GS.spaceScore + 30) {
+        if (GS.score > GS.spaceScore + 30) {
             if (chunkManager.state.biome != "prewarp" && chunkManager.state.biome != "warp") {
                 chunkManager.updateBiome(utils.prewarp_biome);
             }
         }
-        if (GS.score_num > GS.spaceScore + 10) {
+        if (GS.score > GS.spaceScore + 10) {
             const victorySong = document.getElementById('victory-song');
             if (victorySong.paused) victorySong.play();
         }
-        if (GS.score_num > GS.spaceScore) {
+        if (GS.score > GS.spaceScore) {
             const audio = document.getElementById('audio');
             if (audio.volume > 0 || GS.sounds.powerup > 0) {
                 const delta = 0.001;
@@ -391,9 +391,9 @@ export function handleSpace(GS) {
 
 
 // update score counter on the top left corner of game screen
-export function updateScore(document, score) {
+export function updateScore(document, GS) {
     let scoreCounter = document.getElementById('score');
-    scoreCounter.innerHTML = 'Score: '.concat(score != "Infinity" ? score : "∞");
+    scoreCounter.innerHTML = 'Score: '.concat(GS.score != Number.POSITIVE_INFINITY ? GS.score.toFixed(2) : "∞");
 }
 
 // increase audio speed the closer the player is to the ground

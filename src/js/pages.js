@@ -32,26 +32,26 @@ export function init_page(document, menuCanvas) {
 
 
 // render game over screen
-export function quit(document, score) {
+export function quit(document, GS) {
     let ending = document.createElement('div');
     ending.id = 'ending';
     ending.innerHTML = END;
     document.body.appendChild(ending)
 
     let finalScore = document.getElementById('finalScore');
-    finalScore.innerHTML = 'Score: '.concat(score != "Infinity" ? score : "∞");
+    finalScore.innerHTML = 'Score: '.concat(GS.score != Number.POSITIVE_INFINITY ? GS.score.toFixed(2) : "∞");
 
     let scoreComment = document.getElementById('scoreComment');
-    if (score < 5) scoreComment.innerHTML = 'Were you even trying?'
-    else if (score < 15) scoreComment.innerHTML = 'You could do better.'
-    else if (score < 30) scoreComment.innerHTML = 'Not too shabby.'
-    else if (score < 45) scoreComment.innerHTML = 'Maybe you have potential after all.'
-    else if (score < 60) scoreComment.innerHTML = 'You\'re a true pilot.'
-    else if (score < 75) scoreComment.innerHTML = 'I\'m impressed!'
-    else if (score < 100) scoreComment.innerHTML = 'You have transcended the mortal realm.'
-    else if (score < 150) scoreComment.innerHTML = 'You have surpassed the heavens.'
-    else if (score < 200) scoreComment.innerHTML = 'If you\'ve gotten this far...Why are you spending so much time on this game? Go do your PSET or something.'
-    else if (score < 250) scoreComment.innerHTML = 'How is this score even humanly impossible?'
+    if (GS.score < 5) scoreComment.innerHTML = 'Were you even trying?'
+    else if (GS.score < 15) scoreComment.innerHTML = 'You could do better.'
+    else if (GS.score < 30) scoreComment.innerHTML = 'Not too shabby.'
+    else if (GS.score < 45) scoreComment.innerHTML = 'Maybe you have potential after all.'
+    else if (GS.score < 60) scoreComment.innerHTML = 'You\'re a true pilot.'
+    else if (GS.score < 75) scoreComment.innerHTML = 'I\'m impressed!'
+    else if (GS.score < 100) scoreComment.innerHTML = 'You have transcended the mortal realm.'
+    else if (GS.score < 150) scoreComment.innerHTML = 'You have surpassed the heavens.'
+    else if (GS.score < 200) scoreComment.innerHTML = 'If you\'ve gotten this far...Why are you spending so much time on this game? Go do your PSET or something.'
+    else if (GS.score < 250) scoreComment.innerHTML = 'How is this score even humanly impossible?'
     else scoreComment.innerHTML = 'Either you\'re Harvey, you\'re cheating, or both.'
 
     document.getElementById('score').remove();

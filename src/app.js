@@ -121,7 +121,7 @@ const GS = {
         this.menuScene = menuScene;
         this.scene = scene;
 
-        this.spaceScore = 150;
+        this.spaceScore = 75;
         this.score_max = this.spaceScore + 50;
         this.keypress = {};
         this.screens = { "menu": true, "ending": false, "pause": false };
@@ -135,7 +135,7 @@ const GS = {
         this.lastSpeedUpdate = 0;
         this.lastTerrainUpdate = 0;
         this.speedLevel = 1;
-        this.score_num = 0;
+        this.score = 0;
 
 
         this.scene.reset(this.character);
@@ -188,10 +188,9 @@ const onAnimationFrameHandler = (timeStamp) => {
         }
 
         if (!GS.screens["menu"] && !GS.screens["ending"] && !GS.screens["pause"]) {
-            if (GS.score_num < GS.score_max) GS.score_num += 0.01;
-            else GS.score_num = GS.score_max;
-            GS.score = GS.score_num.toFixed(2);
-            handlers.updateScore(document, GS.score)
+            if (GS.score < GS.score_max) GS.score += 0.01;
+            else GS.score = GS.score_max;
+            handlers.updateScore(document, GS)
         }
 
 
@@ -221,8 +220,8 @@ windowResizeHandler();
 window.addEventListener('resize', windowResizeHandler, false);
 
 /**************************EVENT LISTENERS*****************************/
-window.addEventListener('keydown', event => handlers.handleKeyDown(event, GS.keypress), false);
-window.addEventListener('keyup', event => handlers.handleKeyUp(event, GS.keypress), false);
+window.addEventListener('keydown', event => handlers.handleKeyDown(event, GS), false);
+window.addEventListener('keyup', event => handlers.handleKeyUp(event, GS), false);
 window.addEventListener('keydown', event => handlers.handleScreens(GS, event));
 
 /****************************INIT HTML*********************************/

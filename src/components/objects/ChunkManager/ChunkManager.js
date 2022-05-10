@@ -7,6 +7,7 @@ import { Obstacle } from '../Obstacle';
 import { Water } from 'three/examples/jsm/objects/Water.js';
 
 
+
 // SET THESE TO CHANGE CHUNK DIMENSIONS
 const groundY = -200;
 const chunkPxWidth = 1000;
@@ -43,6 +44,7 @@ const default_biome = {
     toSpace: false,
     water: true,
 };
+
 const modifiableFields = Object.keys(default_biome);
 
 class ChunkManager extends Group {
@@ -120,34 +122,34 @@ class ChunkManager extends Group {
 
         // Related to perlin noise, so call updateNoise which updates everything
         const folder0 = this.state.gui.addFolder('TERRAIN GENERATION FACTORS');
-        folder0.add(this.state, 'octaves', 1, 16).name("Jaggedness").onChange(() => this.updateNoise());
-        // folder0.add(this.state, 'amplitude', 0, 10).onChange(() => this.updateNoise());
-        folder0.add(this.state, 'freq', 1, 10).name("Peaks").onChange(() => this.updateNoise());
-        folder0.add(this.state, 'randSeed', 0, 10).name("World Seed").onChange(() => this.updateNoise());
+        folder0.add(this.state, 'octaves', 1, 16).name("Jaggedness").onChange(() => this.updateNoise(this.state));
+        folder0.add(this.state, 'freq', 1, 10).name("Peaks").onChange(() => this.updateNoise(this.state));
+        folder0.add(this.state, 'randSeed', 0, 10).name("World Seed").onChange(() => this.updateNoise(this.state));
+        folder0.open();
 
         // Related to the look of the terrain and don't need to recalculate height map again
         const folder = this.state.gui.addFolder('TERRAIN LOOK FACTORS');
-        folder.add(this.state, 'exaggeration', 0, 70).onChange(() => this.updateTerrainGeo());
-        folder.add(this.state, 'waterHeight', -100, 100).name("Water Level").onChange(() => this.updateTerrainGeo());
-        folder.add(this.state, 'colorWiggle', -1, 1).name("Color Texturing").onChange(() => this.updateTerrainGeo());
-        folder.add(this.state, 'middleGradient', 0, 1).name("Peak Height").onChange(() => this.updateTerrainGeo());
-        folder.addColor(this.state, 'waterColor').name("Water Color").onChange(() => this.updateTerrainGeo());
-        folder.addColor(this.state, 'bankColor').name("Bank Color").onChange(() => this.updateTerrainGeo());
-        folder.addColor(this.state, 'middleColor').name("Middle Color").onChange(() => this.updateTerrainGeo());
-        folder.addColor(this.state, 'peakColor').name("Peak Color").onChange(() => this.updateTerrainGeo());
-        folder.add(this.state, 'gamma').name("Terrain Gamma").onChange(() => this.updateTerrainGeo());
-        folder.add(this.state, 'smoothPeaks').name("Smooth Peaks").onChange(() => this.updateTerrainGeo());
+        folder.add(this.state, 'exaggeration', 0, 70).onChange(() => this.updateTerrainGeo(this.state));
+        folder.add(this.state, 'waterHeight', -100, 100).name("Water Level").onChange(() => this.updateTerrainGeo(this.state));
+        folder.add(this.state, 'colorWiggle', -1, 1).name("Color Texturing").onChange(() => this.updateTerrainGeo(this.state));
+        folder.add(this.state, 'middleGradient', 0, 1).name("Peak Height").onChange(() => this.updateTerrainGeo(this.state));
+        folder.addColor(this.state, 'waterColor').name("Water Color").onChange(() => this.updateTerrainGeo(this.state));
+        folder.addColor(this.state, 'bankColor').name("Bank Color").onChange(() => this.updateTerrainGeo(this.state));
+        folder.addColor(this.state, 'middleColor').name("Middle Color").onChange(() => this.updateTerrainGeo(this.state));
+        folder.addColor(this.state, 'peakColor').name("Peak Color").onChange(() => this.updateTerrainGeo(this.state));
+        folder.add(this.state, 'gamma').name("Terrain Gamma").onChange(() => this.updateTerrainGeo(this.state));
+        folder.add(this.state, 'smoothPeaks').name("Smooth Peaks").onChange(() => this.updateTerrainGeo(this.state));
 
         folder.open();
 
     }
 
-    updateNoise() {
-        for (const chunkLine of this.chunkLines) chunkLine.updateNoise();
+    updateNoise(CMState) {
+        for (const chunkLine of this.chunkLines) chunkLine.updateNoise(CMState);
     }
 
-    updateTerrainGeo() {
-        for (const chunkLine of this.chunkLines) chunkLine.updateTerrainGeo();
+    updateTerrainGeo(CMState) {
+        for (const chunkLine of this.chunkLines) chunkLine.updateNoise(CMState);
     }
 
     // the key invariant to maintain here is that the plane is within the first chunk (i.e. this.chunkLines[0]);

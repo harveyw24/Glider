@@ -230,7 +230,6 @@ class Chunk extends Group {
             }
         }
 
-        console.log(this.activeCloudNum);
 
         this.hideRewards();
         this.hideObstacles();

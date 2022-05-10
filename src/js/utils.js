@@ -22,7 +22,7 @@ export function generateBiomes() {
         peakColor: new THREE.Color(252, 203, 78),
         exaggeration: 10,
         freq: 4,
-        maxObstacleNum: 10,
+        maxObstacleNum: 25,
         obstacle: "cactus",
         water: false,
     }
@@ -67,24 +67,24 @@ export function generateBiomes() {
     }
     const stone_biome = {
         biome: "stone",
-        waterColor: new THREE.Color(5, 78, 5),
-        bankColor: new THREE.Color(54, 82, 54),
-        middleColor: new THREE.Color(223, 175, 115),
-        peakColor: new THREE.Color(55, 46, 29),
+        waterColor: new THREE.Color(14, 101, 165),
+        bankColor: new THREE.Color(115, 115, 115),
+        middleColor: new THREE.Color(255, 255, 255),
+        peakColor: new THREE.Color(255, 255, 255),
         exaggeration: 30,
         freq: 8,
         octaves: 1,
-        colorWiggle: -1,
+        colorWiggle: 0,
         middleGradient: .8,
         gamma: 5,
         smoothPeaks: true,
         rewardHeightMax: 50,
-        maxObstacleNum: 10,
+        maxObstacleNum: 0,
         obstacle: "tree",
         water: true,
     }
-    return [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
     // return [desert_biome];
+    return [default_biome, desert_biome, volcano_biome, grassland_biome, arctic_biome, stone_biome];
 }
 
 export const space_biome = {
